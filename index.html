@@ -48,7 +48,7 @@ nav{position:sticky;top:0;background:rgba(2,16,31,.93);backdrop-filter:blur(8px)
 .btn-outline:hover{background:var(--gold-soft)}
 
 /* Hero */
-.hero{padding:92px 0 72px;background:radial-gradient(1100px 500px at 75% -10%,rgba(217,164,65,.09),transparent 60%),var(--navy)}
+.hero{padding:92px 0 72px;background:var(--navy)}
 .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
 .hero .eyebrow{margin-bottom:20px}
@@ -60,7 +60,9 @@ nav{position:sticky;top:0;background:rgba(2,16,31,.93);backdrop-filter:blur(8px)
 .trust svg{width:14px;height:14px;flex-shrink:0}
 
 /* Chat demo */
-.chat-card{background:var(--navy-card);border:1px solid rgba(217,164,65,.2);border-radius:var(--radius);padding:22px;max-width:400px;margin-left:auto}
+.chat-wrap{position:relative;max-width:400px;margin-left:auto}
+.chat-wrap::before{content:'';position:absolute;inset:-60px -50px;background:radial-gradient(closest-side,rgba(217,164,65,.14),transparent 70%);pointer-events:none}
+.chat-card{position:relative;background:var(--navy-card);border:1px solid rgba(217,164,65,.2);border-radius:var(--radius);padding:22px}
 @media(max-width:900px){.chat-card{margin:0 auto}}
 .chat-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(237,232,221,.12)}
 .chat-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;font-family:var(--serif)}
@@ -210,6 +212,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.2);padding:3
         <span><svg><use href="#tick"/></svg>You approve every campaign</span>
       </div>
     </div>
+    <div class="chat-wrap">
     <div class="chat-card">
       <div class="chat-head">
         <div class="chat-avatar">A</div>
