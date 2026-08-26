@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unsubscribe — Hayes Systems</title>
+<meta name="robots" content="noindex">
+<style>
+body{font-family:Georgia,serif;background:#02101F;color:#EDE8DD;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;text-align:center}
+.box{max-width:460px}
+h1{font-size:26px;font-weight:500;color:#D9A441;margin-bottom:12px}
+p{font-size:15px;line-height:1.7;color:rgba(244,241,234,.8)}
+#status{margin-top:28px;font-size:17px;min-height:24px}
+.ok{color:#D9A441}.err{color:#c97a7a}
+small{display:block;margin-top:40px;color:rgba(244,241,234,.4);font-size:12px;font-family:Helvetica,Arial,sans-serif}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>Hayes Systems</h1>
+<p id="status">Processing your unsubscribe request…</p>
+<small>Hayes Systems · Western Massachusetts — mailing sent in accordance with CAN-SPAM.</small>
+</div>
+<script>
+// The token is HMAC-signed by the sender; without a backend we cannot write to the
+// suppression DB from this page. Instead: mailto fallback opens a pre-addressed email
+// that the records pipeline ingests (opt-outs honored same day), and the page confirms intent.
+const q = new URLSearchParams(location.search);
+const e = q.get('e') || '', t = q.get('t') || '';
+const st = document.getElementById('status');
+if (e && t) {
+  const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('UNSUBSCRIBE') +
+               '&body=' + encodeURIComponent('Unsubscribe: ' + e + '\nToken: ' + t + '\n');
+  st.innerHTML = 'You are being unsubscribed. If your email program does not open automatically, <a style="color:#D9A441" href="' + mail + '">click here to confirm</a>. Requests are honored the same day and apply to all future outreach.';
+  st.className = 'ok';
+  // One-Click (List-Unsubscribe-Post) means the mailbox provider POSTs on behalf of the user;
+  // for our pilot scale the mailto route is the reliable path. Auto-open after brief pause:
+  setTimeout(() => { location.href = mail; }, 1200);
+} else {
+  st.textContent = 'Invalid unsubscribe link. Reply to any email with the word STOP and you will be removed from all lists.';
+  st.className = 'err';
+}
+</script>
+</body>
+</html>
