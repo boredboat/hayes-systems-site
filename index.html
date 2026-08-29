@@ -168,6 +168,15 @@ details p a{color:var(--gold-ink);text-decoration:underline}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.row{grid-template-columns:1fr}}
 
+/* Founder band */
+.founder{display:flex;align-items:center;gap:30px;max-width:860px;margin:0 auto;flex-wrap:wrap}
+.founder-photo{width:128px;height:128px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;background:var(--navy-card)}
+.founder-photo img{width:100%;height:100%;object-fit:cover;display:none}
+.founder-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:56px;color:var(--gold)}
+.founder h2{font-size:clamp(28px,3.5vw,40px);margin-bottom:10px}
+.founder p{font-size:16px;color:rgba(10,27,46,.72);font-weight:300;line-height:1.75;max-width:620px}
+.founder a{color:var(--gold-ink);font-weight:600}
+
 /* Footer */
 footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:36px 0}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
@@ -206,6 +215,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       <a href="#how">How It Works</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
+      <a href="mailto:Matt@hayessystems.com">Contact</a>
       <a class="btn btn-primary nav-cta" href="#contact">Free Database Audit</a>
     </div>
   </div>
@@ -228,6 +238,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       </div>
     </div>
     <div class="chat-wrap">
+    <div style="text-align:center;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(10,27,46,.55);margin-bottom:10px">Sample conversation</div>
     <div class="chat-card">
       <div class="chat-head">
         <div class="chat-avatar">E</div>
@@ -244,8 +255,8 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
     </div>
   </div>
   <div class="container stats-grid">
-    <div class="stat"><div class="big">50%</div><p>of converted leads say yes after the 5th follow-up. Most agents stop at two.</p></div>
-    <div class="stat"><div class="big">87%</div><p>of agents lose deals to slow or inconsistent follow-up, not to better competition.</p></div>
+    <div class="stat"><div class="big">5+</div><p>follow-up touches are what it typically takes to convert a lead. Most agents stop at two.</p></div>
+    <div class="stat"><div class="big">70%</div><p>of real estate leads are lost to poor follow-up, not to better competition.</p></div>
     <div class="stat"><div class="big">6-24 mo</div><p>the window where "not ready yet" quietly becomes "ready now." Nobody's calling them. We are.</p></div>
   </div>
 </header>
@@ -260,7 +271,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
     <div class="pain-grid">
       <div class="pain"><div class="big">$20-60</div><h3>What each lead cost you.</h3><p>Multiply that by the contacts sitting untouched in your CRM and you'll see the inventory you're ignoring while paying for new leads.</p></div>
       <div class="pain"><div class="big">1-2</div><h3>Follow-up attempts before most agents quit.</h3><p>Consumers need five or more touches before they engage, and the gap between those two numbers is where deals go to die.</p></div>
-      <div class="pain"><div class="big">3 deals</div><h3>What the median agent closes per year.</h3><p>At that volume, every reactivated conversation matters more than every new ad dollar, and it costs a fraction as much.</p></div>
+      <div class="pain"><div class="big">9 sides</div><h3>What the typical agent closed in 2025 (NAR).</h3><p>At that volume, every reactivated conversation matters more than another ad dollar, and it costs a fraction as much.</p></div>
     </div>
   </div>
 </section>
@@ -327,7 +338,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       <h2>Questions agents always ask.</h2>
     </div>
     <div class="faq-list">
-      <details><summary>Is this compliant? I've heard horror stories about cold texting.</summary><p>Every list is scrubbed against the national and state do-not-call registries before outreach. About twenty states require paid telemarketer registration before their residents can be called; we simply do not call leads in those states unless a client's engagement covers the registration, and email and text outreach continue normally either way. AI calls only go to leads who explicitly opt in to them, every message includes opt-out handling, and calling hours follow TCPA windows. Compliance failures are our problem, not yours, because we're the sender of record.</p></details>
+      <details><summary>Is this compliant? I've heard horror stories about cold texting.</summary><p>Every list is scrubbed against the national and state do-not-call registries before outreach. About twenty states require paid telemarketer registration before their residents can be called; we simply do not call leads in those states unless a client's engagement covers the registration, and email and text outreach continue normally either way. AI calls only go to leads who explicitly opt in to them, every message includes opt-out handling, and calling hours follow TCPA windows. Compliance is our responsibility as the sender of record: the scrubbing, the consent records, the opt-out handling, and the calling rules are all handled on our side before anything sends.</p></details>
       <details><summary>What stops the AI from going off script?</summary><p>Evelyn only calls leads who explicitly asked for the call and she opens every conversation by saying she is an AI assistant. Her job is narrow: confirm budget and timeline and get the appointment booked. If a lead asks something she cannot know, like whether a specific house is still for sale or what a home might be worth, she says so plainly and books the call with you to answer it, because specific property questions belong to the licensee. Every call is recorded and transcribed so you can hear exactly what was said. Evelyn runs on <a href="https://www.retellai.com/#try-demo" target="_blank" rel="noopener">Retell AI</a>, and you can hear the platform for yourself with their live demo.</p></details>
       <details><summary>Will this annoy my past clients and burn goodwill?</summary><p>The sequence is written to feel like a concierge check-in, not a blast. Any reply, positive or negative, stops automated outreach immediately and routes to you. Leads who opt out are suppressed everywhere, permanently.</p></details>
       <details><summary>What if my leads are old? Like, years old.</summary><p>That's exactly the target range: six to twenty-four months is the sweet spot, but we've run databases with contacts three and four years old that produced appointments. The audit will tell you honestly what yours is worth before anyone commits.</p></details>
@@ -349,6 +360,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
         <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>No commitment and no credit card</span>
         <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Get a straight answer, not a sales pitch</span>
       </div>
+      <p style="margin-top:26px;font-size:15px;color:rgba(10,27,46,.75)">Questions before you send anything? Email us directly at <a href="mailto:Matt@hayessystems.com" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">Matt@hayessystems.com</a>.</p>
     </div>
     <div class="form-card">
       <form id="audit-form" onsubmit="return submitted(event)">
@@ -371,13 +383,27 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
         </div>
         <div class="field"><label for="f-notes">Anything we should know? (CRM, lead sources, last time you did outreach)</label><textarea id="f-notes"></textarea></div>
         <button class="btn btn-primary" type="submit" style="width:100%;border:none;cursor:pointer">Request my free audit</button>
-        <div class="form-fine">We do not sell your data or use your email for promotions.</div>
+        <div class="form-fine">We do not sell your data or use your email for promotions. <a href="privacy.html" style="color:var(--gold-ink);text-decoration:underline">Privacy policy</a></div>
       </form>
       <div class="form-ok" id="form-ok">
         <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
         <h4>Request received.</h4>
         <p>We'll review your details and get back to you with a straight answer about your database.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="founder-sec" style="padding:56px 0 64px">
+  <div class="container founder">
+    <div class="founder-photo">
+      <img src="matt.jpg" alt="Matt, founder of Hayes Systems" onload="this.style.display='block';document.getElementById('founder-mono').style.display='none'">
+      <div id="founder-mono" class="founder-mono">M</div>
+    </div>
+    <div>
+      <span class="eyebrow">The person behind it</span>
+      <h2>Hi, I'm Matt.</h2>
+      <p>I founded Hayes Systems and I build the systems that run it. The outreach is heavily automated, but every campaign runs on settings I configure and results I review, and when you email <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a> it lands in my inbox. The free audit is exactly what it sounds like: I go through your numbers and tell you plainly whether reactivation is worth your time.</p>
     </div>
   </div>
 </section>
@@ -394,10 +420,10 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       </span>
       </a>
       <div class="footer-links">
-        <a href="#problem">The Problem</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+        <a href="#problem">The Problem</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><a href="privacy.html">Privacy</a><a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>
       </div>
     </div>
-    <p class="footer-legal">&copy; 2026 Hayes Systems · Western Massachusetts. Hayes Systems is a marketing service operating in accordance with applicable telephone and text messaging regulations (TCPA), including DNC-list scrubbing and opt-out processing. Performance figures shown are illustrative ranges based on industry benchmarks and prior campaigns; individual results vary with database age, source, and quality.</p>
+    <p class="footer-legal">&copy; 2026 Hayes Systems · Western Massachusetts. Hayes Systems is a marketing service operating in accordance with applicable telephone and text messaging regulations (TCPA), including DNC-list scrubbing and opt-out processing. Performance figures are illustrative ranges from industry benchmarks and prior campaigns. Follow-up statistics reflect widely cited industry research (InsideSales/XANT; NAR 2026 Member Profile); individual results vary with database age, source, and quality.</p>
   </div>
 </footer>
 
