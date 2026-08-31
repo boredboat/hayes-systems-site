@@ -29,13 +29,20 @@ const q = new URLSearchParams(location.search);
 const e = q.get('e') || '', t = q.get('t') || '';
 const st = document.getElementById('status');
 if (e && t) {
-  const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('UNSUBSCRIBE') +
-               '&body=' + encodeURIComponent('Unsubscribe: ' + e + '\nToken: ' + t + '\n');
-  st.innerHTML = 'You are being unsubscribed. If your email program does not open automatically, <a style="color:#D9A441" href="' + mail + '">click here to confirm</a>. Requests are honored the same day and apply to all future outreach.';
-  st.className = 'ok';
-  // One-Click (List-Unsubscribe-Post) means the mailbox provider POSTs on behalf of the user;
-  // for our pilot scale the mailto route is the reliable path. Auto-open after brief pause:
-  setTimeout(() => { location.href = mail; }, 1200);
+  // Record the opt-out server-side FIRST (signed token -> ops API -> opt_outs);
+  // the mailto below is the fallback if this fetch cannot reach the API.
+  // innerHTML is safe here: the only interpolated value (e) passes through
+  // encodeURIComponent, which escapes < > " ' — no untrusted HTML can enter.
+  fetch('https://ops.hayessystems.com/api/unsubscribe?e=' + encodeURIComponent(e) + '&t=' + encodeURIComponent(t))
+    .then(r => r.json())
+    .then(j => { if (j.ok) { st.innerHTML = 'You are unsubscribed from all Hayes Systems outreach. No further emails or texts will be sent.'; st.className = 'ok'; } })
+    .catch(() => {
+      const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('UNSUBSCRIBE') +
+                   '&body=' + encodeURIComponent('Unsubscribe: ' + e + '\nToken: ' + t + '\n');
+      st.innerHTML = 'You are being unsubscribed. If your email program does not open automatically, <a style="color:#D9A441" href="' + mail + '">click here to confirm</a>. Requests are honored the same day and apply to all future outreach.';
+      st.className = 'ok';
+      setTimeout(() => { location.href = mail; }, 1200);
+    });
 } else {
   st.textContent = 'Invalid unsubscribe link. Reply to any email with the word STOP and you will be removed from all lists.';
   st.className = 'err';
