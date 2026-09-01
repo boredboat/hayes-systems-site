@@ -19,38 +19,44 @@
 @font-face{font-family:'Montserrat';font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
 @font-face{font-family:'Montserrat';font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65}
+body{font-family:var(--sans);background:#fff;color:var(--ink-on-light);line-height:1.65}
 .wrap{max-width:680px;margin:0 auto;padding:64px 24px 88px}
-.eyebrow{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,40px);line-height:1.12;margin:10px 0 8px}
-p.intro{font-size:15.5px;color:rgba(10,27,46,.82);margin-bottom:8px}
-h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:34px 0 12px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,40px);line-height:1.12;margin:12px 0 14px;color:var(--ink-on-light)}
+.rule{height:1.5px;background:var(--gold);margin-bottom:10px}
+p.intro{font-size:15px;color:rgba(10,27,46,.8);margin:14px 0 8px}
+h2{font-family:var(--sans);font-weight:600;font-size:14.5px;letter-spacing:.02em;color:var(--ink-on-light);margin:38px 0 14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:640px){.row{grid-template-columns:1fr}}
-.field{margin-bottom:14px}
-label{display:block;font-size:12.5px;font-weight:600;letter-spacing:.04em;margin-bottom:6px}
-input,select,textarea{width:100%;padding:11px 13px;border:1px solid rgba(10,27,46,.25);border-radius:8px;font-family:var(--sans);font-size:15px;background:#fff;color:var(--ink-on-light)}
-input:focus,select:focus,textarea:focus{outline:2px solid rgba(217,164,65,.5);border-color:var(--gold)}
-textarea{resize:vertical;min-height:70px}
-.attest{background:var(--soft);border:1px solid rgba(217,164,65,.4);border-radius:12px;padding:16px 18px;font-size:13.5px;color:rgba(10,27,46,.8);margin:18px 0}
-.btn{display:inline-block;width:100%;padding:15px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.field{margin-bottom:16px}
+label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:rgba(10,27,46,.85)}
+input,select,textarea{width:100%;padding:10px 2px;border:none;border-bottom:1px solid rgba(10,27,46,.35);border-radius:0;font-family:var(--sans);font-size:15px;background:transparent;color:var(--ink-on-light)}
+input:focus,select:focus,textarea:focus{outline:none;border-bottom:1.5px solid var(--gold)}
+textarea{resize:vertical;min-height:70px;border:1px solid rgba(10,27,46,.35);border-radius:2px;padding:10px}
+textarea:focus{border:1.5px solid var(--gold)}
+select{background:#fff;padding:10px 2px}
+.attest-rule{width:118px;height:1px;background:var(--gold);margin:22px 0 10px}
+.attest{font-size:13.5px;color:rgba(10,27,46,.8);margin:0 0 22px;line-height:1.7}
+.btn{display:inline-block;width:100%;padding:15px;border:none;border-radius:2px;background:var(--gold);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
 .btn:disabled{opacity:.5;cursor:wait}
 .fine{font-size:12.5px;color:rgba(10,27,46,.6);margin-top:14px}
-.hint{font-size:12px;color:rgba(10,27,46,.6);margin-top:4px;line-height:1.5}
-.ok{display:none;background:var(--navy-card);border-radius:16px;padding:28px;color:var(--ivory);margin-top:20px}
-.ok h2{color:var(--ivory);margin-top:0}
+.hint{font-size:12px;color:rgba(10,27,46,.6);margin-top:5px;line-height:1.5}
+.ok{display:none;background:var(--ink-on-light);border-radius:2px;padding:28px;color:var(--ivory);margin-top:20px}
+.ok h2{color:var(--ivory);margin-top:0;font-family:var(--serif);font-size:22px;font-weight:600}
 .ok p{color:rgba(237,232,221,.92)}
 .back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--gold-ink);font-weight:600}
+.foot{margin-top:56px;padding-top:16px;border-top:1px solid rgba(10,27,46,.12);font-size:12px;color:rgba(10,27,46,.6);text-align:center}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <span class="eyebrow">Onboarding</span>
+  <span class="kicker">Hayes Systems</span>
   <h1>Everything we need to start your campaign.</h1>
+  <div class="rule"></div>
   <p class="intro">About five minutes. Everything is required except the market note, and typing your name at the bottom counts as your signature.</p>
 
   <form id="ob-form">
-    <h2>Your business</h2>
+    <h2>1. Your business</h2>
     <div class="row">
       <div class="field"><label for="business_name">Business name</label><input id="business_name" required>
         <div class="hint">The name your leads know you by.</div></div>
@@ -58,7 +64,7 @@ textarea{resize:vertical;min-height:70px}
         <div class="hint">Goes in the subject line of every email we send. Leave blank if it's the same as the business name.</div></div>
     </div>
 
-    <h2>Contact</h2>
+    <h2>2. Contact</h2>
     <div class="row">
       <div class="field"><label for="contact_name">Your name</label><input id="contact_name" required>
         <div class="hint">The person we work with day to day.</div></div>
@@ -70,7 +76,7 @@ textarea{resize:vertical;min-height:70px}
         <div class="hint">Where your leads live. We never need access to it.</div></div>
     </div>
 
-    <h2>Appointments</h2>
+    <h2>3. Appointments</h2>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required>
@@ -98,12 +104,13 @@ textarea{resize:vertical;min-height:70px}
       <div class="field"></div>
     </div>
 
-    <h2>Market note (optional)</h2>
+    <h2>4. Market note (optional)</h2>
     <div class="field"><label for="market_note">Your read on the local market, one sentence</label>
       <textarea id="market_note" maxlength="200"></textarea>
       <div class="hint">In your own words. It's how our assistant opens every call.</div></div>
 
-    <h2>Signature</h2>
+    <h2>5. Signature</h2>
+    <div class="attest-rule"></div>
     <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. My signature applies to the intake form, the data agreement, and the pilot terms.</div>
     <div class="row">
       <div class="field"><label for="signature">Type your full name</label><input id="signature" required></div>
@@ -125,6 +132,7 @@ textarea{resize:vertical;min-height:70px}
     <p style="margin-top:10px">Questions in the meantime, just reply to that email.</p>
   </div>
 
+  <div class="foot">Hayes Systems · Western Massachusetts · hayessystems.com</div>
   <a class="back" href="/">← Back to hayessystems.com</a>
 </div>
 <script>
