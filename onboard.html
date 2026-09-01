@@ -68,23 +68,16 @@ select{background:#fff;padding:10px 2px}
     <div class="row">
       <div class="field"><label for="business_name">Business name</label><input id="business_name" required>
         <div class="hint">The name your leads know you by.</div></div>
-      <div class="field"><label for="team_name">Team name, if any</label><input id="team_name">
-        <div class="hint">Goes in the subject line of every email we send. Leave blank if it's the same as the business name.</div></div>
-    </div>
-
-    <h2>2. Contact</h2>
-    <div class="row">
       <div class="field"><label for="contact_name">Your name</label><input id="contact_name" required>
         <div class="hint">The person we work with day to day.</div></div>
-      <div class="field"><label for="contact_email">Email</label><input id="contact_email" type="email" required></div>
     </div>
     <div class="row">
-      <div class="field"><label for="contact_phone">Phone</label><input id="contact_phone"></div>
+      <div class="field"><label for="contact_email">Email</label><input id="contact_email" type="email" required></div>
       <div class="field"><label for="crm_platform">CRM you use</label><input id="crm_platform" placeholder="Follow Up Boss, kvCORE, none...">
         <div class="hint">So we send the right export instructions for your system.</div></div>
     </div>
 
-    <h2>3. Appointments</h2>
+    <h2>2. Appointments</h2>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required>
@@ -98,13 +91,11 @@ select{background:#fff;padding:10px 2px}
       <div class="field"><label for="calendar_owner">Booking account email</label><input id="calendar_owner" type="email">
         <div class="hint">Only if it's different from your email above.</div></div>
     </div>
-
-    <h2>4. Market note (optional)</h2>
-    <div class="field"><label for="market_note">Your read on the local market, one sentence</label>
-      <textarea id="market_note" maxlength="200"></textarea>
+    <div class="field"><label for="market_note">Market note (optional)</label>
+      <textarea id="market_note" maxlength="200" placeholder="Your read on the local market, one sentence"></textarea>
       <div class="hint">In your own words. It's how our assistant opens every call.</div></div>
 
-    <h2>5. The paperwork you are signing</h2>
+    <h2>3. The paperwork you are signing</h2>
     <p class="hint" style="margin:0 0 14px">This is the complete text of the two agreements below your intake details. The copy emailed to you after you submit carries these same terms.</p>
     <details class="terms"><summary>Data Agreement</summary>
       <div id="da-terms"></div>
@@ -113,9 +104,9 @@ select{background:#fff;padding:10px 2px}
       <div id="pa-terms"></div>
     </details>
 
-    <h2>6. Signature</h2>
+    <h2>4. Signature</h2>
     <div class="attest-rule"></div>
-    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. My signature below applies to my intake details above and to both agreements in section 5.</div>
+    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. My signature below applies to my intake details above and to both agreements in section 3.</div>
     <div class="row">
       <div class="field"><label for="signature">Type your full name</label><input id="signature" required></div>
       <div class="field"><label for="date_signed">Date</label><input id="date_signed" type="date" required></div>
@@ -156,9 +147,9 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
   btn.disabled = true; btn.textContent = 'Sending...';
   var v = function(id){ return document.getElementById(id).value.trim(); };
   var payload = {
-    business_name: v('business_name'), team_name: v('team_name'),
+    business_name: v('business_name'),
     contact_name: v('contact_name'), contact_email: v('contact_email'),
-    contact_phone: v('contact_phone'), crm_platform: v('crm_platform'),
+    crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     market_note: v('market_note'),
     signature: v('signature'), date_signed: v('date_signed'),
