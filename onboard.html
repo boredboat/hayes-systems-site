@@ -36,6 +36,7 @@ textarea{resize:vertical;min-height:70px}
 .btn{display:inline-block;width:100%;padding:15px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .btn:disabled{opacity:.5;cursor:wait}
 .fine{font-size:12.5px;color:rgba(10,27,46,.6);margin-top:14px}
+.hint{font-size:12px;color:rgba(10,27,46,.6);margin-top:4px;line-height:1.5}
 .ok{display:none;background:var(--navy-card);border-radius:16px;padding:28px;color:var(--ivory);margin-top:20px}
 .ok h2{color:var(--ivory);margin-top:0}
 .ok p{color:rgba(237,232,221,.92)}
@@ -45,24 +46,28 @@ textarea{resize:vertical;min-height:70px}
 <body>
 <div class="wrap">
   <span class="eyebrow">Onboarding</span>
-  <h1>The paperwork, without the paperwork.</h1>
-  <p class="intro">This covers the same three documents as the PDF, but it all happens right here in your browser, which most people find easier. Everything is required except the market note, and typing your name in the signature fields counts as signing.</p>
+  <h1>Everything we need to start your campaign.</h1>
+  <p class="intro">About five minutes. Everything is required except the market note, and typing your name at the bottom counts as your signature.</p>
 
   <form id="ob-form">
     <h2>Your business</h2>
     <div class="row">
-      <div class="field"><label for="business_name">Business name</label><input id="business_name" required></div>
-      <div class="field"><label for="team_name">Team name, if any</label><input id="team_name"></div>
+      <div class="field"><label for="business_name">Business name</label><input id="business_name" required>
+        <div class="hint">The name your leads know you by.</div></div>
+      <div class="field"><label for="team_name">Team name, if any</label><input id="team_name">
+        <div class="hint">Goes in the subject line of every email we send. Leave blank if it's the same as the business name.</div></div>
     </div>
 
     <h2>Contact</h2>
     <div class="row">
-      <div class="field"><label for="contact_name">Your name</label><input id="contact_name" required></div>
+      <div class="field"><label for="contact_name">Your name</label><input id="contact_name" required>
+        <div class="hint">The person we work with day to day.</div></div>
       <div class="field"><label for="contact_email">Email</label><input id="contact_email" type="email" required></div>
     </div>
     <div class="row">
       <div class="field"><label for="contact_phone">Phone</label><input id="contact_phone"></div>
-      <div class="field"><label for="crm_platform">CRM you use</label><input id="crm_platform" placeholder="Follow Up Boss, kvCORE, none..."></div>
+      <div class="field"><label for="crm_platform">CRM you use</label><input id="crm_platform" placeholder="Follow Up Boss, kvCORE, none...">
+        <div class="hint">Where your leads live. We never need access to it.</div></div>
     </div>
 
     <h2>Appointments</h2>
@@ -74,8 +79,10 @@ textarea{resize:vertical;min-height:70px}
           <option value="calendly">Calendly</option>
           <option value="gohighlevel">GoHighLevel</option>
           <option value="other">Something else</option>
-        </select></div>
-      <div class="field"><label for="calendar_owner">Account email for the booking link</label><input id="calendar_owner" type="email"></div>
+        </select>
+        <div class="hint">What we book appointments into. On something else? A free Cal.com account runs alongside it, nothing to switch.</div></div>
+      <div class="field"><label for="calendar_owner">Account email for the booking link</label><input id="calendar_owner" type="email">
+        <div class="hint">If it's different from the email above.</div></div>
     </div>
     <div class="row">
       <div class="field"><label for="calendar_tz">Timezone</label>
@@ -86,31 +93,30 @@ textarea{resize:vertical;min-height:70px}
           <option value="America/Los_Angeles">Pacific</option>
           <option value="America/Anchorage">Alaska</option>
           <option value="Pacific/Honolulu">Hawaii</option>
-        </select></div>
+        </select>
+        <div class="hint">Calls are scheduled inside 8am to 8pm local.</div></div>
       <div class="field"></div>
     </div>
 
     <h2>Market note (optional)</h2>
     <div class="field"><label for="market_note">Your read on the local market, one sentence</label>
-      <textarea id="market_note" maxlength="200"></textarea></div>
+      <textarea id="market_note" maxlength="200"></textarea>
+      <div class="hint">In your own words. It's how our assistant opens every call.</div></div>
 
-    <h2>Signatures</h2>
-    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. Typing my name counts as my signature on the intake form, the data agreement, and the pilot terms.</div>
+    <h2>Signature</h2>
+    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. My signature applies to the intake form, the data agreement, and the pilot terms.</div>
     <div class="row">
-      <div class="field"><label for="signature">Signature (intake form)</label><input id="signature" required></div>
+      <div class="field"><label for="signature">Type your full name</label><input id="signature" required></div>
       <div class="field"><label for="date_signed">Date</label><input id="date_signed" type="date" required></div>
     </div>
     <div class="row">
-      <div class="field"><label for="da_signer">Signature (data agreement)</label><input id="da_signer" required></div>
-      <div class="field"><label for="da_title">Title</label><input id="da_title"></div>
-    </div>
-    <div class="row">
-      <div class="field"><label for="pa_signer">Signature (pilot terms)</label><input id="pa_signer" required></div>
-      <div class="field"><label for="pa_date">Date</label><input id="pa_date" type="date" required></div>
+      <div class="field"><label for="da_title">Title</label><input id="da_title">
+        <div class="hint">Broker, owner, team lead, whatever applies.</div></div>
+      <div class="field"></div>
     </div>
 
     <button class="btn" type="submit" id="submit-btn">Send it over</button>
-    <p class="fine">Goes straight to Hayes Systems, and you'll hear back with next steps by email. Nothing is charged and no calls are made until your campaign is on the calendar.</p>
+    <p class="fine">Nothing is charged and no calls are made until your campaign is scheduled.</p>
   </form>
 
   <div class="ok" id="ok-card">
@@ -134,10 +140,10 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     calendar_tz: v('calendar_tz'), market_note: v('market_note'),
     signature: v('signature'), date_signed: v('date_signed'),
-    da_agency: v('business_name'), da_signer: v('da_signer'),
+    da_agency: v('business_name'), da_signer: v('signature'),
     da_title: v('da_title'), da_date: v('date_signed'),
-    pa_agency: v('business_name'), pa_signer: v('pa_signer'),
-    pa_title: v('da_title') || ' ', pa_date: v('pa_date')
+    pa_agency: v('business_name'), pa_signer: v('signature'),
+    pa_title: v('da_title') || ' ', pa_date: v('date_signed')
   };
   try {
     var r = await fetch('https://ops.hayessystems.com/api/intake/web', {
@@ -154,11 +160,11 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     } else {
       var miss = (out.fields || []).join(', ');
       alert('Missing required fields: ' + (miss || 'unknown'));
-      btn.disabled = false; btn.textContent = 'Send it in';
+      btn.disabled = false; btn.textContent = 'Send it over';
     }
   } catch (err) {
     alert('Could not reach the server. Check your connection and try again.');
-    btn.disabled = false; btn.textContent = 'Send it in';
+    btn.disabled = false; btn.textContent = 'Send it over';
   }
 });
 </script>
