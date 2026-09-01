@@ -1,0 +1,65 @@
+{
+ "data_agreement": {
+  "title": "Data Agreement",
+  "intro": "This agreement covers the lead information you provide to Hayes Systems for a reactivation campaign. It is part of the paperwork you are completing below.",
+  "clauses": [
+   {
+    "h": "1. What you provide",
+    "b": "A file of past-inquiry leads (names, phone numbers, email addresses, and the state on file, if known) exported from your CRM, plus the booking connection described in the intake form."
+   },
+   {
+    "h": "2. What you represent",
+    "b": "You represent that the lead information was lawfully collected in the ordinary course of your business, that to the best of your knowledge each person previously contacted your agency about real estate, and that you will relay to Hayes Systems, within 24 hours, any opt-out request you receive directly from a person on the list."
+   },
+   {
+    "h": "3. How the data is used",
+    "b": "Hayes Systems uses the list solely to run your campaign: hygiene, consent asks by email and text, consented AI-assisted phone calls, appointment booking, and reporting. The list is never sold, rented, or used for any other purpose. Of our service providers, only the calling platform that places your calls receives lead contact details (the number being called and the name we greet them by); campaign emails are delivered through an email provider in the ordinary course of sending. Bookings are placed on your own booking service, and no payment processor ever sees your list."
+   },
+   {
+    "h": "4. How the data is protected",
+    "b": "Access is limited to Hayes Systems personnel operating the campaign. Data is encrypted in transit and stored on access-controlled systems. Contact details are removed at campaign close-out; only consent and opt-out records are retained (they are the legal record of the campaign) for five years. Hayes Systems maintains a Written Information Security Program as required by 201 CMR 17."
+   },
+   {
+    "h": "5. Opt-out handling",
+    "b": "Any person on the list may stop all contact by replying STOP to a text, saying so on a call, or using the unsubscribe link in an email. Hayes Systems suppresses that person from every channel immediately and permanently, and honors relayed opt-outs from you within the same day."
+   },
+   {
+    "h": "6. Term and end of service",
+    "b": "This agreement runs for the engagement and ends when the campaign closes and the final report is delivered. On request, Hayes Systems confirms in writing that your list has been purged from active systems."
+   }
+  ]
+ },
+ "pilot_terms": {
+  "title": "Terms of the Free Pilot Campaign",
+  "clauses": [
+   {
+    "h": "1. What the pilot is",
+    "b": "One campaign on up to 500 of your dormant leads: import and hygiene, consent asks by email and text, consented AI-assisted phone calls, appointment booking on your calendar, and a close-out report. Campaign length is typically two to four weeks."
+   },
+   {
+    "h": "2. What it costs",
+    "b": "Nothing. The pilot itself is free, including if you end it midway. When the campaign closes, one invoice covers the appointments booked during the pilot at $60 each and is charged automatically to your card on file. If a prospect no-shows, that appointment is not charged. If anything on the invoice looks wrong, you have 14 days to raise it and we make it right."
+   },
+   {
+    "h": "3. What you provide",
+    "b": "A full CSV export of your leads and your booking connection (Cal.com, Calendly, or GoHighLevel). The list is used solely to provide the service."
+   },
+   {
+    "h": "4. Your representations",
+    "b": "You represent that the lead information was lawfully collected in the ordinary course of your business, that to the best of your knowledge each person previously contacted your agency about real estate, and that you will relay to Hayes Systems, within 24 hours, any opt-out request you receive directly from a person on the list."
+   },
+   {
+    "h": "5. How the data is handled",
+    "b": "As in the data agreement: used solely to run this campaign, never sold or rented, contact details purged at close-out, consent and opt-out records retained five years as the legal record. Opt-outs stop every channel immediately and permanently."
+   },
+   {
+    "h": "6. Ending the pilot",
+    "b": "Either side may end the pilot at any time. Work stops within a business day. Appointments already booked remain payable under clause 2."
+   },
+   {
+    "h": "7. Results",
+    "b": "The close-out report is generated and delivered to you via email at the end of every campaign and may be used for your purposes under the condition that Hayes Systems branding is left unmodified."
+   }
+  ]
+ }
+}
