@@ -149,11 +149,11 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     } else {
       var miss = (out.fields || []).join(', ');
       alert('Missing required fields: ' + (miss || 'unknown'));
-      btn.disabled = false; btn.textContent = 'Send it over';
+      btn.disabled = false; btn.textContent = 'Submit';
     }
   } catch (err) {
     alert('Could not reach the server. Check your connection and try again.');
-    btn.disabled = false; btn.textContent = 'Send it over';
+    btn.disabled = false; btn.textContent = 'Submit';
   }
 });
 </script>
