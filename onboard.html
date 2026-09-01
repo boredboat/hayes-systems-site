@@ -73,7 +73,7 @@ select{background:#fff;padding:10px 2px}
     <div class="row">
       <div class="field"><label for="contact_phone">Phone</label><input id="contact_phone"></div>
       <div class="field"><label for="crm_platform">CRM you use</label><input id="crm_platform" placeholder="Follow Up Boss, kvCORE, none...">
-        <div class="hint">Where your leads live. We never need access to it.</div></div>
+        <div class="hint">So we send the right export instructions for your system.</div></div>
     </div>
 
     <h2>3. Appointments</h2>
@@ -87,21 +87,8 @@ select{background:#fff;padding:10px 2px}
           <option value="other">Something else</option>
         </select>
         <div class="hint">What we book appointments into. On something else? A free Cal.com account runs alongside it, nothing to switch.</div></div>
-      <div class="field"><label for="calendar_owner">Account email for the booking link</label><input id="calendar_owner" type="email">
-        <div class="hint">If it's different from the email above.</div></div>
-    </div>
-    <div class="row">
-      <div class="field"><label for="calendar_tz">Timezone</label>
-        <select id="calendar_tz">
-          <option value="America/New_York">Eastern</option>
-          <option value="America/Chicago">Central</option>
-          <option value="America/Denver">Mountain</option>
-          <option value="America/Los_Angeles">Pacific</option>
-          <option value="America/Anchorage">Alaska</option>
-          <option value="Pacific/Honolulu">Hawaii</option>
-        </select>
-        <div class="hint">Calls are scheduled inside 8am to 8pm local.</div></div>
-      <div class="field"></div>
+      <div class="field"><label for="calendar_owner">Booking account email</label><input id="calendar_owner" type="email">
+        <div class="hint">Only if it's different from your email above.</div></div>
     </div>
 
     <h2>4. Market note (optional)</h2>
@@ -111,19 +98,13 @@ select{background:#fff;padding:10px 2px}
 
     <h2>5. Signature</h2>
     <div class="attest-rule"></div>
-    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours. My signature applies to the intake form, the data agreement, and the pilot terms.</div>
+    <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list within 24 hours.</div>
     <div class="row">
       <div class="field"><label for="signature">Type your full name</label><input id="signature" required></div>
       <div class="field"><label for="date_signed">Date</label><input id="date_signed" type="date" required></div>
     </div>
-    <div class="row">
-      <div class="field"><label for="da_title">Title</label><input id="da_title">
-        <div class="hint">Broker, owner, team lead, whatever applies.</div></div>
-      <div class="field"></div>
-    </div>
 
-    <button class="btn" type="submit" id="submit-btn">Send it over</button>
-    <p class="fine">Nothing is charged and no calls are made until your campaign is scheduled.</p>
+    <button class="btn" type="submit" id="submit-btn">Submit</button>
   </form>
 
   <div class="ok" id="ok-card">
@@ -146,12 +127,12 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     contact_name: v('contact_name'), contact_email: v('contact_email'),
     contact_phone: v('contact_phone'), crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
-    calendar_tz: v('calendar_tz'), market_note: v('market_note'),
+    market_note: v('market_note'),
     signature: v('signature'), date_signed: v('date_signed'),
     da_agency: v('business_name'), da_signer: v('signature'),
-    da_title: v('da_title'), da_date: v('date_signed'),
+    da_date: v('date_signed'),
     pa_agency: v('business_name'), pa_signer: v('signature'),
-    pa_title: v('da_title') || ' ', pa_date: v('date_signed')
+    pa_date: v('date_signed')
   };
   try {
     var r = await fetch('https://ops.hayessystems.com/api/intake/web', {
