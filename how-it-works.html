@@ -30,6 +30,8 @@ p strong{color:var(--ink-on-light)}
 a{color:var(--gold-ink);font-weight:600}
 .card{background:var(--navy-card);border-radius:16px;padding:20px 24px;margin:22px 0}
 .card p{color:rgba(237,232,221,.92);font-size:15px}
+.card p+p{margin-top:2px}
+.card .card-head{font-size:17px;font-weight:600;color:var(--ivory);margin-bottom:8px}
 .card h2{color:var(--ivory);margin-top:0}
 ol,ul{padding-left:22px;margin:0 0 14px}
 li{font-size:15.5px;color:rgba(10,27,46,.82);margin-bottom:8px}
@@ -43,7 +45,7 @@ td{color:rgba(10,27,46,.82)}
 </head>
 <body>
 <div class="wrap">
-  <span class="eyebrow">The process, exactly</span>
+  <span class="eyebrow">The Process</span>
   <h1>How it works, from your side of the table.</h1>
   <div class="updated">Last updated September 1, 2026</div>
 
@@ -67,7 +69,10 @@ td{color:rgba(10,27,46,.82)}
 
   <h2>When money moves</h2>
   <div class="card">
-    <p><strong>The card is charged exactly once per campaign: when it ends.</strong> The last call finishes, the report is generated, and one invoice covering that campaign's booked appointments is charged automatically to your card on file. Not before the campaign, not during it, not per appointment. If a prospect no-shows, that appointment comes off the invoice.</p>
+    <p class="card-head">The card is charged exactly once per campaign: when it ends.</p>
+    <p>The last call finishes, the report is generated, and one invoice covering that campaign's booked appointments is charged automatically to your card on file.</p>
+    <p>Not before the campaign. Not during it. Not per appointment.</p>
+    <p>If a prospect no-shows, that appointment comes off the invoice.</p>
   </div>
   <p>If anything on the invoice looks wrong, you have 14 days to say so and we make it right. The pilot itself follows the same rule with one difference: appointments booked during the pilot are billed at the standard rate on its close-out invoice, and if the pilot books nothing, the invoice is zero.</p>
 

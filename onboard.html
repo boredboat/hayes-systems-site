@@ -79,6 +79,8 @@ select{background:#fff;padding:10px 2px}
       <div class="field"><label for="crm_platform">CRM you use</label><input id="crm_platform" placeholder="Follow Up Boss, kvCORE, none...">
         <div class="hint">So we send the right export instructions for your system.</div></div>
     </div>
+    <div class="field"><label for="lead_phone">Number leads should reach you on</label><input id="lead_phone" type="tel" placeholder="(413) 555-0100">
+      <div class="hint">The phone number we give prospects when they ask for a human. Only needed if it's different from any number you've given us or obvious from your booking setup.</div></div>
 
     <h2>2. Appointments</h2>
     <div class="row">
@@ -155,7 +157,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
   var payload = {
     business_name: v('business_name'),
     contact_name: v('contact_name'), contact_email: v('contact_email'),
-    crm_platform: v('crm_platform'),
+    lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     market_note: v('market_note'),
     agree_terms: document.getElementById('agree').checked,
