@@ -181,11 +181,12 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
       document.getElementById('ob-form').style.display = 'none';
       document.getElementById('ok-card').style.display = 'block';
       if (out.message) document.getElementById('ok-msg').textContent = out.message;
-      // show the connect button for calendly clients
-      if (v('calendar') === 'calendly') {
+      // show the connect button for calendar platforms with OAuth
+      var plat = v('calendar');
+      if (plat === 'calendly' || plat === 'calcom') {
         var slug = v('business_name').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         var btn = document.getElementById('connect-btn');
-        btn.href = 'https://ops.hayessystems.com/api/connect/calendly/start?client=' + encodeURIComponent(slug);
+        btn.href = 'https://ops.hayessystems.com/api/connect/' + plat + '/start?client=' + encodeURIComponent(slug);
         document.getElementById('connect-row').style.display = 'block';
       }
       window.scrollTo({top: 0, behavior: 'smooth'});
