@@ -77,6 +77,8 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         <tr><td>Records in your export</td><td id="a-rows"></td></tr>
         <tr><td>Workable leads</td><td><b id="a-work"></b></td></tr>
         <tr><td>Removed</td><td id="a-removed"></td></tr>
+        <tr><td>Held: booked with you before</td><td id="a-held"></td></tr>
+        <tr><td>Held: agents not on your roster</td><td id="a-roster"></td></tr>
         <tr><td>Projected appointments</td><td><b id="a-appts"></b></td></tr>
         <tr><td>Estimated cost</td><td id="a-cost"></td></tr>
         <tr><td>If nothing books</td><td><b>$0</b></td></tr>
@@ -154,11 +156,20 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       document.getElementById('a-removed').textContent =
         d.audit.removed + ' (' + d.audit.dupes + ' duplicates, ' + d.audit.malformed + ' malformed, ' +
         d.audit.unreachable + ' unreachable' + (d.audit.suppressed ? ', ' + d.audit.suppressed + ' opted out' : '') + ')';
+      document.getElementById('a-held').textContent = d.audit.held_previously_booked
+        ? d.audit.held_previously_booked + ' (we do not re-run these; they are active relationships, and Matt reviews any you want touched)'
+        : '0';
+      document.getElementById('a-roster').textContent = d.audit.held_off_roster
+        ? d.audit.held_off_roster + ' (update your roster to include them, or they stay out)'
+        : '0';
       document.getElementById('a-appts').textContent = d.audit.projected_bookings;
       document.getElementById('a-cost').textContent = '$' + d.audit.est_cost_lo + ' - $' + d.audit.est_cost_hi;
-      document.getElementById('a-note').textContent = d.audit.capped
+      var reNote = d.audit.previously_worked
+        ? d.audit.previously_worked + ' of these were worked in an earlier campaign; they go to the back of the queue. '
+        : '';
+      document.getElementById('a-note').textContent = reNote + (d.audit.capped
         ? 'Your account is pilot scope: the first 500 workable leads run; the rest waits. Want the whole list worked? Say so in a reply and we will set full-list scope.'
-        : 'Projections are bands, not promises: they come from your list size against published reactivation benchmarks.';
+        : 'Projections are bands, not promises: they come from your list size against published reactivation benchmarks.');
       document.getElementById('step1').hidden = true;
       document.getElementById('step2').hidden = false;
       window.scrollTo(0, 0);
@@ -176,8 +187,15 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({email: email.value.trim(), csv_text: csvText})
-    }).then(function(r){ return r.json(); }).then(function(d){
-      if(!d.ok){ show(document.getElementById('err2'), d.error || 'Launch failed.'); b.disabled = false; b.textContent = 'Confirm and launch'; return; }
+    }).then(function(r){ return r.json().then(function(j){ j._status = r.status; return j; }); }).then(function(d){
+      if(!d.ok){
+        if(d.blockers && d.blockers.length){
+          show(document.getElementById('err2'),
+               'Before we can launch: ' + d.blockers.map(function(x){ return x.msg; }).join(' '));
+        } else {
+          show(document.getElementById('err2'), d.error || 'Launch failed.');
+        }
+        b.disabled = false; b.textContent = 'Confirm and launch'; return; }
       document.getElementById('d-msg').textContent =
         d.staged + ' workable leads staged for your next campaign. We confirm the start by email.';
       document.getElementById('step2').hidden = true;
