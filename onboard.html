@@ -54,6 +54,9 @@ select{background:#fff;padding:10px 2px}
 .ok p{color:rgba(237,232,221,.92)}
 .back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--gold-ink);font-weight:600}
 .foot{margin-top:56px;padding-top:16px;border-top:1px solid rgba(10,27,46,.12);font-size:12px;color:rgba(10,27,46,.6);text-align:center}
+.agree-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:18px}
+.agree-row input[type="checkbox"]{width:18px;height:18px;margin-top:3px;flex-shrink:0;accent-color:var(--gold);border-radius:2px}
+.agree-label{font-size:13.5px;font-weight:600;letter-spacing:0;text-transform:none;margin-bottom:0;color:var(--ink-on-light);cursor:pointer}
 </style>
 </head>
 <body>
@@ -107,6 +110,8 @@ select{background:#fff;padding:10px 2px}
     <h2>4. Signature</h2>
     <div class="attest-rule"></div>
     <div class="attest">By signing below, I confirm I am authorized to act for the agency named above, that the lead information we provide was lawfully collected in the ordinary course of business, that to the best of my knowledge each person previously contacted our agency about real estate, and that we will relay any opt-out request we receive directly from a person on the list promptly. My signature below applies to my intake details above and to both agreements in section 3.</div>
+    <div class="field agree-row"><input type="checkbox" id="agree" required>
+      <label for="agree" class="agree-label">I have read and agree to the Data Agreement and the Pilot Terms.</label></div>
     <div class="row">
       <div class="field"><label for="signature">Type your full name</label><input id="signature" required></div>
       <div class="field"><label for="date_signed">Date</label><input id="date_signed" type="date" required></div>
@@ -153,6 +158,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     market_note: v('market_note'),
+    agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
     da_agency: v('business_name'), da_signer: v('signature'),
     da_date: v('date_signed'),
