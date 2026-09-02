@@ -83,6 +83,13 @@ select{background:#fff;padding:10px 2px}
       <div class="hint">The phone number we give prospects when they ask for a human. Only needed if it's different from any number you've given us or obvious from your booking setup.</div></div>
 
     <h2>2. Appointments</h2>
+    <div class="field"><label for="campaign_scope">Campaign scope</label>
+      <select id="campaign_scope" required>
+        <option value="">Choose...</option>
+        <option value="pilot">Pilot: up to 500 leads</option>
+        <option value="full">Full list: my entire export</option>
+      </select>
+      <div class="hint">Both cost the same per appointment; the pilot just works a smaller first slice. Not sure? Start with the pilot.</div></div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required>
@@ -108,7 +115,7 @@ select{background:#fff;padding:10px 2px}
     <details class="terms"><summary>Data Agreement</summary>
       <div id="da-terms"></div>
     </details>
-    <details class="terms"><summary>Terms of the Free Pilot Campaign</summary>
+    <details class="terms"><summary>Campaign Terms</summary>
       <div id="pa-terms"></div>
     </details>
 
@@ -165,6 +172,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     contact_name: v('contact_name'), contact_email: v('contact_email'),
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
+    campaign_scope: v('campaign_scope'),
     market_note: v('market_note'),
     agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
