@@ -54,11 +54,18 @@ nav{position:sticky;top:0;background:#121F2C;border-bottom:1px solid rgba(217,16
 .btn{display:inline-block;padding:13px 22px;border-radius:2px;font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:transform .15s ease,background .15s ease,color .15s ease}
 .btn-primary{background:var(--gold);color:var(--navy)}
 .btn-primary:hover{background:#E4B45A;transform:translateY(-1px)}
-.btn-outline{border:1px solid var(--gold-ink);color:var(--gold-ink)}
+.btn-outline{border:1px solid var(--gold-ink);color:var(--gold-ink);background:rgba(237,232,221,.78)}
 .btn-outline:hover{background:var(--gold-soft)}
 
 /* Hero */
-.hero{padding:92px 0 72px;background:radial-gradient(900px 420px at 50% -60px,rgba(217,164,65,.10),transparent 65%),var(--ivory)}
+.hero{position:relative;padding:92px 0 72px;background:radial-gradient(900px 420px at 50% -60px,rgba(217,164,65,.10),transparent 65%),var(--ivory)}
+.hero::before{content:'';position:absolute;inset:0;background:url('img/hero-newengland.webp') center 38%/cover no-repeat}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(237,232,221,.97) 0%,rgba(237,232,221,.92) 40%,rgba(237,232,221,.55) 66%,rgba(237,232,221,.14) 100%),linear-gradient(180deg,rgba(237,232,221,.55) 0%,rgba(237,232,221,0) 26%),linear-gradient(0deg,rgba(237,232,221,.92) 0%,rgba(237,232,221,0) 24%)}
+.hero > .container{position:relative;z-index:1}
+@media(max-width:900px){
+  .hero::before{background:url('img/hero-newengland-mobile.webp') center 30%/cover no-repeat}
+  .hero::after{background:linear-gradient(180deg,rgba(237,232,221,.94) 0%,rgba(237,232,221,.86) 55%,rgba(237,232,221,.6) 100%)}
+}
 .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
 .hero .eyebrow{margin-bottom:20px}
@@ -66,7 +73,7 @@ nav{position:sticky;top:0;background:#121F2C;border-bottom:1px solid rgba(217,16
 .hero p.lede{font-size:18px;color:rgba(10,27,46,.82);margin:24px 0 34px;max-width:560px;font-weight:400;line-height:1.75}
 .hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
 .trust{display:flex;gap:22px;margin-top:32px;flex-wrap:wrap}
-.trust span{font-size:12.5px;letter-spacing:.05em;color:rgba(10,27,46,.66);display:flex;align-items:center;gap:8px}
+.trust span{font-size:12.5px;letter-spacing:.05em;color:rgba(10,27,46,.75);display:flex;align-items:center;gap:8px}
 .trust svg{width:14px;height:14px;flex-shrink:0}
 
 /* Chat demo */
