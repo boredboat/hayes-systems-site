@@ -99,6 +99,9 @@ select{background:#fff;padding:10px 2px}
     <div class="field"><label for="market_note">Market note (optional)</label>
       <textarea id="market_note" maxlength="200" placeholder="Your read on the local market, one sentence"></textarea>
       <div class="hint">In your own words. It's how our assistant opens every call. If no note is provided the information will be skipped.</div></div>
+    <div class="field"><label for="agent_roster">Who works your leads</label>
+      <textarea id="agent_roster" rows="3" placeholder="One per line: agent name, and their own booking link if they have one"></textarea>
+      <div class="hint">Every agent you want contacted on behalf of. List each on their own line, like "Dana Lopez, https://cal.com/dana/call". If your team books into one shared calendar, names alone are fine. Solo? One name. Agents not listed here are left out: leads assigned to them in your export are held for your review before anything sends.</div></div>
 
     <h2>3. The paperwork you are signing</h2>
     <p class="hint" style="margin:0 0 14px">Please review the following terms and agreements before signing.</p>
@@ -163,6 +166,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     market_note: v('market_note'),
+    agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
     da_agency: v('business_name'), da_signer: v('signature'),
