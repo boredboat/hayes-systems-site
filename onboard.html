@@ -126,7 +126,10 @@ select{background:#fff;padding:10px 2px}
   <div class="ok" id="ok-card">
     <h2>That's everything on your end.</h2>
     <p id="ok-msg">Your paperwork is in. A copy is heading to your email for your records, and we'll be in touch to connect your booking platform and schedule the campaign start.</p>
-    <p style="margin-top:10px">Questions in the meantime, just reply to that email.</p>
+    <p id="connect-row" style="margin-top:18px;display:none">
+      <a id="connect-btn" class="btn" style="width:auto;padding:13px 26px;text-decoration:none" href="#">Connect your calendar now</a>
+      <span style="display:block;font-size:12.5px;color:rgba(237,232,221,.75);margin-top:8px">Skip this and we'll set it up with you by email.</span>
+    </p>
   </div>
 
   <div class="foot">Hayes Systems · Western Massachusetts · hayessystems.com</div>
@@ -178,6 +181,13 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
       document.getElementById('ob-form').style.display = 'none';
       document.getElementById('ok-card').style.display = 'block';
       if (out.message) document.getElementById('ok-msg').textContent = out.message;
+      // show the connect button for calendly clients
+      if (v('calendar') === 'calendly') {
+        var slug = v('business_name').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        var btn = document.getElementById('connect-btn');
+        btn.href = 'https://ops.hayessystems.com/api/connect/calendly/start?client=' + encodeURIComponent(slug);
+        document.getElementById('connect-row').style.display = 'block';
+      }
       window.scrollTo({top: 0, behavior: 'smooth'});
     } else {
       var miss = (out.fields || []).join(', ');
