@@ -78,6 +78,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         <tr><td>Workable leads</td><td><b id="a-work"></b></td></tr>
         <tr><td>Removed</td><td id="a-removed"></td></tr>
         <tr><td>Held: booked with you before</td><td id="a-held"></td></tr>
+        <tr><td>Held: too recent to reactivate</td><td id="a-fresh"></td></tr>
         <tr><td>Held: agents not on your roster</td><td id="a-roster"></td></tr>
         <tr><td>Projected appointments</td><td><b id="a-appts"></b></td></tr>
         <tr><td>Estimated cost</td><td id="a-cost"></td></tr>
@@ -158,6 +159,9 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         d.audit.unreachable + ' unreachable' + (d.audit.suppressed ? ', ' + d.audit.suppressed + ' opted out' : '') + ')';
       document.getElementById('a-held').textContent = d.audit.held_previously_booked
         ? d.audit.held_previously_booked + ' (we do not re-run these; they are active relationships, and Matt reviews any you want touched)'
+        : '0';
+      document.getElementById('a-fresh').textContent = d.audit.held_too_fresh
+        ? d.audit.held_too_fresh + ' (we work dormant leads; recent ones are still warm in your own pipeline)'
         : '0';
       document.getElementById('a-roster').textContent = d.audit.held_off_roster
         ? d.audit.held_off_roster + ' (update your roster to include them, or they stay out)'
