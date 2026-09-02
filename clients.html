@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client CSV Upload — Hayes Systems</title>
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --navy:#02101F; --navy-card:#0B1C30;
+  --ivory:#EDE8DD; --soft:#F4F1EA; --cream:#FCFAF4;
+  --gold:#D9A441; --gold-soft:rgba(217,164,65,.14);
+  --ink-on-light:#0A1B2E; --gold-ink:#7D5C15;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@font-face{font-family:'Cormorant Garamond';font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65}
+.wrap{max-width:680px;margin:0 auto;padding:64px 24px 80px}
+.eyebrow{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(32px,5vw,42px);line-height:1.12;margin:10px 0 8px}
+.updated{font-size:13px;color:rgba(10,27,46,.6);margin-bottom:32px}
+p{font-size:15px;color:rgba(10,27,46,.82);margin-bottom:14px}
+label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin:18px 0 6px;color:rgba(10,27,46,.75)}
+input[type=email]{width:100%;padding:12px 14px;border:1px solid rgba(10,27,46,.25);border-radius:6px;font-size:15px;font-family:var(--sans);background:var(--cream);color:var(--ink-on-light)}
+input[type=email]:focus{outline:none;border-color:var(--gold)}
+.drop{margin-top:18px;border:1.5px dashed rgba(10,27,46,.3);border-radius:10px;padding:28px 20px;text-align:center;background:var(--cream);cursor:pointer;transition:border-color .15s}
+.drop:hover{border-color:var(--gold)}
+.drop.has{border-style:solid;border-color:var(--gold)}
+.drop .dt{font-size:15px;font-weight:600}
+.drop .ds{font-size:13px;color:rgba(10,27,46,.6);margin-top:4px}
+.btn{display:inline-block;margin-top:22px;padding:13px 22px;border-radius:2px;background:var(--gold);color:var(--navy);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--sans)}
+.btn:disabled{opacity:.5;cursor:wait}
+.err{margin-top:16px;background:rgba(158,59,59,.08);border:1px solid rgba(158,59,59,.3);border-radius:8px;padding:12px 16px;font-size:14px;color:#9E3B3D}
+.audit{margin-top:24px;background:var(--cream);border:1px solid rgba(217,164,65,.45);border-radius:14px;padding:24px 26px}
+.audit h2{font-family:var(--serif);font-size:22px;margin-bottom:6px}
+.audit .lead{font-size:15px;margin-bottom:14px}
+.audit table{width:100%;border-collapse:collapse;margin:8px 0 4px}
+.audit th,.audit td{padding:8px 10px;text-align:left;font-size:14px;border-bottom:1px solid rgba(10,27,46,.1)}
+.audit th{font-weight:600;color:var(--ink-on-light)}
+.audit td{color:rgba(10,27,46,.82)}
+.audit td b{color:var(--ink-on-light)}
+.small{font-size:13px;color:rgba(10,27,46,.62)}
+.done{margin-top:24px;background:rgba(46,125,50,.08);border:1px solid rgba(46,125,50,.35);border-radius:14px;padding:24px 26px}
+.done h2{font-family:var(--serif);font-size:22px;color:#2E7D32;margin-bottom:6px}
+.back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--gold-ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">Client portal</span>
+  <h1>Run a new campaign.</h1>
+  <div class="updated">Your paperwork and calendar connection are already on file</div>
+
+  <div id="step1">
+    <p>Upload a fresh CSV export of the leads you want worked. We run the same hygiene and audit as your first campaign, show you the numbers, and start when you confirm.</p>
+    <label for="email">Your account email</label>
+    <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
+    <div class="drop" id="drop">
+      <div class="dt" id="dt">Drop your CSV here or click to choose</div>
+      <div class="ds" id="ds">One file, any size up to a few MB</div>
+      <input type="file" id="file" accept=".csv,text/csv" hidden>
+    </div>
+    <button class="btn" id="go" disabled>Run the audit</button>
+    <div class="err" id="err" hidden></div>
+  </div>
+
+  <div id="step2" hidden>
+    <div class="audit">
+      <h2>Your numbers</h2>
+      <p class="lead" id="a-lead"></p>
+      <table>
+        <tr><th>What</th><th>Result</th></tr>
+        <tr><td>Records in your export</td><td id="a-rows"></td></tr>
+        <tr><td>Workable leads</td><td><b id="a-work"></b></td></tr>
+        <tr><td>Removed</td><td id="a-removed"></td></tr>
+        <tr><td>Projected appointments</td><td><b id="a-appts"></b></td></tr>
+        <tr><td>Estimated cost</td><td id="a-cost"></td></tr>
+        <tr><td>If nothing books</td><td><b>$0</b></td></tr>
+      </table>
+      <p class="small" id="a-note"></p>
+      <p class="small">Billed per appointment on your calendar, one invoice at campaign close, on file with us already.</p>
+    </div>
+    <button class="btn" id="confirm">Confirm and launch</button>
+    <p class="small" style="margin-top:10px">Confirming schedules the campaign. Matt reviews the plan and it starts.</p>
+    <div class="err" id="err2" hidden></div>
+  </div>
+
+  <div id="step3" hidden>
+    <div class="done">
+      <h2>Campaign scheduled.</h2>
+      <p id="d-msg">Your list is in and the plan is staged. We confirm the start by email.</p>
+    </div>
+  </div>
+
+  <a class="back" href="/">← Back to hayessystems.com</a>
+</div>
+
+<script>
+(function(){
+  var email = document.getElementById('email');
+  var drop = document.getElementById('drop');
+  var file = document.getElementById('file');
+  var dt = document.getElementById('dt');
+  var go = document.getElementById('go');
+  var err = document.getElementById('err');
+  var csvText = '';
+
+  function ready(){
+    go.disabled = !(email.value.indexOf('@') > 0 && csvText);
+  }
+  email.addEventListener('input', ready);
+
+  drop.addEventListener('click', function(){ file.click(); });
+  file.addEventListener('change', function(){ load(file.files[0]); });
+  drop.addEventListener('dragover', function(e){ e.preventDefault(); });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault();
+    if(e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+  });
+
+  function load(f){
+    if(!f) return;
+    if(f.size > 8 * 1024 * 1024){ show(err, 'That file is too large. Email it to Matt@hayessystems.com instead.'); return; }
+    var rd = new FileReader();
+    rd.onload = function(){
+      csvText = rd.result;
+      dt.textContent = f.name;
+      document.getElementById('ds').textContent = Math.round(f.size/1024) + ' KB, ready';
+      drop.classList.add('has');
+      ready();
+    };
+    rd.readAsText(f);
+  }
+
+  function show(el, msg){ el.textContent = msg; el.hidden = false; }
+
+  go.addEventListener('click', function(){
+    go.disabled = true; go.textContent = 'Running...';
+    err.hidden = true;
+    fetch('https://ops.hayessystems.com/api/client/upload', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email.value.trim(), csv_text: csvText})
+    }).then(function(r){ return r.json(); }).then(function(d){
+      if(!d.ok){ show(err, d.hint || d.error || 'Something went wrong.'); go.disabled = false; go.textContent = 'Run the audit'; return; }
+      document.getElementById('a-lead').textContent =
+        'For ' + d.client.name + ', from the file you uploaded:';
+      document.getElementById('a-rows').textContent = d.audit.rows_reviewed;
+      document.getElementById('a-work').textContent = d.audit.workable;
+      document.getElementById('a-removed').textContent =
+        d.audit.removed + ' (' + d.audit.dupes + ' duplicates, ' + d.audit.malformed + ' malformed, ' +
+        d.audit.unreachable + ' unreachable' + (d.audit.suppressed ? ', ' + d.audit.suppressed + ' opted out' : '') + ')';
+      document.getElementById('a-appts').textContent = d.audit.projected_bookings;
+      document.getElementById('a-cost').textContent = '$' + d.audit.est_cost_lo + ' - $' + d.audit.est_cost_hi;
+      document.getElementById('a-note').textContent = d.audit.capped
+        ? 'Your account is pilot scope: the first 500 workable leads run; the rest waits. Want the whole list worked? Say so in a reply and we will set full-list scope.'
+        : 'Projections are bands, not promises: they come from your list size against published reactivation benchmarks.';
+      document.getElementById('step1').hidden = true;
+      document.getElementById('step2').hidden = false;
+      window.scrollTo(0, 0);
+    }).catch(function(){
+      show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.');
+      go.disabled = false; go.textContent = 'Run the audit';
+    });
+  });
+
+  document.getElementById('confirm').addEventListener('click', function(){
+    var b = document.getElementById('confirm');
+    b.disabled = true; b.textContent = 'Launching...';
+    document.getElementById('err2').hidden = true;
+    fetch('https://ops.hayessystems.com/api/client/launch', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email.value.trim(), csv_text: csvText})
+    }).then(function(r){ return r.json(); }).then(function(d){
+      if(!d.ok){ show(document.getElementById('err2'), d.error || 'Launch failed.'); b.disabled = false; b.textContent = 'Confirm and launch'; return; }
+      document.getElementById('d-msg').textContent =
+        d.staged + ' workable leads staged for your next campaign. We confirm the start by email.';
+      document.getElementById('step2').hidden = true;
+      document.getElementById('step3').hidden = false;
+      window.scrollTo(0, 0);
+    }).catch(function(){
+      show(document.getElementById('err2'), 'Could not reach the server. Your audit is safe; try confirming again.');
+      b.disabled = false; b.textContent = 'Confirm and launch';
+    });
+  });
+})();
+</script>
+</body>
+</html>
