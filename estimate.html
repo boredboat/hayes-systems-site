@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Launch Estimate — Hayes Systems</title>
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --navy:#02101F; --navy-card:#0B1C30;
+  --ivory:#EDE8DD; --soft:#F4F1EA; --cream:#FCFAF4;
+  --gold:#D9A441; --gold-soft:rgba(217,164,65,.14);
+  --ink-on-light:#0A1B2E; --gold-ink:#7D5C15;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@font-face{font-family:'Cormorant Garamond';font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65}
+.wrap{max-width:760px;margin:0 auto;padding:64px 24px 80px}
+.eyebrow{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,5vw,46px);line-height:1.12;margin:10px 0 8px}
+.updated{font-size:13px;color:rgba(10,27,46,.6);margin-bottom:36px}
+h2{font-family:var(--serif);font-weight:600;font-size:24px;margin:34px 0 10px}
+p{font-size:15px;color:rgba(10,27,46,.82);margin-bottom:14px}
+p strong{color:var(--ink-on-light)}
+a{color:var(--gold-ink);font-weight:600}
+.card{background:var(--cream);border:1px solid rgba(217,164,65,.45);border-radius:16px;padding:26px 28px;margin:22px 0}
+.card p{margin-bottom:10px}
+.card p:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:18px 0}
+th,td{padding:10px 12px;text-align:left;font-size:14.5px;border-bottom:1px solid rgba(10,27,46,.12)}
+th{font-weight:600;color:var(--ink-on-light)}
+td{color:rgba(10,27,46,.82)}
+td b{color:var(--ink-on-light)}
+.btn{display:inline-block;margin-top:18px;padding:13px 22px;border-radius:2px;background:var(--gold);color:var(--navy);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none}
+.btn:hover{background:#E4B45A}
+.small{font-size:13px;color:rgba(10,27,46,.62)}
+.nodata{border:1px solid rgba(10,27,46,.18);border-radius:16px;padding:22px 26px;background:var(--soft);margin:22px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">Before you commit</span>
+  <h1>Your launch estimate.</h1>
+  <div class="updated">Based on the audit of your list</div>
+
+  <div id="estimate">
+    <div class="nodata" id="nodata" hidden>
+      <p><strong>No estimate found in this link.</strong> That usually means the link is missing its numbers or was copied incompletely. Reply to your audit email and we will send a fresh link.</p>
+    </div>
+
+    <p id="lede">Your audit found <b id="w">-</b> workable leads. Here is what launching a campaign on that list looks like in dollars, before you sign anything.</p>
+
+    <div class="card">
+      <p><strong>The pilot: up to 500 of your workable leads.</strong></p>
+      <table>
+        <tr><th>What</th><th>Estimate</th></tr>
+        <tr><td>Projected appointments booked</td><td><b id="appts">-</b></td></tr>
+        <tr><td>Cost if the campaign hits the low end</td><td><b id="cost-lo">-</b></td></tr>
+        <tr><td>Cost if it hits the high end</td><td><b id="cost-hi">-</b></td></tr>
+        <tr><td>If nothing books</td><td><b>$0</b></td></tr>
+      </table>
+      <p class="small">You are billed only for appointments that land on your calendar, on one invoice when the campaign ends. A prospect who no-shows costs you nothing and earns you a free replacement.</p>
+    </div>
+
+    <h2>Where these numbers come from</h2>
+    <p>Projected appointments come from your audit: your workable lead count against published reactivation benchmarks, as a band, not a promise. Cost is that band at the per-appointment rate of $60. Real results can land anywhere in the band or outside it, which is why nothing is charged unless appointments actually book.</p>
+
+    <h2>What happens next</h2>
+    <p>One form and a booking connection, and the campaign is scheduled. The paperwork spells out the same terms you see here, and your card is only charged when a campaign finishes.</p>
+    <a class="btn" href="onboard.html">Continue to the paperwork</a>
+    <p class="small" style="margin-top:14px">Not ready yet? <a href="mailto:Matt@hayessystems.com">Email Matt</a> with questions; nothing is committed until you sign.</p>
+  </div>
+
+  <p class="small" style="margin-top:36px">Hayes Systems · Western Massachusetts · Matt@hayessystems.com</p>
+</div>
+
+<script>
+(function(){
+  var q = {};
+  location.search.replace(/([a-z]+)=([^&]+)/g, function(_, k, v){ q[k] = decodeURIComponent(v); });
+  var need = ['w','appts'];
+  if(!q.w || !q.appts){ document.getElementById('nodata').hidden = false; return; }
+  document.getElementById('w').textContent = q.w;
+  document.getElementById('appts').textContent = q.appts;
+  var lo = parseInt(q.appts, 10) || 0;
+  var m = (q.appts || '').match(/(\d+)\s*-\s*(\d+)/);
+  if(m){ lo = parseInt(m[1], 10); }
+  document.getElementById('cost-lo').textContent = '$' + (lo * 60);
+  document.getElementById('cost-hi').textContent = m ? '$' + (parseInt(m[2], 10) * 60) : '$' + (lo * 60);
+})();
+</script>
+</body>
+</html>
