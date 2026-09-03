@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /onboard.html
+Disallow: /estimate.html
+Disallow: /clients.html
+Disallow: /unsubscribe.html
+
+Sitemap: https://www.hayessystems.com/sitemap.xml
