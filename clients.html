@@ -172,7 +172,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         ? d.audit.previously_worked + ' of these were worked in an earlier campaign; they go to the back of the queue. '
         : '';
       document.getElementById('a-note').textContent = reNote + (d.audit.capped
-        ? 'Your account is pilot scope: the first 500 workable leads run; the rest waits. Want the whole list worked? Say so in a reply and we will set full-list scope.'
+        ? 'Your account is capped at 500 workable leads for now. Want the whole list worked? Say so in a reply and we will lift the cap.'
         : 'Projections are bands, not promises: they come from your list size against published reactivation benchmarks.');
       document.getElementById('step1').hidden = true;
       document.getElementById('step2').hidden = false;

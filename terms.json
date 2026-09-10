@@ -34,11 +34,11 @@
   "clauses": [
    {
     "h": "1. What the campaign is",
-    "b": "One campaign on your dormant leads: import and hygiene, consent asks by email and text, consented AI-assisted phone calls, appointment booking on your calendar, and a close-out report. The scope you choose on the intake form applies: pilot scope works up to 500 leads; full-list scope works your entire export."
+    "b": "One campaign on your dormant leads: import and hygiene, consent asks by email and text, consented AI-assisted phone calls, appointment booking on your calendar, and a close-out report. The campaign works your entire export."
    },
    {
     "h": "2. What it costs",
-    "b": "Nothing. The pilot itself is free, including if you end it midway. When the campaign closes, one invoice covers the appointments booked during the pilot at $60 each and is charged automatically to your card on file. If a prospect no-shows, that appointment is not charged. If anything on the invoice looks wrong, you have 14 days to raise it and we make it right."
+    "b": "You pay $60 per booked appointment and nothing else - no setup fee, no monthly minimum, nothing upfront. When the campaign closes, one invoice covers the appointments it booked and is charged automatically to your card on file. If nothing books, you owe nothing. If a prospect no-shows, that appointment is not charged. If anything on the invoice looks wrong, you have 14 days to raise it and we make it right."
    },
    {
     "h": "3. What you provide",
@@ -53,8 +53,8 @@
     "b": "As in the data agreement: used solely to run this campaign, never sold or rented, contact details purged at close-out, consent and opt-out records retained five years as the legal record. Opt-outs stop every channel immediately and permanently."
    },
    {
-    "h": "6. Ending the pilot",
-    "b": "Either side may end the pilot at any time. Work stops within a business day. Appointments already booked remain payable under clause 2."
+    "h": "6. Ending the campaign",
+    "b": "Either side may end the campaign at any time. Work stops within a business day. Appointments already booked remain payable under clause 2."
    },
    {
     "h": "7. Results",
