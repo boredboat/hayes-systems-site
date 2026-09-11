@@ -95,9 +95,6 @@ select{background:#fff;padding:10px 2px}
       <input id="appts_per_week" type="number" min="1" max="50" step="1" required placeholder="5">
       <div class="hint">This sets how fast we run your campaign and roughly how many appointments to expect each week.</div></div>
     </div>
-    <div class="field"><label for="min_age_days">Lead age to work</label>
-      <input id="min_age_days" type="number" min="30" max="365" step="1" placeholder="90">
-      <div class="hint">We contact leads once they've been quiet for 90 days. Prefer a different bar? Anywhere from 30 days to 1 year works.</div></div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required>
@@ -179,7 +176,6 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     campaign_scope: v('campaign_scope'),
     appts_per_week: v('appts_per_week'),
-    min_age_days: v('min_age_days'),
     agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
