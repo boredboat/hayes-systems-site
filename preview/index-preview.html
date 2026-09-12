@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hayes Systems | Lead Reactivation for Real Estate Teams</title>
+<meta name="description" content="We revive the dormant leads already sitting in your CRM. Email, SMS, and opt-in AI voice outreach. Pay per booked appointment, no-shows replaced free.">
+<link rel="canonical" href="https://www.hayessystems.com/">
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/CormorantGaramond-500.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:300;font-display:swap;src:url('fonts/Montserrat-300.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/Montserrat-500.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/Montserrat-700.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+:root{
+  --navy:#02101F; --navy-lift:#071526; --navy-card:#0B1C30;
+  --ivory:#EDE8DD; --soft:#F4F1EA;
+  --gold:#D9A441; --gold-soft:rgba(217,164,65,.14);
+  --ink-on-light:#0A1B2E;
+  --gold-ink:#7D5C15;
+  --radius:16px;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65;font-weight:400}
+.container{max-width:1120px;margin:0 auto;padding:0 24px;width:100%;box-sizing:border-box}
+.eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1,h2{font-family:var(--serif);font-weight:600;line-height:1.12}
+h1{font-size:clamp(36px,5vw,58px);color:var(--ink-on-light)}
+h2{font-size:clamp(30px,4vw,44px);color:var(--ink-on-light)}
+a{color:inherit}
+
+/* Brand lockup */
+.lockup{display:flex;align-items:center;gap:14px;text-decoration:none}
+.lockup .mark-art{width:38px;height:41px;flex-shrink:0}
+.lockup .divider{width:1px;height:36px;background:var(--gold);opacity:.55;flex-shrink:0}
+.lockup .words{display:flex;flex-direction:column}
+.lockup .hayes-art{width:118px;height:25px;color:var(--ivory)}
+.lockup .systems{font-family:var(--sans);font-size:9px;font-weight:400;letter-spacing:.38em;margin-right:-.38em;color:var(--gold);display:flex;align-items:center;gap:8px;margin-top:4px}
+.lockup .systems::before,.lockup .systems::after{content:'';height:1px;background:var(--gold);opacity:.55;flex:1}
+
+/* Nav */
+nav{position:sticky;top:0;background:var(--navy);border-bottom:1px solid rgba(217,164,65,.16);z-index:50}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:74px}
+.nav-links{display:flex;gap:22px;align-items:center}
+.nav-links a:not(.btn){font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,234,.72);text-decoration:none;white-space:nowrap}
+.nav-links a:not(.btn):hover{color:var(--gold)}
+.nav-links .nav-cta{white-space:nowrap;flex-shrink:0;padding:11px 16px;font-size:12.5px}
+@media(max-width:1050px){.nav-links a:not(.btn){display:none}}
+@media(max-width:420px){.nav-links{gap:10px}.nav-links .nav-cta{padding:10px 12px;font-size:11.5px;letter-spacing:.08em}.lockup .divider,.lockup .words{display:none}}
+
+/* Buttons */
+.btn{display:inline-block;padding:13px 22px;border-radius:2px;font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:transform .15s ease,background .15s ease,color .15s ease}
+.btn-primary{background:var(--gold);color:var(--navy)}
+.btn-primary:hover{background:#E4B45A;transform:translateY(-1px)}
+.btn-outline{border:1px solid var(--gold-ink);color:var(--gold-ink);background:rgba(237,232,221,.78)}
+.btn-outline:hover{background:var(--gold-soft)}
+
+/* Hero */
+.hero{position:relative;padding:92px 0 72px;background:radial-gradient(900px 420px at 50% -60px,rgba(217,164,65,.10),transparent 65%),var(--ivory)}
+.hero::before{content:'';position:absolute;inset:0;background:url('img/hero-newengland.webp') center/cover no-repeat}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(237,232,221,.97) 0%,rgba(237,232,221,.9) 38%,rgba(237,232,221,.45) 64%,rgba(237,232,221,.08) 100%),linear-gradient(180deg,rgba(237,232,221,.5) 0%,rgba(237,232,221,0) 24%),linear-gradient(0deg,rgba(237,232,221,.9) 0%,rgba(237,232,221,0) 22%)}
+.hero > .container{position:relative;z-index:1}
+@media(max-width:900px){
+  .hero::before{background:url('img/hero-newengland-mobile.webp') center 30%/cover no-repeat}
+  .hero::after{background:linear-gradient(180deg,rgba(237,232,221,.94) 0%,rgba(237,232,221,.86) 55%,rgba(237,232,221,.6) 100%)}
+}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero .eyebrow{margin-bottom:20px}
+.hero h1 .accent{color:var(--gold-ink)}
+.hero p.lede{font-size:18px;color:rgba(10,27,46,.82);margin:24px 0 34px;max-width:560px;font-weight:400;line-height:1.75}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.trust{display:flex;gap:14px 22px;margin-top:32px;flex-wrap:wrap}
+.trust span{font-size:15px;letter-spacing:.03em;color:rgba(10,27,46,.82);display:flex;align-items:center;gap:9px;font-weight:500}
+.trust svg{width:17px;height:17px;flex-shrink:0}
+
+/* Chat demo */
+.chat-wrap{position:relative;max-width:400px;margin-left:auto}
+.chat-wrap::before{content:'';position:absolute;inset:-60px -50px;background:radial-gradient(closest-side,rgba(217,164,65,.14),transparent 70%);pointer-events:none}
+@media(max-width:900px){.chat-wrap::before{inset:-40px -20px}}
+.chat-card{position:relative;background:#FCFAF4;border:1px solid rgba(10,27,46,.09);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius);padding:22px}
+@media(max-width:900px){.chat-card{margin:0 auto}}
+.chat-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(10,27,46,.08)}
+.chat-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;font-family:var(--serif)}
+.chat-head .name{font-weight:600;font-size:14px;color:var(--ink-on-light)}
+.chat-head .status{font-size:11.5px;color:var(--gold-ink);display:flex;align-items:center;gap:6px;letter-spacing:.06em}
+.chat-head .status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
+.bubble{max-width:82%;padding:11px 15px;border-radius:12px;font-size:15px;margin-top:14px;line-height:1.55}
+.bubble.them{background:rgba(10,27,46,.06);border:1px solid rgba(10,27,46,.08);color:var(--ink-on-light);border-bottom-left-radius:3px}
+.bubble.us{background:var(--gold);color:var(--navy);border-bottom-right-radius:3px;margin-left:auto;font-weight:500}
+
+/* Stats */
+.stats-band{background:var(--navy);padding:56px 0}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0 44px}
+.stat-item .big{font-family:var(--serif);font-size:42px;color:var(--gold);font-weight:600;line-height:1}
+.stat-item p{font-size:15px;color:rgba(244,241,234,.72);margin:10px 0 0;max-width:300px;font-weight:400}
+.stat-item + .stat-item{border-left:1px solid rgba(217,164,65,.16);padding-left:44px}
+@media(max-width:820px){.stats-row{grid-template-columns:1fr;gap:26px}.stat-item + .stat-item{border-left:none;padding-left:0;border-top:1px solid rgba(217,164,65,.16);padding-top:26px}}
+
+/* Sections */
+section{padding:72px 0}
+@media(max-width:900px){section{padding:56px 0}}
+.sec-head{max-width:660px;margin-bottom:36px}
+.sec-head .eyebrow{display:block;margin-bottom:16px}
+.sec-head p{color:rgba(10,27,46,.82);font-size:18px;margin-top:16px;font-weight:400;line-height:1.75}
+
+/* Problem */
+#problem{background:var(--soft);border-top:1px solid rgba(217,164,65,.16);border-bottom:1px solid rgba(217,164,65,.16)}
+.pain-grid{display:grid;grid-template-columns:repeat(3,minmax(240px,320px));justify-content:center;gap:20px}
+@media(max-width:820px){.pain-grid{grid-template-columns:1fr}}
+.pain{border:1px solid rgba(217,164,65,.4);border-radius:var(--radius);padding:28px;background:#FCFAF4;box-shadow:0 6px 18px rgba(10,27,46,.05);text-align:center}
+.pain .big{font-family:var(--serif);font-size:42px;color:var(--gold-ink);font-weight:600;line-height:1}
+.pain h3{font-family:var(--sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 10px;color:var(--ink-on-light)}
+.pain p{font-size:15px;color:rgba(10,27,46,.75);font-weight:400;margin:0 auto;max-width:250px}
+
+/* How */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));justify-content:center;gap:18px}
+@media(max-width:980px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.steps{grid-template-columns:1fr}}
+.step{background:#FCFAF4;border:1px solid rgba(10,27,46,.09);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius);padding:28px 24px;text-align:center}
+.step .num{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:17px;font-family:var(--sans);margin:0 auto 18px;box-shadow:0 0 0 6px rgba(217,164,65,.14)}
+.step h3{font-family:var(--serif);font-size:22px;margin-bottom:10px;color:var(--ink-on-light)}
+.step p{font-size:15px;color:rgba(10,27,46,.78);font-weight:400;margin:0 auto;max-width:270px;line-height:1.6}
+
+/* Pricing */
+#pricing{background:var(--soft);border-top:1px solid rgba(217,164,65,.16);border-bottom:1px solid rgba(217,164,65,.16)}
+.price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,440px));gap:24px;justify-content:center}
+@media(max-width:820px){.price-grid{grid-template-columns:1fr}}
+.plan{border-radius:var(--radius);padding:38px 34px}
+.plan.audit-plan{background:#FCFAF4;border:1px solid rgba(10,27,46,.1);box-shadow:0 10px 30px rgba(10,27,46,.06)}
+.plan.after{background:#FCFAF4;color:var(--ink-on-light);border:1px solid rgba(217,164,65,.45);box-shadow:0 18px 44px rgba(10,27,46,.10)}
+.plan .tier{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:var(--gold)}
+.plan .amount{font-family:var(--serif);font-size:56px;font-weight:600;margin:12px 0 2px;color:var(--ink-on-light);line-height:1}
+.plan.after .amount{color:var(--ink-on-light)}
+.plan .per{font-size:12.5px;color:rgba(10,27,46,.6);letter-spacing:.04em;margin:2px 0 20px}
+.plan.after .per{color:rgba(10,27,46,.68)}
+.plan .pitch{font-size:15px;color:rgba(10,27,46,.75);margin:16px 0 24px;font-weight:400;line-height:1.7}
+.plan.after .pitch{color:rgba(10,27,46,.82)}
+.plan ul{list-style:none;display:grid;gap:12px;margin-bottom:30px}
+.plan li{font-size:15px;display:flex;gap:10px;align-items:flex-start;color:rgba(10,27,46,.85)}
+.plan.after li{color:rgba(10,27,46,.85)}
+.plan .check{flex-shrink:0;margin-top:4px}
+.plan .btn{width:100%;text-align:center}
+.plan.after .btn-primary{background:var(--ink-on-light);color:var(--ivory)}
+.plan.after .btn-primary:hover{background:#132A44}
+.plan-note{font-size:13.5px;color:rgba(10,27,46,.6);text-align:center;max-width:600px;margin:36px auto 0;font-weight:400;line-height:1.7}
+
+/* FAQ */
+.faq-list{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+@media(max-width:820px){.faq-list{grid-template-columns:1fr}}
+details{background:#FCFAF4;border:1px solid rgba(10,27,46,.08);box-shadow:0 6px 18px rgba(10,27,46,.05);border-radius:12px;padding:20px 24px}
+summary{font-weight:600;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;letter-spacing:.01em;color:var(--ink-on-light)}
+summary::after{content:'+';font-size:20px;color:var(--gold-ink);transition:transform .2s;font-weight:400}
+details[open] summary::after{transform:rotate(45deg)}
+details p{font-size:15px;color:rgba(10,27,46,.75);margin-top:12px;max-width:640px;font-weight:400;line-height:1.7}
+details p a{color:var(--gold-ink);text-decoration:underline}
+
+/* Contact */
+#contact{background:var(--ivory)}
+.cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+@media(max-width:860px){.cta-grid{grid-template-columns:1fr}}
+.cta-points{display:grid;gap:18px;margin-top:26px}
+.cta-points span{display:flex;gap:13px;align-items:center;font-size:17px;color:rgba(10,27,46,.85)}
+.form-card{background:#FCFAF4;color:var(--ink-on-light);border-radius:var(--radius);padding:34px;border:1px solid rgba(10,27,46,.08);box-shadow:0 18px 44px rgba(10,27,46,.12)}
+.form-card h3{font-family:var(--serif);font-size:22px;margin-bottom:6px;color:var(--ink-on-light)}
+.form-card .sub{font-size:12.5px;color:rgba(10,27,46,.68);margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:rgba(10,27,46,.75)}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1px solid rgba(10,27,46,.2);border-radius:6px;font-size:14px;font-family:var(--sans);background:var(--soft);color:var(--ink-on-light)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+.field textarea{min-height:74px;resize:vertical}
+.form-fine{font-size:12.5px;color:rgba(10,27,46,.65);margin-top:12px;text-align:center}
+.form-ok{display:none;text-align:center;padding:26px 8px}
+.form-ok .tick{width:52px;height:52px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.form-ok h4{font-family:var(--serif);font-size:22px;color:var(--ink-on-light)}
+.form-ok p{font-size:13px;color:rgba(10,27,46,.65);margin-top:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+
+/* Founder band */
+.founder-sec{background:var(--soft);border-top:1px solid rgba(217,164,65,.16);border-bottom:1px solid rgba(217,164,65,.16)}
+.founder{display:flex;align-items:center;gap:30px;max-width:860px;margin:0 auto;flex-wrap:wrap}
+.founder-photo{width:128px;height:128px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;background:var(--navy-card)}
+.founder-photo img{width:100%;height:100%;object-fit:cover;display:none}
+.founder-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:56px;color:var(--gold)}
+.founder h2{font-size:clamp(28px,3.5vw,40px);margin-bottom:10px}
+.founder p{font-size:15px;color:rgba(10,27,46,.82);font-weight:400;line-height:1.75;max-width:620px}
+.founder a{color:var(--gold-ink);font-weight:600}
+
+/* Footer */
+footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:36px 0}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.footer-links{display:flex;gap:14px 22px;flex-wrap:wrap}
+.footer-links a{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:rgba(244,241,234,.6)}
+.footer-links a:hover{color:var(--gold)}
+.footer-legal{font-size:12.5px;line-height:1.7;max-width:840px;margin-top:18px;color:rgba(244,241,234,.58);font-weight:400}
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns%3D'http://www.w3.org/2000/svg' viewBox%3D'86 216 226 247'%3E%3Cpath fill%3D'%23EDE8DD' fill-rule%3D'evenodd' d%3D'M 91.178 226.685 C 91.381 227.739, 93.189 228.800, 96.007 229.519 C 102.422 231.155, 104.735 232.613, 106.740 236.280 C 108.387 239.294, 108.500 245.994, 108.500 341.044 C 108.500 437.233, 108.405 442.733, 106.696 445.342 C 104.359 448.908, 99.854 451.608, 94.926 452.396 C 92.398 452.800, 91 453.554, 91 454.512 C 91 455.801, 95.679 456, 126 456 C 155.476 456, 161 455.777, 161 454.588 C 161 453.714, 159.437 452.912, 156.898 452.483 C 150.864 451.463, 147.202 447.644, 145.995 441.114 C 145.448 438.151, 145 421.435, 145 403.966 L 145 372.205 171.186 352.436 C 185.588 341.563, 197.850 332.685, 198.436 332.707 C 199.021 332.729, 210.750 341.184, 224.500 351.495 C 238.250 361.806, 250.063 370.461, 250.750 370.728 C 252.673 371.475, 252.539 440.775, 250.606 445.401 C 248.894 449.498, 245.686 451.858, 240.750 452.652 C 238.532 453.009, 237 453.816, 237 454.628 C 237 455.764, 242.852 456, 271 456 C 300.361 456, 305 455.798, 305 454.519 C 305 453.705, 303.762 452.764, 302.250 452.429 C 293.343 450.457, 291.118 448.963, 288.949 443.498 C 288.055 441.245, 287.786 415.728, 287.867 340.748 C 287.958 255.964, 288.192 240.475, 289.427 237.520 C 291.098 233.520, 295.839 230.248, 301.250 229.360 C 304.029 228.904, 305 228.260, 305 226.872 C 305 225.078, 303.526 225, 269.500 225 C 234.667 225, 234 225.038, 234 227 C 234 228.510, 234.674 229.005, 236.750 229.022 C 238.262 229.034, 241.432 229.921, 243.793 230.992 C 247.142 232.512, 248.518 233.918, 250.052 237.384 C 251.940 241.652, 252.007 244.026, 251.758 298.024 L 251.500 354.222 234 340.956 C 224.375 333.660, 212.612 324.610, 207.861 320.845 C 203.110 317.080, 198.933 314, 198.580 314 C 198.226 314, 186.364 322.994, 172.219 333.987 C 158.073 344.981, 146.146 353.981, 145.713 353.987 C 145.280 353.994, 145.056 328.688, 145.215 297.750 C 145.471 247.812, 145.690 241.088, 147.168 237.828 C 149.141 233.477, 152.499 231.071, 158.849 229.461 C 161.717 228.734, 163.624 227.652, 163.823 226.641 C 164.118 225.144, 160.937 225, 127.500 225 C 93.676 225, 90.878 225.130, 91.178 226.685 '/%3E%3Cpath fill%3D'%23D9A441' fill-rule%3D'evenodd' d%3D'M 179 388 L 179 396 187 396 L 195 396 195 388 L 195 380 187 380 L 179 380 179 388  M 202 388 L 202 396 210 396 L 218 396 218 388 L 218 380 210 380 L 202 380 202 388  M 179.210 411.250 L 179.500 419.500 187 419.500 L 194.500 419.500 194.790 411.250 L 195.081 403 187 403 L 178.919 403 179.210 411.250  M 202 411.542 L 202 420.084 209.750 419.792 L 217.500 419.500 217.790 411.250 L 218.081 403 210.040 403 L 202 403 202 411.542 '/%3E%3C/svg%3E">
+</head>
+<body id="top">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="86 216 226 247">
+    <path fill="#EDE8DD" fill-rule="evenodd" d="M 91.178 226.685 C 91.381 227.739, 93.189 228.800, 96.007 229.519 C 102.422 231.155, 104.735 232.613, 106.740 236.280 C 108.387 239.294, 108.500 245.994, 108.500 341.044 C 108.500 437.233, 108.405 442.733, 106.696 445.342 C 104.359 448.908, 99.854 451.608, 94.926 452.396 C 92.398 452.800, 91 453.554, 91 454.512 C 91 455.801, 95.679 456, 126 456 C 155.476 456, 161 455.777, 161 454.588 C 161 453.714, 159.437 452.912, 156.898 452.483 C 150.864 451.463, 147.202 447.644, 145.995 441.114 C 145.448 438.151, 145 421.435, 145 403.966 L 145 372.205 171.186 352.436 C 185.588 341.563, 197.850 332.685, 198.436 332.707 C 199.021 332.729, 210.750 341.184, 224.500 351.495 C 238.250 361.806, 250.063 370.461, 250.750 370.728 C 252.673 371.475, 252.539 440.775, 250.606 445.401 C 248.894 449.498, 245.686 451.858, 240.750 452.652 C 238.532 453.009, 237 453.816, 237 454.628 C 237 455.764, 242.852 456, 271 456 C 300.361 456, 305 455.798, 305 454.519 C 305 453.705, 303.762 452.764, 302.250 452.429 C 293.343 450.457, 291.118 448.963, 288.949 443.498 C 288.055 441.245, 287.786 415.728, 287.867 340.748 C 287.958 255.964, 288.192 240.475, 289.427 237.520 C 291.098 233.520, 295.839 230.248, 301.250 229.360 C 304.029 228.904, 305 228.260, 305 226.872 C 305 225.078, 303.526 225, 269.500 225 C 234.667 225, 234 225.038, 234 227 C 234 228.510, 234.674 229.005, 236.750 229.022 C 238.262 229.034, 241.432 229.921, 243.793 230.992 C 247.142 232.512, 248.518 233.918, 250.052 237.384 C 251.940 241.652, 252.007 244.026, 251.758 298.024 L 251.500 354.222 234 340.956 C 224.375 333.660, 212.612 324.610, 207.861 320.845 C 203.110 317.080, 198.933 314, 198.580 314 C 198.226 314, 186.364 322.994, 172.219 333.987 C 158.073 344.981, 146.146 353.981, 145.713 353.987 C 145.280 353.994, 145.056 328.688, 145.215 297.750 C 145.471 247.812, 145.690 241.088, 147.168 237.828 C 149.141 233.477, 152.499 231.071, 158.849 229.461 C 161.717 228.734, 163.624 227.652, 163.823 226.641 C 164.118 225.144, 160.937 225, 127.500 225 C 93.676 225, 90.878 225.130, 91.178 226.685 "/>
+    <path fill="#D9A441" fill-rule="evenodd" d="M 179 388 L 179 396 187 396 L 195 396 195 388 L 195 380 187 380 L 179 380 179 388  M 202 388 L 202 396 210 396 L 218 396 218 388 L 218 380 210 380 L 202 380 202 388  M 179.210 411.250 L 179.500 419.500 187 419.500 L 194.500 419.500 194.790 411.250 L 195.081 403 187 403 L 178.919 403 179.210 411.250  M 202 411.542 L 202 420.084 209.750 419.792 L 217.500 419.500 217.790 411.250 L 218.081 403 210.040 403 L 202 403 202 411.542 "/>
+  </symbol>
+  <symbol id="word-hayes" viewBox="403 253 542 117">
+    <path fill="currentColor" fill-rule="evenodd" d="M 903.081 257.535 C 896.115 259.477, 891.993 262.065, 887.205 267.504 C 882.631 272.701, 881 277.536, 881 285.899 C 881 298.025, 887.429 305.700, 907.782 317.871 C 927.152 329.454, 932.034 334.939, 932.238 345.345 C 932.559 361.697, 914.983 370.796, 898.348 362.890 C 892.585 360.151, 885.445 352.174, 881.818 344.424 C 880.139 340.837, 878.651 338.036, 878.512 338.201 C 878.372 338.365, 878.537 343.895, 878.879 350.489 C 879.447 361.449, 879.672 362.507, 881.500 362.814 C 882.600 362.999, 887.100 364.549, 891.500 366.259 C 898.576 369.008, 900.713 369.374, 910 369.425 C 922.225 369.491, 926.925 367.875, 934.312 361.066 C 940.603 355.268, 943.394 348.458, 943.356 339 C 943.298 324.418, 936.269 316.238, 912.500 303.093 C 897.459 294.775, 892.068 288.450, 892.022 279.066 C 891.968 268.224, 899.980 260.610, 911.408 260.643 C 921.973 260.673, 930.285 266.634, 935.896 278.205 L 938.949 284.500 938.967 279.500 C 939.001 270.410, 937.766 260.911, 936.602 261.310 C 935.996 261.518, 932.464 260.661, 928.754 259.405 C 919.646 256.322, 909.963 255.617, 903.081 257.535  M 593.444 260.750 C 592.574 262.813, 587.215 275.750, 581.537 289.500 C 562.629 335.282, 552.978 357.341, 550.342 360.796 C 548.907 362.678, 545.880 365.059, 543.616 366.087 L 539.500 367.956 554.500 367.888 C 565.050 367.840, 568.586 367.554, 566.419 366.925 C 561.927 365.621, 559.516 362.497, 559.659 358.166 C 559.726 356.150, 562.140 348.762, 565.025 341.750 L 570.270 329 592.385 329.028 L 614.500 329.056 619.263 341.278 C 626.305 359.350, 626.423 359.777, 625.124 362.627 C 624.505 363.985, 622.536 365.733, 620.749 366.509 C 617.793 367.795, 619.121 367.923, 635.500 367.939 L 653.500 367.956 649.346 366.070 C 646.506 364.780, 644.390 362.810, 642.657 359.842 C 640.013 355.315, 611.903 290.023, 600.427 261.754 C 598.027 255.843, 595.659 255.503, 593.444 260.750  M 408.718 260.326 C 415.887 262.942, 415.469 259.891, 415.778 311.896 C 415.957 342.016, 415.692 359.679, 415.036 361.406 C 414.387 363.113, 412.464 364.795, 409.757 366.024 L 405.500 367.956 423 367.956 L 440.500 367.956 436.480 366.130 C 430.321 363.332, 430 361.863, 430 336.453 L 430 314 462.051 314 L 494.103 314 493.801 337.474 C 493.507 360.366, 493.444 361.005, 491.224 363.224 C 489.973 364.476, 487.498 366.028, 485.724 366.674 C 483.048 367.648, 485.558 367.848, 500.500 367.848 C 516.037 367.848, 518.029 367.678, 515.055 366.603 C 513.161 365.919, 510.686 364.120, 509.555 362.606 C 507.551 359.921, 507.500 358.709, 507.500 313.500 C 507.500 268.291, 507.551 267.079, 509.555 264.394 C 510.686 262.880, 513.161 261.081, 515.055 260.397 C 518.041 259.318, 516.166 259.147, 501 259.115 C 485.653 259.083, 483.869 259.241, 486.500 260.403 C 493.317 263.411, 493.466 263.968, 493.821 287.603 L 494.142 309 462.071 309 L 430 309 430 288.547 C 430 265.309, 430.392 263.636, 436.480 260.870 L 440.500 259.044 423 259.098 C 408.401 259.143, 406.033 259.347, 408.718 260.326  M 656.541 260.880 C 662.577 263.621, 664.964 266.835, 687.422 302.445 L 698.109 319.389 697.804 340.169 C 697.510 360.254, 697.424 361.025, 695.224 363.224 C 693.973 364.476, 691.498 366.028, 689.724 366.674 C 687.048 367.648, 689.558 367.848, 704.500 367.848 C 719.442 367.848, 721.952 367.648, 719.276 366.674 C 717.502 366.028, 715.027 364.476, 713.776 363.224 C 711.572 361.019, 711.489 360.264, 711.162 339.343 L 710.825 317.739 724.662 294.722 C 739.208 270.528, 745.782 262.251, 752 260.302 C 754.896 259.394, 752.910 259.193, 740.500 259.141 C 726.915 259.084, 725.799 259.208, 728.671 260.458 C 732.915 262.304, 734.335 265.125, 733.161 269.378 C 732.653 271.220, 727.834 280.326, 722.454 289.614 C 717.073 298.901, 711.957 307.735, 711.085 309.244 C 710.213 310.753, 709.275 311.985, 709 311.983 C 708.031 311.975, 682.022 269.245, 681.854 267.385 C 681.475 263.200, 682.145 261.841, 685.250 260.491 C 688.208 259.205, 686.881 259.077, 670.500 259.061 L 652.500 259.044 656.541 260.880  M 774.581 260.075 C 776.276 260.567, 778.526 261.923, 779.581 263.089 C 781.406 265.105, 781.514 267.485, 781.779 311.827 C 781.986 346.301, 781.747 359.198, 780.861 361.335 C 780.094 363.188, 778.201 364.876, 775.582 366.042 C 771.545 367.839, 771.916 367.859, 809.530 367.929 L 847.560 368 849.301 357.750 C 850.259 352.113, 851.316 346.375, 851.651 345 C 852.012 343.518, 850.623 344.990, 848.238 348.617 C 844.160 354.818, 840.334 358.299, 834 361.572 C 831.186 363.026, 827.378 363.466, 814.577 363.814 C 800.057 364.210, 798.537 364.088, 797.327 362.433 C 796.314 361.047, 796 355.084, 796 337.213 L 796 313.808 809.797 314.154 C 825.650 314.552, 827.929 315.428, 831.062 322.328 L 832.956 326.500 832.956 312 L 832.956 297.500 831.115 301.500 C 828.107 308.033, 825.332 309, 809.596 309 L 796 309 796 286 L 796 263 811.322 263 C 822.657 263, 827.849 263.411, 831.276 264.579 C 836.575 266.384, 842.120 271.924, 844.095 277.385 C 844.814 279.373, 845.671 281, 845.999 281 C 846.616 281, 845.405 265.246, 844.482 261.250 L 843.962 259 807.731 259.090 C 784.641 259.148, 772.618 259.505, 774.581 260.075  M 591.341 277.607 C 590.952 278.648, 586.666 289.127, 581.817 300.893 C 576.968 312.660, 573 322.672, 573 323.143 C 573 323.615, 581.823 324, 592.607 324 C 607.894 324, 612.103 323.725, 611.712 322.750 C 606.567 309.953, 592.684 276.398, 592.413 276.107 C 592.212 275.891, 591.729 276.566, 591.341 277.607 "/>
+  </symbol>
+  <symbol id="tick" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav>
+  <div class="container nav-inner">
+    <a class="lockup" href="#top">
+      <svg class="mark-art"><use href="#mark"/></svg>
+      <span class="divider"></span>
+      <span class="words">
+        <svg class="hayes-art"><use href="#word-hayes"/></svg>
+        <span class="systems">SYSTEMS</span>
+      </span>
+    </a>
+    <div class="nav-links">
+      <a href="#problem">The Problem</a>
+      <a href="#how">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="clients.html" style="color:var(--gold)">Already a client?</a>
+      <a class="btn btn-primary nav-cta" href="#contact">Free Database Audit</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">Lead reactivation for real estate teams</span>
+      <h1>The cheapest leads you'll ever work are the ones <span class="accent">you already paid for.</span></h1>
+      <p class="lede">Your CRM already holds leads you paid for and never fully worked. Hayes Systems re-engages them with personalized email, text, and opt-in AI calls, and books qualified appointments straight onto your calendar.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#contact">Get a free database audit</a>
+        <a class="btn btn-outline" href="#how">See how it works</a>
+      </div>
+      <div class="trust">
+        <span><svg><use href="#tick"/></svg>No CRM changes</span>
+        <span><svg><use href="#tick"/></svg>Zero upfront cost</span>
+        <span><svg><use href="#tick"/></svg>Pay per booked appointment</span>
+        <span><svg><use href="#tick"/></svg>One-click calendar connection</span>
+        <span><svg><use href="#tick"/></svg>Weekly campaign reports</span>
+      </div>
+    </div>
+    <div class="chat-wrap">
+    <div style="text-align:center;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(10,27,46,.55);margin-bottom:10px">Sample conversation</div>
+    <div class="chat-card">
+      <div class="chat-head">
+        <div class="chat-avatar">H</div>
+        <div>
+          <div class="name">Hadley Group follow-up &middot; Assistant</div>
+          <div class="status">Connected with your team</div>
+        </div>
+      </div>
+      <div class="bubble them">Hi Sarah, Dana with the Hadley Group has been seeing some new opportunities come through lately. Would a quick call with her be worth your time this week?</div>
+      <div class="bubble us">Actually, yes! We got pre-approved last month &#128522;</div>
+      <div class="bubble them">Congratulations, that's a big step. Want me to set up a short call with Dana? I can book a time that works for you.</div>
+      <div class="bubble us">Thursday works.</div>
+    </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats-band" aria-label="Follow-up facts">
+  <div class="container stats-row">
+    <div class="stat-item"><div class="big">5+</div><p>follow-up touches are what it typically takes to convert a lead. Most agents stop at two.</p></div>
+    <div class="stat-item"><div class="big">70%</div><p>of real estate leads are lost to poor follow-up, not to better competition.</p></div>
+    <div class="stat-item"><div class="big">90 days+</div><p>is all it takes for a lead to go cold. Nobody's calling them. We are.</p></div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">The problem</span>
+      <h2>You already bought this pipeline.</h2>
+      <p>Every contact in your database cost real money. Then they went quiet, and the follow-up stopped. The acquisition cost is spent. The opportunity isn't.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain"><div class="big">$20-60</div><h3>What each lead cost you.</h3><p>Multiply that by every contact sitting untouched in your CRM.</p></div>
+      <div class="pain"><div class="big">1-2</div><h3>Follow-up attempts before most agents quit.</h3><p>It takes five or more touches to convert. Deals die inside that gap.</p></div>
+      <div class="pain"><div class="big">9 Sides</div><h3>What the typical agent closed in 2025 (NAR).</h3><p>At that volume, one reactivated conversation is worth more than another ad dollar.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Four steps. No new software to learn.</h2>
+      <p>We run the whole sequence, and appointments land on your calendar automatically. That's the entire process.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Send us your CSV</h3><p>Export the leads quiet for three months or more. No integrations, no changes to your CRM.</p></div>
+      <div class="step"><div class="num">2</div><h3>We run the sequence</h3><p>A personalized email, then a friendly text. Leads who want a call say so, and our conversational AI assistant takes it from there.</p></div>
+      <div class="step"><div class="num">3</div><h3>Appointments hit your calendar</h3><p>On the call, the assistant confirms the lead is genuinely looking, with a sense of timeline and budget, then books.</p><p>Your booking link connects with one click.</p></div>
+      <div class="step"><div class="num">4</div><h3>Pay for results</h3><p>Billed per booked appointment, one invoice at campaign close.</p><p>No-shows are replaced free, and a campaign that books nothing costs nothing.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">Pricing</span>
+      <h2>Structured so there's nothing to lose.</h2>
+      <p>A free audit of your database first. Then you pay only for appointments that land on your calendar.</p>
+    </div>
+    <div class="price-grid">
+      <div class="plan audit-plan">
+        <div class="tier">Database Audit</div>
+        <div class="amount">Free</div>
+        <div class="per">Know exactly what's sitting in your CRM before you spend a cent.</div>
+        <ul>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Your dormant leads, sized and scored for reactivation</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Evidence-backed advice</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>No commitment and no credit card required</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Yours to keep, whatever you decide</li>
+        </ul>
+        <a class="btn btn-primary" href="#contact">Get the free audit</a>
+      </div>
+      <div class="plan after">
+        <div class="tier">Campaigns</div>
+        <div class="amount">$60</div>
+        <div class="per">/ booked appointment</div>
+        <p class="pitch">You're billed per appointment that lands on your calendar, on one invoice at campaign close charged automatically to your card on file. Any no-show makes your next appointment free.</p>
+        <ul>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Unlimited campaign size</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Email, text, and opt-in AI calls in one sequence</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Weekly progress updates while the campaign runs</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Close-out report with the full numbers: messages, conversations, appointments</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Written-consent calling, TCPA handled</li>
+        </ul>
+        <a class="btn btn-primary" href="#contact">Contact us</a>
+      </div>
+    </div>
+    <div style="max-width:860px;margin:34px auto 0;padding:26px 30px;background:#FCFAF4;border:1px solid rgba(10,27,46,.1);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius)">
+      <span class="eyebrow" style="color:var(--gold-ink)">Continuous coverage</span>
+      <h3 style="font-family:var(--serif);font-size:22px;margin:8px 0 10px;color:var(--ink-on-light)">Your database is quietly producing opportunity every month. A retainer works it year-round.</h3>
+      <p style="font-size:15px;color:rgba(10,27,46,.82);line-height:1.65">Most teams wait until the pipeline runs dry to look at old leads. A retainer watches your list year-round: campaigns launch the moment a segment shows life, and a quarterly report shows what the program actually produced. Retainer clients book at a discounted per-appointment rate.</p>
+      <a class="btn btn-primary" href="#contact" style="margin-top:16px">Ask about a retainer</a>
+    </div>
+    <p class="plan-note">Based on industry benchmarks for database reactivation, a 500-lead database typically produces 10 to 30 re-engaged conversations per campaign.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions agents always ask.</h2>
+    </div>
+    <div class="faq-list">
+      <details><summary>Is this compliant? I've heard horror stories about cold texting.</summary><p>Nothing we do is cold. A call only happens after that person replies YES in writing.</p><p>About twenty states require paid registration to call their residents, so we don't call there; email and text continue normally. Opt-outs, calling hours, and recordkeeping are handled before anything sends. <a href="compliance.html" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">The full picture is on our compliance page.</a></p></details>
+      <details><summary>What stops the AI from going off script?</summary><p>Evelyn only calls leads who explicitly asked for the call and opens every conversation by saying she is an AI assistant.</p><p>Her job is narrow: confirm budget and timeline and book the appointment. Property-specific questions belong to you, the licensee, so she says so plainly and books the call with you to answer them.</p><p>Every call is recorded and transcribed. Evelyn runs on <a href="https://www.retellai.com/#try-demo" target="_blank" rel="noopener">Retell AI</a>; try their live demo.</p></details>
+      <details><summary>Will this annoy my past clients and burn goodwill?</summary><p>Every message is personalized and reads as a friendly check-in from your team, not a marketing blast. When a lead replies, automated messages stop and a real conversation starts: interested responses go straight to you, and anyone who asks us to stop is stopped everywhere, permanently.</p></details>
+      <details><summary>What if my leads are old? Like, years old.</summary><p>Older is our specialty: three months quiet is the minimum age we work (fresher leads belong to your own follow-up), and the sweet spot runs to a couple of years. Databases with three- and four-year-old contacts have produced appointments. The audit tells you honestly what yours is worth before anyone commits.</p></details>
+      <details><summary>Do you need access to my CRM?</summary><p>No. Export your full list as a CSV and send it over as-is. We handle the rest: duplicates, dead numbers, and junk entries are removed, and only the promising old leads get worked. Appointments land right on your calendar.</p></details>
+      <details><summary>Why not just build this myself?</summary><p>You can. The pieces exist; the hard part is making them work together. Automations break quietly: a CRM changes its export format, a scheduling link expires, and the workflow you built in January is silently dead by March. Someone has to notice and fix it, forever. That is the job we actually do.</p><p>You would also take on the compliance side yourself, as the sender of record: consent records, opt-out suppression, calling-hour rules. Build it yourself and you own the maintenance. Work with us and you never think about it.</p></details>
+      <details><summary>When a lead replies, how fast do you respond?</summary><p>Fast enough that momentum never dies: our median reply goes out in about a minute, so when a lead says yes, the next question (picking a time) is already on its way. Industry research puts a big premium on responding inside the first hour. Old leads get the same urgency as new inquiries.</p></details>
+      <details><summary>We already have an inside sales team.</summary><p>Good, keep them on new leads; that's the job they are measured on, and we don't touch it. We work the old list that never gets called. Appointments we book arrive on your agents' calendars with the same qualification notes your inside team writes (timeline, budget), so the handoff feels familiar.</p></details>
+      <details><summary>What do I need on my side?</summary><p>Just a calendar our assistant can book into. Cal.com, Calendly, or GoHighLevel: we email a link, you press authorize, done.</p><p>Solo agents are fine on any plan, including free. Teams need round-robin scheduling: Cal.com and Calendly include it in team plans (about $12-16 per user a month), GoHighLevel in the standard subscription. A free Cal.com calendar also works alongside anything else.</p></details>
+      <details><summary>What counts as an appointment I pay for?</summary><p>An appointment on your calendar with a prospect from your list, booked during a call or from the link we send. One invoice at close covers the appointments booked, charged to the card on file. If anything looks wrong, you have 14 days to say so and we make it right.</p></details>
+      <details><summary>What happens if someone no-shows?</summary><p>When a prospect no-shows, your next booked appointment is on us. On Calendly the detection is automatic; on Cal.com and GoHighLevel, flag it and the credit lands the same way.</p></details>
+      <details><summary>Is there a bad time of year to run this?</summary><p>Homes sell year-round, but the market peaks April through June and slows about a third by January. A fall or winter campaign still books appointments and builds your pipeline before the March ramp. The audit prices your list as it is today.</p></details>
+      <details><summary>Does Hayes Systems offer other services?</summary><p>We currently provide only lead reactivation to real estate teams. We are a newer company with a focus on quality and not quantity. As we become more experienced we hope to bring more useful services to market.</p></details>
+      <details><summary>Can this run continuously instead of one campaign at a time?</summary><p>Yes. A monthly retainer covers list monitoring and hygiene, suppression management, a quarterly report of what the program produced, and campaigns that launch as each segment shows life. Bookings run $50 instead of $60, and the retainer starts at $500 a month.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="founder-sec">
+  <div class="container founder">
+    <div class="founder-photo">
+      <img src="matt.jpg?v=3" alt="Matt, founder of Hayes Systems" onload="this.style.display='block';document.getElementById('founder-mono').style.display='none'">
+      <div id="founder-mono" class="founder-mono">M</div>
+    </div>
+    <div>
+      <span class="eyebrow">The person behind it</span>
+      <h2>Hi, I'm Matt.</h2>
+      <p>I founded Hayes Systems on one principle: honesty. That's why my name and face are on it. No hollow promises, no costs hidden behind confusion. If you have questions, email me directly at <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>.</p>
+    </div>
+  </div>
+</section>
+<section id="contact">
+  <div class="container cta-grid">
+    <div>
+      <span class="eyebrow">Free database audit</span>
+      <h2>Find out what your CRM is worth.</h2>
+      <p style="color:rgba(10,27,46,.82);margin-top:16px;font-size:18px;font-weight:400;line-height:1.75">Send us the basics and you'll get a structured report back: how many of your dormant leads are workable, and what a campaign would likely produce.</p>
+      <div class="cta-points">
+        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Takes two minutes to request</span>
+        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>No commitment and no credit card</span>
+        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Get a straight answer, not a sales pitch</span>
+      </div>
+      <p style="margin-top:26px;font-size:15px;color:rgba(10,27,46,.82)">Questions before you send anything? Email us directly at <a href="mailto:Matt@hayessystems.com" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">Matt@hayessystems.com</a>.</p>
+    </div>
+    <div class="form-card">
+      <form id="audit-form" onsubmit="return submitted(event)">
+        <h3>Request your free audit</h3>
+        <div class="sub">No commitment. The audit comes to you by email.</div>
+        <div class="row">
+          <div class="field"><label for="f-name">Your name</label><input id="f-name" required></div>
+          <div class="field"><label for="f-team">Team / brokerage</label><input id="f-team"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" required></div>
+          <div class="field"><label for="f-phone">Phone</label><input id="f-phone" type="tel"></div>
+        </div>
+        <div class="field"><label for="f-size">Roughly how many dormant leads in your database?</label>
+          <select id="f-size" required>
+            <option value="">Select a range</option>
+            <option>Under 250</option><option>250 to 500</option><option>500 to 1,000</option>
+            <option>1,000 to 2,500</option><option>2,500+</option><option>Honestly, no idea</option>
+          </select>
+        </div>
+        <div class="field"><label for="f-comm">Average commission on a deal from this list? (optional)</label>
+          <input id="f-comm" type="text" inputmode="numeric" placeholder="e.g. 12000, powers the value estimate in your audit">
+        </div>
+        <div class="field"><label for="f-notes">Additional info</label><textarea id="f-notes"></textarea></div>
+        <button class="btn btn-primary" type="submit" id="audit-submit" style="width:100%;border:none;cursor:pointer">Request my free audit</button>
+        <div class="form-fine">We do not sell your data or use your email for promotions. <a href="privacy.html" style="color:var(--gold-ink);text-decoration:underline">Privacy policy</a></div>
+      </form>
+      <div class="form-ok" id="form-ok">
+        <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h4>Request received.</h4>
+        <p>We'll review your details and get back to you with a straight answer about your database.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a class="lockup" href="#top">
+        <svg class="mark-art"><use href="#mark"/></svg>
+      <span class="divider"></span>
+      <span class="words">
+        <svg class="hayes-art"><use href="#word-hayes"/></svg>
+        <span class="systems">SYSTEMS</span>
+      </span>
+      </a>
+      <div class="footer-links">
+        <a href="#problem">The Problem</a><a href="#how">How It Works</a><a href="how-it-works.html">The Process</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><a href="compliance.html">Compliance</a><a href="privacy.html">Privacy</a><a href="cancellation.html">Cancellation</a><a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>
+      </div>
+    </div>
+    <p class="footer-legal">&copy; 2026 Hayes Systems · Western Massachusetts. Hayes Systems is a marketing service operating in accordance with applicable telephone and text messaging regulations (TCPA), placing calls only to leads who have given written consent, with permanent opt-out processing; see our <a href="compliance.html" style="color:rgba(244,241,234,.6)">compliance page</a>. Performance figures are illustrative ranges from industry benchmarks; individual results vary with database age, source, and quality. Follow-up statistics reflect widely cited industry research (InsideSales/XANT; NAR 2026 Member Profile).</p>
+  </div>
+</footer>
+
+<script>
+function submitted(e){
+  e.preventDefault();
+  var f = e.target;
+  var v = function(id){ return document.getElementById(id).value.trim(); };
+  var payload = {
+    name: v('f-name'), team: v('f-team'), email: v('f-email'), phone: v('f-phone'),
+    size: v('f-size'), commission: v('f-comm'), notes: v('f-notes')
+  };
+  var btn = document.getElementById('audit-submit');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  fetch('https://ops.hayessystems.com/api/audit/web', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){ return r.json(); }).then(function(d){
+    document.getElementById('audit-form').style.display = 'none';
+    var ok = document.getElementById('form-ok');
+    ok.style.display = 'block';
+    var p = ok.querySelector('p');
+    if (p && d.ok) p.textContent = 'Request received. Your audit is on its way to ' + payload.email + '.';
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = 'Request my free audit';
+    alert('Something went wrong sending the request. Email us directly at Matt@hayessystems.com.');
+  });
+  return false;
+}
+</script>
+</body>
+</html>
