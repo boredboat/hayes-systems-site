@@ -401,13 +401,6 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
           <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" required></div>
           <div class="field"><label for="f-phone">Phone</label><input id="f-phone" type="tel"></div>
         </div>
-        <div class="field"><label for="f-size">Roughly how many dormant leads in your database?</label>
-          <select id="f-size" required>
-            <option value="">Select a range</option>
-            <option>Under 250</option><option>250 to 500</option><option>500 to 1,000</option>
-            <option>1,000 to 2,500</option><option>2,500+</option><option>Honestly, no idea</option>
-          </select>
-        </div>
         <div class="field"><label for="f-comm">Average commission on a deal from this list? (optional)</label>
           <input id="f-comm" type="text" inputmode="numeric" placeholder="e.g. 12000 &mdash; powers the value estimate in your audit">
         </div>
@@ -464,7 +457,7 @@ function submitted(e){
   var v = function(id){ return document.getElementById(id).value.trim(); };
   var payload = {
     name: v('f-name'), team: v('f-team'), email: v('f-email'), phone: v('f-phone'),
-    size: v('f-size'), commission: v('f-comm'), notes: v('f-notes')
+    commission: v('f-comm'), notes: v('f-notes')
   };
   var btn = document.getElementById('audit-submit');
   btn.disabled = true; btn.textContent = 'Sending...';
