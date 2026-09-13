@@ -379,9 +379,9 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 <section id="contact">
   <div class="container cta-grid">
     <div>
-      <span class="eyebrow">Free database audit</span>
+      <span class="eyebrow">Free estimate</span>
       <h2>Find out what your CRM is worth.</h2>
-      <p style="color:rgba(10,27,46,.82);margin-top:16px;font-size:18px;font-weight:400;line-height:1.75">Send us the basics and you'll get a structured report back: how many of your dormant leads are workable, and what a campaign would likely produce.</p>
+      <p style="color:rgba(10,27,46,.82);margin-top:16px;font-size:18px;font-weight:400;line-height:1.75">Tell us roughly how many dormant leads you have and you'll get the estimate by email: how many are workable and what a campaign would likely produce. Want exact numbers instead? The free audit of your list does that, whenever you're ready.</p>
       <div class="cta-points">
         <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Takes two minutes to request</span>
         <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>No commitment and no credit card</span>
@@ -391,8 +391,8 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
     </div>
     <div class="form-card">
       <form id="audit-form" onsubmit="return submitted(event)">
-        <h3>Request your free audit</h3>
-        <div class="sub">No commitment. The audit comes to you by email.</div>
+        <h3>Get your dormant-lead estimate</h3>
+        <div class="sub">No commitment, no list to send. It comes to you by email.</div>
         <div class="row">
           <div class="field"><label for="f-name">Your name</label><input id="f-name" required></div>
           <div class="field"><label for="f-team">Team / brokerage</label><input id="f-team"></div>
@@ -401,11 +401,24 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
           <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" required></div>
           <div class="field"><label for="f-phone">Phone</label><input id="f-phone" type="tel"></div>
         </div>
-        <div class="field"><label for="f-comm">Average commission on a deal from this list? (optional)</label>
-          <input id="f-comm" type="text" inputmode="numeric" placeholder="e.g. 12000 &mdash; powers the value estimate in your audit">
+        <div class="row">
+          <div class="field"><label for="f-band">Roughly how many dormant leads (no contact in 3+ months)?</label>
+            <select id="f-band" required>
+              <option value="">Choose...</option>
+              <option value="u500">Under 500</option>
+              <option value="500-1500">500 to 1,500</option>
+              <option value="1500-5000">1,500 to 5,000</option>
+              <option value="5000+">5,000 or more</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+            <div class="form-fine" style="margin-top:4px">An estimate is fine - we work from bands, and the free audit later replaces it with exact numbers.</div>
+          </div>
+          <div class="field"><label for="f-comm">Average commission on a deal from this list? (optional)</label>
+            <input id="f-comm" type="text" inputmode="numeric" placeholder="e.g. 12000 &mdash; powers the value estimate">
+          </div>
         </div>
         <div class="field"><label for="f-notes">Additional info</label><textarea id="f-notes"></textarea></div>
-        <button class="btn btn-primary" type="submit" id="audit-submit" style="width:100%;border:none;cursor:pointer">Request my free audit</button>
+        <button class="btn btn-primary" type="submit" id="audit-submit" style="width:100%;border:none;cursor:pointer">Get my estimate</button>
         <div class="form-fine">We do not sell your data or use your email for promotions. <a href="privacy.html" style="color:var(--gold-ink);text-decoration:underline">Privacy policy</a></div>
       </form>
       <div class="form-ok" id="form-ok">
@@ -457,7 +470,7 @@ function submitted(e){
   var v = function(id){ return document.getElementById(id).value.trim(); };
   var payload = {
     name: v('f-name'), team: v('f-team'), email: v('f-email'), phone: v('f-phone'),
-    commission: v('f-comm'), notes: v('f-notes')
+    band: v('f-band'), commission: v('f-comm'), notes: v('f-notes')
   };
   var btn = document.getElementById('audit-submit');
   btn.disabled = true; btn.textContent = 'Sending...';
@@ -470,9 +483,9 @@ function submitted(e){
     var ok = document.getElementById('form-ok');
     ok.style.display = 'block';
     var p = ok.querySelector('p');
-    if (p && d.ok) p.textContent = 'Request received. Your audit is on its way to ' + payload.email + '.';
+    if (p && d.ok) p.textContent = 'Estimate received. It is on its way to ' + payload.email + '.';
   }).catch(function(){
-    btn.disabled = false; btn.textContent = 'Request my free audit';
+    btn.disabled = false; btn.textContent = 'Get my estimate';
     alert('Something went wrong sending the request. Email us directly at Matt@hayessystems.com.');
   });
   return false;
