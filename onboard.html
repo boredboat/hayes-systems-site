@@ -84,13 +84,6 @@ select{background:#fff;padding:10px 2px}
 
     <h2>2. Appointments</h2>
     <div class="row">
-      <div class="field"><label for="campaign_scope">Campaign scope</label>
-      <select id="campaign_scope" required>
-        <option value="">Choose...</option>
-        <option value="full">Full list: my entire export</option>
-        <option value="pilot">Start smaller: first 500 leads</option>
-      </select>
-      <div class="hint">Both cost the same per appointment; the smaller option just works a first slice. Not sure? Work the full list.</div></div>
       <div class="field"><label for="appts_per_week">Appointments per week your team can run</label>
       <input id="appts_per_week" type="number" min="1" max="50" step="1" required placeholder="5">
       <div class="hint">This sets how fast we run your campaign and roughly how many appointments to expect each week.</div></div>
@@ -156,7 +149,7 @@ fetch('/terms.json').then(r => r.json()).then(t => {
   da.innerHTML = (t.data_agreement.intro ? '<p class="tintro">' + esc(t.data_agreement.intro) + '</p>' : '') +
     t.data_agreement.clauses.map(c => '<h3>' + esc(c.h) + '</h3><p>' + esc(c.b) + '</p>').join('');
   const pa = document.getElementById('pa-terms');
-  pa.innerHTML = t.pilot_terms.clauses.map(c => '<h3>' + esc(c.h) + '</h3><p>' + esc(c.b) + '</p>').join('');
+  pa.innerHTML = t.campaign_terms.clauses.map(c => '<h3>' + esc(c.h) + '</h3><p>' + esc(c.b) + '</p>').join('');
 }).catch(e => {
   // if terms fail to load, the form must not be submittable blind
   document.getElementById('submit-btn').disabled = true;
@@ -174,15 +167,14 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     contact_name: v('contact_name'), contact_email: v('contact_email'),
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
-    campaign_scope: v('campaign_scope'),
     appts_per_week: v('appts_per_week'),
     agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
     da_agency: v('business_name'), da_signer: v('signature'),
     da_date: v('date_signed'),
-    pa_agency: v('business_name'), pa_signer: v('signature'),
-    pa_date: v('date_signed')
+    ct_agency: v('business_name'), ct_signer: v('signature'),
+    ct_date: v('date_signed')
   };
   try {
     var r = await fetch('https://ops.hayessystems.com/api/intake/web', {

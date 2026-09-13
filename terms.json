@@ -29,7 +29,7 @@
    }
   ]
  },
- "pilot_terms": {
+ "campaign_terms": {
   "title": "Campaign Terms",
   "clauses": [
    {
@@ -38,7 +38,7 @@
    },
    {
     "h": "2. What it costs",
-    "b": "You pay $60 per booked appointment and nothing else - no setup fee, no monthly minimum, nothing upfront. When the campaign closes, one invoice covers the appointments it booked and is charged automatically to your card on file. If nothing books, you owe nothing. If a prospect no-shows, that appointment is not charged. If anything on the invoice looks wrong, you have 14 days to raise it and we make it right."
+    "b": "You pay $60 per booked appointment and nothing else - no setup fee, no monthly minimum, nothing upfront. When the campaign closes, one invoice covers the appointments it booked and is charged automatically to your card on file. If nothing books, you owe nothing. If a no-shows, that appointment is not charged. If anything on the invoice looks wrong, you have 14 days to raise it and we make it right."
    },
    {
     "h": "3. What you provide",
