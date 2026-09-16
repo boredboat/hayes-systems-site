@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report emails — Hayes Systems</title>
+<meta name="robots" content="noindex">
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
+body{font-family:'Montserrat',-apple-system,sans-serif;background:#02101F;color:#EDE8DD;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;text-align:center}
+.box{max-width:460px}
+h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;color:#D9A441;margin-bottom:12px}
+p{font-size:15px;line-height:1.7;color:rgba(244,241,234,.8)}
+#status{margin-top:28px;font-size:17px;min-height:24px}
+.ok{color:#D9A441}.err{color:#c97a7a}
+small{display:block;margin-top:40px;color:rgba(244,241,234,.4);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>Hayes Systems</h1>
+<p id="status">Updating your email preferences…</p>
+<small>Hayes Systems · Western Massachusetts</small>
+</div>
+<script>
+// Scoped preference page (distinct from /unsubscribe): this link appears only in
+// client service email (the Friday report). It stops report emails for the
+// client who clicks it; transactional mail and campaign outreach are untouched.
+const q = new URLSearchParams(location.search);
+const e = q.get('e') || '', t = q.get('t') || '';
+const st = document.getElementById('status');
+if (e && t) {
+  fetch('https://ops.hayessystems.com/api/report-opt-out?e=' + encodeURIComponent(e) + '&t=' + encodeURIComponent(t))
+    .then(r => r.json())
+    .then(j => { if (j.ok) { st.textContent = 'You are off the weekly report list. You will still hear from us about your campaign: the kickoff note, billing, and the final report.'; st.className = 'ok'; } else { st.textContent = 'We could not update that preference automatically. Reply to any report email and we will take care of it.'; st.className = 'err'; } })
+    .catch(() => {
+      // innerHTML is safe here: the only interpolated value (e) passes through
+      // encodeURIComponent inside the mailto body — quotes/angle brackets cannot
+      // escape the href attribute. Same pattern as unsubscribe.html.
+      const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('No weekly reports') +
+                   '&body=' + encodeURIComponent('Please stop the weekly report emails for: ' + e + '\nToken: ' + t + '\n');
+      st.innerHTML = 'We are turning those off. If your email program does not open automatically, <a style="color:#D9A441" href="' + mail + '">click here to confirm</a>.';
+      st.className = 'ok';
+      setTimeout(() => { location.href = mail; }, 1200);
+    });
+} else {
+  st.textContent = 'Invalid link. Reply to any report email and we will update your preference.';
+  st.className = 'err';
+}
+</script>
+</body>
+</html>
