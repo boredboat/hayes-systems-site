@@ -138,14 +138,44 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 
   // one-time launch link arrives in the URL fragment (#t=...) — fragments
   // never reach servers or logs; the browser sends the token once, in the
-  // launch POST body
+  // launch POST body. A valid link opens the UPLOAD-ONLY view (Matt 9/17):
+  // the menu / request-campaign options stay hidden.
   var m = location.hash.match(/[#&]t=([a-f0-9]{16,80})/);
   if(m){ token = m[1]; }
-  if(token){
+  function applyToken(){
     document.getElementById('gated').hidden = false;
     document.getElementById('sendlink').hidden = true;
+    var rq = document.getElementById('reqcamp');
+    if(rq){ rq.hidden = true; }
+    var h1 = document.querySelector('h1');
+    if(h1){ h1.textContent = 'Upload your list.'; }
+    var uh = document.querySelector('.up-head');
+    if(uh){ uh.hidden = true; }
+    var upd = document.querySelector('.up-desc');
+    if(upd){ upd.textContent = 'Drop your dormant-lead export below. We run the hygiene and audit, show you the numbers, and start when you confirm.'; }
     var ln = document.getElementById('link-note');
-    if(ln){ ln.textContent = 'Your launch link is active for this visit. It finishes when you confirm the launch.'; }
+    if(ln){ ln.hidden = true; }
+    var emlbl = document.querySelector('label[for="email"]');
+    if(emlbl){ emlbl.hidden = true; }
+    email.readOnly = true;
+  }
+  if(token){
+    // verify the link (non-consuming) and resolve who clicked
+    fetch('https://ops.hayessystems.com/api/portal/whoami?t=' + token)
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d.ok && d.valid){
+          email.value = d.email || '';
+          applyToken();
+        } else {
+          token = '';
+          var e0 = document.getElementById('err0');
+          e0.textContent = 'That link has expired or was already used. Enter your email below to get a fresh one.';
+          e0.hidden = false;
+        }
+        ready();
+      })
+      .catch(function(){ applyToken(); ready(); });
   }
 
   function ready(){
