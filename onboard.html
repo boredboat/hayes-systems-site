@@ -50,6 +50,7 @@ textarea{resize:vertical;min-height:74px}
 .btn:disabled{opacity:.5;cursor:wait}
 .fine{font-size:12.5px;color:rgba(10,27,46,.6);margin-top:14px}
 .hint{font-size:12.5px;color:rgba(10,27,46,.6);margin-top:5px;line-height:1.5}
+.opt{font-weight:400;color:rgba(10,27,46,.55);font-size:12.5px}
 .ok{display:none;background:var(--ink-on-light);border-radius:2px;padding:28px;color:var(--ivory);margin-top:20px}
 .ok h2{color:var(--ivory);margin-top:0;font-family:var(--serif);font-size:22px;font-weight:600}
 .ok p{color:rgba(237,232,221,.92);font-size:15px}
@@ -98,9 +99,9 @@ textarea{resize:vertical;min-height:74px}
    <div class="card">
     <h2>2. Appointments</h2>
     <div class="row">
-      <div class="field"><label for="appts_per_week">Appointments per week your team can run</label>
-      <input id="appts_per_week" type="number" min="1" max="50" step="1" required placeholder="5">
-      <div class="hint">This sets how fast we run your campaign and roughly how many appointments to expect each week.</div></div>
+      <div class="field"><label for="appts_per_week">Appointments per week your team can run <span class="opt">(optional)</span></label>
+      <input id="appts_per_week" type="number" min="1" max="50" step="1" placeholder="No limit">
+      <div class="hint">Most teams leave this blank. Set it only if you are a solo agent with limited availability, and we will pace the campaign to fit your week.</div></div>
     </div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
