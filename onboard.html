@@ -99,6 +99,8 @@ textarea{resize:vertical;min-height:74px}
    <div class="card">
     <h2>2. Appointments</h2>
     <div class="row">
+      <div class="field"><label for="calendar_owner">Email you log into your booking platform with</label><input id="calendar_owner" type="email">
+        <div class="hint">For teams: the account that holds the shared calendar everyone books onto.</div></div>
       <div class="field"><label for="appts_per_week">Appointments per week your team can run <span class="opt">(optional)</span></label>
       <input id="appts_per_week" type="number" min="1" max="50" step="1" placeholder="No limit">
       <div class="hint">Most teams leave this blank. Set it only if you are a solo agent with limited availability, and we will pace the campaign to fit your week.</div></div>
@@ -113,8 +115,6 @@ textarea{resize:vertical;min-height:74px}
           <option value="other">Something else</option>
         </select>
         <div class="hint">What we book appointments into. Working with a team? Cal.com and Calendly need their team plan for shared round-robin booking (about $12-16 per user a month; GoHighLevel includes it). Solo agents are fine on any plan, including free. On something else? A free Cal.com account runs alongside it, nothing to switch.</div></div>
-      <div class="field"><label for="calendar_owner">Email you log into your booking platform with</label><input id="calendar_owner" type="email">
-        <div class="hint">For teams: the account that holds the shared calendar everyone books onto.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Who works your leads</label>
       <textarea id="agent_roster" rows="3" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
