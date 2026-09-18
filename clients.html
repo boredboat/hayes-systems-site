@@ -105,7 +105,6 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         <tr><td>Held: too recent to reactivate</td><td id="a-fresh"></td></tr>
         <tr><td>Held: agents not on your roster</td><td id="a-roster"></td></tr>
         <tr><td>Projected appointments</td><td><b id="a-appts"></b></td></tr>
-        <tr><td>Estimated cost</td><td id="a-cost"></td></tr>
         <tr><td>If nothing books</td><td><b>$0</b></td></tr>
       </table>
       <p class="small" id="a-note"></p>
@@ -255,7 +254,6 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         ? d.audit.held_off_roster + ' (update your roster to include them, or they stay out)'
         : '0';
       document.getElementById('a-appts').textContent = d.audit.projected_bookings;
-      document.getElementById('a-cost').textContent = '$' + d.audit.est_cost_lo + ' - $' + d.audit.est_cost_hi;
       var reNote = d.audit.previously_worked
         ? d.audit.previously_worked + ' of these were worked in an earlier campaign; they go to the back of the queue. '
         : '';
