@@ -52,22 +52,21 @@ td b{color:var(--ink-on-light)}
       <p><strong>No estimate found in this link.</strong> That usually means the link is missing its numbers or was copied incompletely. Reply to your audit email and we will send a fresh link.</p>
     </div>
 
-    <p id="lede">Your audit found <b id="w">-</b> workable leads. Here is what launching a campaign on that list looks like in dollars, before you sign anything.</p>
+    <p id="lede">Your audit found <b id="w">-</b> workable leads. Here is what launching a campaign on that list looks like, before you sign anything.</p>
 
     <div class="card">
       <p><strong>Your campaign, on the workable leads from your audit.</strong></p>
       <table>
         <tr><th>What</th><th>Estimate</th></tr>
         <tr><td>Projected appointments booked</td><td><b id="appts">-</b></td></tr>
-        <tr><td>Cost if the campaign hits the low end</td><td><b id="cost-lo">-</b></td></tr>
-        <tr><td>Cost if it hits the high end</td><td><b id="cost-hi">-</b></td></tr>
+        <tr><td>Cost per booked appointment</td><td><b>$60</b></td></tr>
         <tr><td>If nothing books</td><td><b>$0</b></td></tr>
       </table>
-      <p class="small">You are billed only for appointments that land on your calendar, billed in at most two invoices, the final one when the campaign ends. A prospect who no-shows costs you nothing and earns you a free replacement.</p>
+      <p class="small">One fee and nothing else: no setup fee, no subscription, no platform fee. You are billed in at most two invoices across the campaign, the final one when it ends. A prospect who no-shows costs you nothing.</p>
     </div>
 
     <h2>Where these numbers come from</h2>
-    <p>Projected appointments come from your audit: your workable lead count against published reactivation benchmarks, as a band, not a promise. Cost is that band at the per-appointment rate of $60. Real results can land anywhere in the band or outside it, which is why nothing is charged unless appointments actually book.</p>
+    <p>Projected appointments come from your audit: your workable lead count against published reactivation benchmarks, as a band, not a promise. Real results can land anywhere in the band or outside it, which is why nothing is charged unless appointments actually book.</p>
 
     <h2>What happens next</h2>
     <p>One form and a booking connection, and the campaign is scheduled. The paperwork spells out the same terms you see here, and your card is only charged when a campaign finishes.</p>
@@ -86,11 +85,6 @@ td b{color:var(--ink-on-light)}
   if(!q.w || !q.appts){ document.getElementById('nodata').hidden = false; return; }
   document.getElementById('w').textContent = q.w;
   document.getElementById('appts').textContent = q.appts;
-  var lo = parseInt(q.appts, 10) || 0;
-  var m = (q.appts || '').match(/(\d+)\s*-\s*(\d+)/);
-  if(m){ lo = parseInt(m[1], 10); }
-  document.getElementById('cost-lo').textContent = '$' + (lo * 60);
-  document.getElementById('cost-hi').textContent = m ? '$' + (parseInt(m[2], 10) * 60) : '$' + (lo * 60);
 })();
 </script>
 </body>
