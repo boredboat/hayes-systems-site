@@ -52,8 +52,8 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 .audit th{font-weight:600;color:var(--ink-on-light)}
 .audit td{color:rgba(10,27,46,.82)}
 .audit td b{color:var(--ink-on-light)}
-.agree{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;font-weight:400;letter-spacing:0;text-transform:none;margin:18px 0 4px;color:rgba(10,27,46,.82);line-height:1.6}
-.agree input{margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0}
+.agree{display:block;font-size:13.5px;font-weight:400;letter-spacing:0;text-transform:none;margin:18px 0 4px;color:rgba(10,27,46,.82);line-height:1.6;cursor:pointer}
+.agree input{accent-color:var(--gold);width:16px;height:16px;margin-right:9px;vertical-align:-3px}
 .agree a{color:var(--gold-ink);font-weight:600}
 .small{font-size:13px;color:rgba(10,27,46,.62)}
 .done{margin-top:24px;background:rgba(46,125,50,.08);border:1px solid rgba(46,125,50,.35);border-radius:14px;padding:24px 26px}
@@ -263,7 +263,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         d.audit.removed + ' (' + d.audit.dupes + ' duplicates, ' + d.audit.malformed + ' malformed, ' +
         d.audit.unreachable + ' unreachable' + (d.audit.suppressed ? ', ' + d.audit.suppressed + ' opted out' : '') + ')';
       document.getElementById('a-held').textContent = d.audit.held_previously_booked
-        ? d.audit.held_previously_booked + ' (we do not re-run these; they are active relationships, and Matt reviews any you want touched)'
+        ? d.audit.held_previously_booked + ' (we do not re-run these; they are active relationships)'
         : '0';
       document.getElementById('a-fresh').textContent = d.audit.held_too_fresh
         ? d.audit.held_too_fresh + ' (we work dormant leads; recent ones are still warm in your own pipeline)'
