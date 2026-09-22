@@ -210,7 +210,9 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
       // show the connect button for calendar platforms with OAuth
       var plat = v('calendar');
       if (plat === 'calendly' || plat === 'calcom') {
-        var slug = v('business_name').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        // same slug rule as the server (48-char cap): a longer business
+        // name used to build a connect URL the server had no client for
+        var slug = v('business_name').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
         var btn = document.getElementById('connect-btn');
         btn.href = 'https://ops.hayessystems.com/api/connect/' + plat + '/start?client=' + encodeURIComponent(slug);
         document.getElementById('connect-row').style.display = 'block';
