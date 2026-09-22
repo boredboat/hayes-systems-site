@@ -66,18 +66,18 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
   <div class="updated">Your paperwork and calendar connection are already on file</div>
 
   <div id="step1">
+    <label for="email">Your email</label>
+    <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
+
     <div class="reqcamp" id="reqcamp">
       <h2>Request a new campaign</h2>
       <p>Your last campaign's paperwork stays on file. Tell us you are ready and we will reach out for your latest export (or pull it from your CRM if we have a connection).</p>
-      <input id="req-email" type="email" placeholder="Your email" autocomplete="email">
       <button type="button" id="req-btn">Request a new campaign</button>
       <div class="err" id="err3" hidden></div>
     </div>
 
     <h2 class="up-head">Have your export ready? Start now</h2>
     <p class="up-desc">Export your dormant leads from your CRM as a CSV and drop it here. We run the same hygiene and audit as your first campaign, show you the numbers, and start when you confirm.</p>
-    <label for="email">Your account email</label>
-    <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
     <button class="btn" id="sendlink" style="margin-top:14px">Email me a launch link</button>
     <p class="small" id="link-note" style="margin-top:10px">One click and no password: we email you a link that opens this page ready to go. It works once and expires in 30 minutes.</p>
     <div class="err" id="err0" hidden></div>
@@ -312,7 +312,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
   var reqBtn = document.getElementById('req-btn');
   if(reqBtn){
     reqBtn.addEventListener('click', function(){
-      var em = (document.getElementById('req-email').value || '').trim();
+      var em = (document.getElementById('email').value || '').trim();
       var err3 = document.getElementById('err3');
       err3.hidden = true;
       if(em.indexOf('@') < 1){ err3.textContent = 'Enter the email on your account.'; err3.hidden = false; return; }
