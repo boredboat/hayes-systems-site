@@ -236,8 +236,6 @@ edits_est = [
      '<tr><td scope="row">Cost if the campaign hits the low end</td><td><b id="cost-lo">-</b></td></tr>'),
     ('<tr><td>Cost if it hits the high end</td><td><b id="cost-hi">-</b></td></tr>',
      '<tr><td scope="row">Cost if it hits the high end</td><td><b id="cost-hi">-</b></td></tr>'),
-    ('<tr><td>If nothing books</td><td><b>$0</b></td></tr>',
-     '<tr><td scope="row">If nothing books</td><td><b>$0</b></td></tr>'),
 ]
 
 est = apply_edits(est, edits_est, 'estimate')
