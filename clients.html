@@ -52,6 +52,9 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 .audit th{font-weight:600;color:var(--ink-on-light)}
 .audit td{color:rgba(10,27,46,.82)}
 .audit td b{color:var(--ink-on-light)}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;font-weight:400;letter-spacing:0;text-transform:none;margin:18px 0 4px;color:rgba(10,27,46,.82);line-height:1.6}
+.agree input{margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0}
+.agree a{color:var(--gold-ink);font-weight:600}
 .small{font-size:13px;color:rgba(10,27,46,.62)}
 .done{margin-top:24px;background:rgba(46,125,50,.08);border:1px solid rgba(46,125,50,.35);border-radius:14px;padding:24px 26px}
 .done h2{font-family:var(--serif);font-size:22px;color:#2E7D32;margin-bottom:6px}
@@ -95,7 +98,8 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       <p class="small" id="a-note"></p>
       <p class="small">Billed per appointment on your calendar, the final invoice at campaign close, on card on file. Appointments landing within 30 days after close are billed then.</p>
     </div>
-    <button class="btn" id="confirm">Confirm and launch</button>
+    <label class="agree" for="agree-box"><input type="checkbox" id="agree-box"> I understand confirming starts my campaign under the <a href="terms.html" target="_blank" rel="noopener">signed terms</a>: $60 per appointment that lands on my calendar, invoiced at close and charged to the card on file. I can stop anytime.</label>
+    <button class="btn" id="confirm" disabled>Confirm and launch</button>
     <p class="small" style="margin-top:10px">Confirming schedules the campaign. Matt reviews the plan and it starts.</p>
     <div class="err" id="err2" hidden></div>
   </div>
@@ -283,6 +287,10 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
     });
   }
 
+  document.getElementById('agree-box').addEventListener('change', function(){
+    document.getElementById('confirm').disabled = !this.checked;
+  });
+
   document.getElementById('confirm').addEventListener('click', function(){
     var b = document.getElementById('confirm');
     b.disabled = true; b.textContent = 'Launching...';
@@ -290,7 +298,8 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
     fetch('https://ops.hayessystems.com/api/client/launch', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email.value.trim(), csv_text: csvText, token: token})
+      body: JSON.stringify({email: email.value.trim(), csv_text: csvText, token: token,
+                            agreed: document.getElementById('agree-box').checked})
     }).then(function(r){ return r.json().then(function(j){ j._status = r.status; return j; }); }).then(function(d){
       if(!d.ok){
         if(d.need_link){
