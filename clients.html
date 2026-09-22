@@ -121,8 +121,9 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
   // the token once, in the upload/launch POST bodies. A valid link swaps
   // the request card for the upload view.
   var token = '';
+  var staleToken = '';   // kept for the expired-link one-click resend
   var m = location.hash.match(/[#&]t=([a-f0-9]{16,80})/);
-  if(m){ token = m[1]; }
+  if(m){ token = m[1]; staleToken = m[1]; }
   function ready(){
     if(go){ go.disabled = !(email.value.indexOf('@') > 0 && csvText && token); }
   }
@@ -173,11 +174,46 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         if(d.ok && d.valid){
           email.value = d.email || '';
           applyToken();
-        } else {
+        } else if(d.ok && d.expired && d.email_hint){
+          // known stale link: one-click resend keyed to the TOKEN (the
+          // server resolves the client; the page never sees the full
+          // address). All nodes built with createElement/textContent —
+          // no untrusted string ever enters innerHTML.
           token = '';
           var e0 = document.getElementById('err0');
-          e0.textContent = 'That link has expired or was already used. Request a new campaign below and we will email a fresh link.';
+          e0.textContent = 'That link has expired or was already used. Want a fresh one?';
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.id = 'resend-btn';
+          btn.textContent = 'Email a new link to ' + d.email_hint;
+          btn.setAttribute('style', 'background:var(--gold);color:#fff;border:none;border-radius:6px;padding:12px 22px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px;display:block');
+          btn.addEventListener('click', function(){
+            btn.disabled = true; btn.textContent = 'Sending...';
+            fetch('https://ops.hayessystems.com/api/portal/resend', {
+              method: 'POST', headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({token: staleToken})
+            }).then(function(r){ return r.json(); }).then(function(j){
+              if(j.ok){
+                e0.textContent = 'Sent. Check your inbox for the fresh link.';
+                e0.style.background = 'rgba(46,125,50,.08)';
+                e0.style.borderColor = 'rgba(46,125,50,.35)';
+                e0.style.color = '#2E7D32';
+              } else {
+                btn.disabled = false;
+                btn.textContent = 'Email a new link to ' + d.email_hint;
+              }
+            }).catch(function(){
+              btn.disabled = false;
+              btn.textContent = 'Email a new link to ' + d.email_hint;
+            });
+          });
+          e0.appendChild(btn);
           e0.hidden = false;
+        } else {
+          token = '';
+          var e0b = document.getElementById('err0');
+          e0b.textContent = 'That link has expired or was already used. Request a new campaign below and we will email a fresh link.';
+          e0b.hidden = false;
         }
         ready();
       })
