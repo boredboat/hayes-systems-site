@@ -62,34 +62,19 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 <div class="wrap">
   <span class="eyebrow">Client portal</span>
   <style>[hidden]{display:none !important}</style>
-  <h1>Run a new campaign.</h1>
-  <div class="updated">Your paperwork and calendar connection are already on file</div>
+  <h1 id="page-h1">Request a new campaign.</h1>
+  <div class="updated" id="page-sub">Your paperwork and calendar connection are already on file</div>
 
   <div id="step1">
-    <label for="email">Your email</label>
-    <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
-
     <div class="reqcamp" id="reqcamp">
       <h2>Request a new campaign</h2>
-      <p>Your last campaign's paperwork stays on file. Tell us you are ready and we will reach out for your latest export (or pull it from your CRM if we have a connection).</p>
+      <p>We will email you what we have on file (contact info, scheduling setup, agents). If anything changed, reply with what is new and we will update it. If all is well, the same email has your link to upload the latest export from your CRM.</p>
+      <label for="email">Your email</label>
+      <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
       <button type="button" id="req-btn">Request a new campaign</button>
       <div class="err" id="err3" hidden></div>
     </div>
-
-    <h2 class="up-head">Have your export ready? Start now</h2>
-    <p class="up-desc">Export your dormant leads from your CRM as a CSV and drop it here. We run the same hygiene and audit as your first campaign, show you the numbers, and start when you confirm.</p>
-    <button class="btn" id="sendlink" style="margin-top:14px">Email me a launch link</button>
-    <p class="small" id="link-note" style="margin-top:10px">One click and no password: we email you a link that opens this page ready to go. It works once and expires in 30 minutes.</p>
     <div class="err" id="err0" hidden></div>
-    <div id="gated" hidden>
-    <div class="drop" id="drop">
-      <div class="dt" id="dt">Drop your CSV here or click to choose</div>
-      <div class="ds" id="ds">One file, any size up to a few MB</div>
-      <input type="file" id="file" accept=".csv,text/csv" hidden>
-    </div>
-    <button class="btn" id="go" disabled>Run the audit</button>
-    <div class="err" id="err" hidden></div>
-    </div>
   </div>
 
   <div id="step2" hidden>
@@ -128,36 +113,57 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 <script>
 (function(){
   var email = document.getElementById('email');
-  var drop = document.getElementById('drop');
-  var file = document.getElementById('file');
-  var dt = document.getElementById('dt');
-  var go = document.getElementById('go');
-  var err = document.getElementById('err');
+  var drop = null, file = null, dt = null, go = null, err = null;
   var csvText = '';
-  var token = '';
 
-  // one-time launch link arrives in the URL fragment (#t=...) — fragments
-  // never reach servers or logs; the browser sends the token once, in the
-  // launch POST body. A valid link opens the UPLOAD-ONLY view (Matt 9/17):
-  // the menu / request-campaign options stay hidden.
+  // One-time upload link arrives in the details email's URL fragment
+  // (#t=...) — fragments never reach servers or logs; the browser sends
+  // the token once, in the upload/launch POST bodies. A valid link swaps
+  // the request card for the upload view.
+  var token = '';
   var m = location.hash.match(/[#&]t=([a-f0-9]{16,80})/);
   if(m){ token = m[1]; }
+  function ready(){
+    if(go){ go.disabled = !(email.value.indexOf('@') > 0 && csvText && token); }
+  }
   function applyToken(){
-    document.getElementById('gated').hidden = false;
-    document.getElementById('sendlink').hidden = true;
     var rq = document.getElementById('reqcamp');
     if(rq){ rq.hidden = true; }
-    var h1 = document.querySelector('h1');
+    var h1 = document.getElementById('page-h1');
     if(h1){ h1.textContent = 'Upload your list.'; }
-    var uh = document.querySelector('.up-head');
-    if(uh){ uh.hidden = true; }
-    var upd = document.querySelector('.up-desc');
-    if(upd){ upd.textContent = 'Drop your dormant-lead export below. We run the hygiene and audit, show you the numbers, and start when you confirm.'; }
-    var ln = document.getElementById('link-note');
-    if(ln){ ln.hidden = true; }
+    var sub = document.getElementById('page-sub');
+    if(sub){ sub.textContent = 'From the link in your email.'; }
+    var e0 = document.getElementById('err0');
+    if(e0){ e0.hidden = true; }
+    // innerHTML below is FULLY STATIC markup (no variables, no user data,
+    // no interpolation) — nothing untrusted enters it; XSS-safe by construction.
+    var box = document.createElement('div');
+    box.id = 'gated';
+    box.innerHTML = '<div class="drop" id="drop">'
+      + '<div class="dt" id="dt">Drop your CSV here or click to choose</div>'
+      + '<div class="ds" id="ds">One file, any size up to a few MB</div>'
+      + '<input type="file" id="file" accept=".csv,text/csv" hidden>'
+      + '</div>'
+      + '<button class="btn" id="go" disabled>Run the audit</button>'
+      + '<div class="err" id="err" hidden></div>';
+    document.getElementById('step1').appendChild(box);
+    drop = document.getElementById('drop');
+    file = document.getElementById('file');
+    dt = document.getElementById('dt');
+    go = document.getElementById('go');
+    err = document.getElementById('err');
+    drop.addEventListener('click', function(){ file.click(); });
+    file.addEventListener('change', function(){ load(file.files[0]); });
+    drop.addEventListener('dragover', function(e){ e.preventDefault(); });
+    drop.addEventListener('drop', function(e){
+      e.preventDefault();
+      if(e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+    });
+    go.addEventListener('click', runAudit);
     var emlbl = document.querySelector('label[for="email"]');
     if(emlbl){ emlbl.hidden = true; }
     email.readOnly = true;
+    ready();
   }
   if(token){
     // verify the link (non-consuming) and resolve who clicked
@@ -170,7 +176,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         } else {
           token = '';
           var e0 = document.getElementById('err0');
-          e0.textContent = 'That link has expired or was already used. Enter your email below to get a fresh one.';
+          e0.textContent = 'That link has expired or was already used. Request a new campaign below and we will email a fresh link.';
           e0.hidden = false;
         }
         ready();
@@ -178,39 +184,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       .catch(function(){ applyToken(); ready(); });
   }
 
-  function ready(){
-    go.disabled = !(email.value.indexOf('@') > 0 && csvText && token);
-  }
   email.addEventListener('input', ready);
-
-  var sl = document.getElementById('sendlink');
-  var err0 = document.getElementById('err0');
-  sl.addEventListener('click', function(){
-    var em = email.value.trim();
-    err0.hidden = true;
-    if(em.indexOf('@') < 1){ err0.textContent = 'Enter the email on your account first.'; err0.hidden = false; return; }
-    sl.disabled = true; sl.textContent = 'Sending...';
-    fetch('https://ops.hayessystems.com/api/portal/link', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: em})
-    }).then(function(r){ return r.json(); }).then(function(d){
-      sl.textContent = 'Launch link sent';
-      var ln2 = document.getElementById('link-note');
-      if(ln2){ ln2.textContent = (d.message || 'Check your inbox.') + ' The link opens this page ready to go.'; }
-    }).catch(function(){
-      sl.disabled = false; sl.textContent = 'Email me a launch link';
-      err0.textContent = 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.';
-      err0.hidden = false;
-    });
-  });
-
-  drop.addEventListener('click', function(){ file.click(); });
-  file.addEventListener('change', function(){ load(file.files[0]); });
-  drop.addEventListener('dragover', function(e){ e.preventDefault(); });
-  drop.addEventListener('drop', function(e){
-    e.preventDefault();
-    if(e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
-  });
 
   function load(f){
     if(!f) return;
@@ -228,7 +202,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
 
   function show(el, msg){ el.textContent = msg; el.hidden = false; }
 
-  go.addEventListener('click', function(){
+  function runAudit(){
     go.disabled = true; go.textContent = 'Running...';
     err.hidden = true;
     fetch('https://ops.hayessystems.com/api/client/upload', {
@@ -236,7 +210,13 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({email: email.value.trim(), csv_text: csvText, token: token})
     }).then(function(r){ return r.json(); }).then(function(d){
-      if(!d.ok){ show(err, d.hint || d.error || 'Something went wrong.'); go.disabled = false; go.textContent = 'Run the audit'; return; }
+      if(!d.ok){
+        if(d.need_link){
+          show(err, 'That upload link has expired or was already used. Request a new campaign below and we will email a fresh link.');
+          return;
+        }
+        show(err, d.hint || d.error || 'Something went wrong.');
+        go.disabled = false; go.textContent = 'Run the audit'; return; }
       document.getElementById('a-lead').textContent =
         'For ' + d.client.name + ', from the file you uploaded:';
       document.getElementById('a-rows').textContent = d.audit.rows_reviewed;
@@ -265,7 +245,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.');
       go.disabled = false; go.textContent = 'Run the audit';
     });
-  });
+  }
 
   document.getElementById('confirm').addEventListener('click', function(){
     var b = document.getElementById('confirm');
@@ -279,13 +259,14 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       if(!d.ok){
         if(d.need_link){
           show(document.getElementById('err2'),
-               'That launch link has expired. Request a fresh one below.');
+               'That upload link has expired. Request a new campaign below and we will email a fresh one.');
           document.getElementById('step2').hidden = true;
           document.getElementById('step1').hidden = false;
           token = '';
-          document.getElementById('gated').hidden = true;
-          var sl2 = document.getElementById('sendlink');
-          sl2.hidden = false; sl2.disabled = false; sl2.textContent = 'Email me a new launch link';
+          var g2 = document.getElementById('gated');
+          if(g2){ g2.hidden = true; }
+          var rq2 = document.getElementById('reqcamp');
+          if(rq2){ rq2.hidden = false; }
           window.scrollTo(0, 0);
           return;
         }
