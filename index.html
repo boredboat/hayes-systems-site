@@ -479,11 +479,18 @@ function submitted(e){
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
   }).then(function(r){ return r.json(); }).then(function(d){
+    if (!d.ok) {
+      btn.disabled = false; btn.textContent = 'Get my estimate';
+      var fine = document.querySelector('#audit-form .form-fine');
+      fine.textContent = 'That did not go through. Email us at Matt@hayessystems.com and we will send your estimate.';
+      fine.style.marginTop = '14px';
+      return;
+    }
     document.getElementById('audit-form').style.display = 'none';
     var ok = document.getElementById('form-ok');
     ok.style.display = 'block';
     var p = ok.querySelector('p');
-    if (p && d.ok) p.textContent = 'Estimate received. It is on its way to ' + payload.email + '.';
+    if (p) p.textContent = 'Estimate received. It is on its way to ' + payload.email + '.';
   }).catch(function(){
     btn.disabled = false; btn.textContent = 'Get my estimate';
     alert('Something went wrong sending the request. Email us directly at Matt@hayessystems.com.');

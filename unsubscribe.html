@@ -38,7 +38,7 @@ if (e && t) {
   // encodeURIComponent, which escapes < > " ' — no untrusted HTML can enter.
   fetch('https://ops.hayessystems.com/api/unsubscribe?e=' + encodeURIComponent(e) + '&t=' + encodeURIComponent(t))
     .then(r => r.json())
-    .then(j => { if (j.ok) { st.innerHTML = 'You are unsubscribed from all Hayes Systems outreach. No further emails or texts will be sent.'; st.className = 'ok'; } })
+    .then(j => { if (j.ok) { st.innerHTML = 'You are unsubscribed from all Hayes Systems outreach. No further emails or texts will be sent.'; st.className = 'ok'; } else { st.textContent = 'This link has expired. Email Matt@hayessystems.com and we will remove you the same day.'; st.className = 'err'; } })
     .catch(() => {
       const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('UNSUBSCRIBE') +
                    '&body=' + encodeURIComponent('Unsubscribe: ' + e + '\nToken: ' + t + '\n');
