@@ -36,7 +36,6 @@ input:focus{outline:none;border-color:var(--gold)}
 .done .n{font-weight:600;color:var(--gold-ink)}
 .fine{font-size:11.5px;color:rgba(10,27,46,.55);margin-top:20px;line-height:1.6}
 .fine a{color:var(--gold-ink);text-decoration:underline}
-.steps{background:rgba(217,164,65,.07);border:1px solid rgba(217,164,65,.25);border-radius:10px;padding:16px 18px;font-size:13.5px;color:rgba(10,27,46,.85);margin-bottom:6px;white-space:pre-line}
 #acct-row{display:none}
 </style>
 </head>
@@ -44,13 +43,11 @@ input:focus{outline:none;border-color:var(--gold)}
 <div class="card">
   <span class="eyebrow">Hayes Systems</span>
   <h1 id="pg-title">Connect your CRM.</h1>
-  <p class="sub" id="pg-sub">Paste the token below. This page checks the connection on the spot and shows you the result before you close it, so nothing is left to guesswork.</p>
-
-  <div class="steps" id="how"></div>
+  <p class="sub" id="pg-sub">Please paste the token below and click "Connect". If the token is rejected check for missing or incorrect characters.</p>
 
   <div id="step1">
     <label for="token">API token</label>
-    <input type="password" id="token" autocomplete="off" placeholder="Paste the token you just copied">
+    <input type="password" id="token" autocomplete="off">
     <div id="acct-row">
       <label for="acct">Account ID</label>
       <input type="text" id="acct" autocomplete="off" placeholder="From Settings, Account in kvCORE">
@@ -65,7 +62,7 @@ input:focus{outline:none;border-color:var(--gold)}
     <p id="done-msg"></p>
   </div>
 
-  <p class="fine" id="fine-print">We use the connection for one thing: reading your contacts with read-only requests. Nothing in your CRM is ever changed, and asking us to switch it off cuts it immediately. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
+  <p class="fine" id="fine-print">CRM connections are limited to the length of the campaign and are read only. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
 </div>
 <script>
 var API = 'https://ops.hayessystems.com';
@@ -99,7 +96,6 @@ function renderHow(d){
   clientName = d.client || '';
   connected = !!d.connected;
   var label = d.platform_label || 'your CRM';
-  document.getElementById('how').textContent = d.how || '';
   document.getElementById('pg-title').textContent = 'Connect your ' + label + '.';
   document.getElementById('acct-row').style.display = d.needs_account_id ? 'block' : 'none';
   if(connected){
