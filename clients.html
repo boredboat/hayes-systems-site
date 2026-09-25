@@ -16,7 +16,7 @@
   "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
 }
 </script>
-<title>Client CSV Upload — Hayes Systems</title>
+<title>Client Portal — Hayes Systems</title>
 <meta name="robots" content="noindex">
 <style>
 :root{
@@ -84,7 +84,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
   <div id="step1">
     <div class="reqcamp" id="reqcamp">
       <h2>Request a new campaign</h2>
-      <p>We will email you what we have on file (contact info, scheduling setup, agents). If anything changed, reply with what is new and we will update it. If all is well, the same email has your link to upload the latest export from your CRM.</p>
+      <p>We will email you what we have on file (contact info, scheduling setup, agents). If anything changed, reply with what is new and we will update it. If all is well, we pull a fresh copy from your CRM connection, or the same email has your upload link if you send lists by file.</p>
       <label for="email">Your email</label>
       <input type="email" id="email" placeholder="The email you signed up with" autocomplete="email">
       <button type="button" id="req-btn">Request a new campaign</button>
@@ -99,7 +99,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       <p class="lead" id="a-lead"></p>
       <table>
         <tr><th>What</th><th>Result</th></tr>
-        <tr><td>Records in your export</td><td id="a-rows"></td></tr>
+        <tr><td>Records in your list</td><td id="a-rows"></td></tr>
         <tr><td>Workable leads</td><td><b id="a-work"></b></td></tr>
         <tr><td>Removed</td><td id="a-removed"></td></tr>
         <tr><td>Held: booked with you before</td><td id="a-held"></td></tr>

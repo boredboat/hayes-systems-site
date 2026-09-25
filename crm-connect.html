@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connect your CRM — Hayes Systems</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/email-logo.png">
+<style>
+@font-face{font-family:'Cormorant Garamond';font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
+:root{
+  --navy:#02101F;
+  --ivory:#EDE8DD; --cream:#FCFAF4;
+  --gold:#D9A441; --gold-soft:rgba(217,164,65,.14);
+  --ink-on-light:#0A1B2E; --gold-ink:#7D5C15;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.card{max-width:560px;width:100%;background:var(--cream);border:1px solid rgba(217,164,65,.45);border-radius:14px;padding:40px 38px}
+.eyebrow{font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4vw,32px);line-height:1.15;margin:10px 0 8px}
+.sub{font-size:14.5px;color:rgba(10,27,46,.78);margin-bottom:24px}
+label{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--gold-ink);margin:18px 0 6px}
+input[type=password],input[type=text]{width:100%;padding:13px 14px;font-family:var(--sans);font-size:14.5px;color:var(--ink-on-light);background:#fff;border:1px solid rgba(10,27,46,.25);border-radius:8px}
+input:focus{outline:none;border-color:var(--gold)}
+.btn{display:block;width:100%;margin-top:22px;padding:14px;border-radius:2px;background:var(--gold);color:var(--navy);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--sans)}
+.btn:disabled{opacity:.5;cursor:default}
+.err{display:none;background:rgba(158,59,59,.08);border:1px solid rgba(158,59,59,.3);border-radius:8px;padding:12px 16px;font-size:13.5px;color:#9E3B3D;margin-top:16px}
+.done{display:none;text-align:center;padding:16px 0 4px}
+.done .tick{width:54px;height:54px;border-radius:50%;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.done h2{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.done p{font-size:14px;color:rgba(10,27,46,.78);line-height:1.6}
+.done .n{font-weight:600;color:var(--gold-ink)}
+.fine{font-size:11.5px;color:rgba(10,27,46,.55);margin-top:20px;line-height:1.6}
+.fine a{color:var(--gold-ink);text-decoration:underline}
+.steps{background:rgba(217,164,65,.07);border:1px solid rgba(217,164,65,.25);border-radius:10px;padding:16px 18px;font-size:13.5px;color:rgba(10,27,46,.85);margin-bottom:6px;white-space:pre-line}
+#acct-row{display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="eyebrow">Hayes Systems</span>
+  <h1 id="pg-title">Connect your CRM.</h1>
+  <p class="sub" id="pg-sub">Paste the token below. This page checks the connection on the spot and shows you the result before you close it, so nothing is left to guesswork.</p>
+
+  <div class="steps" id="how"></div>
+
+  <div id="step1">
+    <label for="token">API token</label>
+    <input type="password" id="token" autocomplete="off" placeholder="Paste the token you just copied">
+    <div id="acct-row">
+      <label for="acct">Account ID</label>
+      <input type="text" id="acct" autocomplete="off" placeholder="From Settings, Account in kvCORE">
+    </div>
+    <button class="btn" id="go" disabled>Connect</button>
+    <div class="err" id="err" hidden></div>
+  </div>
+
+  <div class="done" id="done">
+    <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h2>Connected.</h2>
+    <p id="done-msg"></p>
+  </div>
+
+  <p class="fine" id="fine-print">We use the connection for one thing: reading your contacts with read-only requests. Nothing in your CRM is ever changed, and asking us to switch it off cuts it immediately. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
+</div>
+<script>
+var API = 'https://ops.hayessystems.com';
+var m = window.location.hash.match(/[#&]t=([a-f0-9]+)/);
+var tok = m ? m[1] : '';
+var platform = '', clientName = '', connected = false;
+var go = document.getElementById('go'),
+    tokenIn = document.getElementById('token'),
+    acctIn = document.getElementById('acct'),
+    err = document.getElementById('err');
+function show(el, msg){ el.textContent = msg; el.hidden = false; }
+function failState(title, msg){
+  document.getElementById('step1').style.display = 'none';
+  var d = document.getElementById('done'); d.style.display = 'block';
+  document.querySelector('.done .tick').style.display = 'none';
+  document.querySelector('.done h2').textContent = title;
+  document.getElementById('done-msg').textContent = msg;
+}
+if(!tok){
+  failState('This link is missing its key.',
+            'Open the connection link from your email, or email Matt@hayessystems.com.');
+}
+tokenIn.addEventListener('input', check);
+acctIn.addEventListener('input', check);
+function check(){
+  var needAcct = document.getElementById('acct-row').style.display === 'block';
+  go.disabled = !tokenIn.value.trim() || (needAcct && !acctIn.value.trim());
+}
+function renderHow(d){
+  platform = d.platform || '';
+  clientName = d.client || '';
+  connected = !!d.connected;
+  var label = d.platform_label || 'your CRM';
+  document.getElementById('how').textContent = d.how || '';
+  document.getElementById('pg-title').textContent = 'Connect your ' + label + '.';
+  document.getElementById('acct-row').style.display = d.needs_account_id ? 'block' : 'none';
+  if(connected){
+    document.getElementById('pg-sub').textContent =
+      'A connection is already active on this page\'s client record. Submitting a new token replaces the old one.';
+  }
+  check();
+}
+if(tok){
+  fetch(API + '/api/crm/link/info?t=' + tok)
+    .then(function(r){ return r.json(); })
+    .then(renderHow)
+    .catch(function(){ renderHow({}); });
+}
+go.addEventListener('click', function(){
+  go.disabled = true; go.textContent = 'Checking...';
+  err.hidden = true;
+  fetch(API + '/api/crm/link/save', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({t: tok,
+                          token: tokenIn.value.trim(),
+                          account_id: acctIn.value.trim()})
+  }).then(function(r){ return r.json(); }).then(function(d){
+    go.disabled = false; go.textContent = 'Connect';
+    if(!d.ok){
+      show(err, d.error || 'That did not go through. Check the token and try again, or email Matt@hayessystems.com.');
+      return;
+    }
+    document.getElementById('step1').style.display = 'none';
+    var dn = document.getElementById('done'); dn.style.display = 'block';
+    document.getElementById('done-msg').textContent =
+      (clientName ? clientName + ' is connected to ' : 'Connected to ') +
+      (d.platform_label || 'your CRM') + '. We can see ' +
+      '<span class="n">' + d.contacts_visible + '</span> contacts with a phone number or email. ' +
+      'We take it from here; nothing else is needed from you today.';
+  }).catch(function(){
+    go.disabled = false; go.textContent = 'Connect';
+    show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.');
+  });
+});
+</script>
+</body>
+</html>

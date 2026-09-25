@@ -5,7 +5,7 @@
   "clauses": [
    {
     "h": "1. What you provide",
-    "b": "A file of past-inquiry leads exported from your CRM, plus the booking connection described in the intake form."
+    "b": "A read-only connection to your CRM that we use to pull your past-inquiry leads, revocable by you at any time, or, where your platform has no connection available, a CSV export of those leads, plus the booking connection described in the intake form."
    },
    {
     "h": "2. What you represent",
@@ -34,7 +34,7 @@
   "clauses": [
    {
     "h": "1. What the campaign is",
-    "b": "One campaign on your dormant leads: import and hygiene, consent asks by email and consented AI-assisted phone calls, appointment booking on your calendar, and a close-out report. The campaign works your entire export."
+    "b": "One campaign on your dormant leads: import and hygiene, consent asks by email and consented AI-assisted phone calls, appointment booking on your calendar, and a close-out report. The campaign works your entire list."
    },
    {
     "h": "2. What it costs",
@@ -42,7 +42,7 @@
    },
    {
     "h": "3. What you provide",
-    "b": "A full CSV export of your leads and your booking connection (Cal.com, Calendly, or GoHighLevel). The list is used solely to provide the service."
+    "b": "A read-only connection to your CRM that we use to pull your past-inquiry leads, revocable by you at any time, or, where your platform has no connection available, a CSV export of those leads, plus your booking connection (Cal.com, Calendly, or GoHighLevel). The list is used solely to provide the service."
    },
    {
     "h": "4. Your representations",
