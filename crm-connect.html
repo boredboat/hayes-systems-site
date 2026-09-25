@@ -28,12 +28,8 @@ input[type=password],input[type=text]{width:100%;padding:13px 14px;font-family:v
 input:focus{outline:none;border-color:var(--gold)}
 .btn{display:block;width:100%;margin-top:22px;padding:14px;border-radius:2px;background:var(--gold);color:var(--navy);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--sans)}
 .btn:disabled{opacity:.5;cursor:default}
-.err{display:none;background:rgba(158,59,59,.08);border:1px solid rgba(158,59,59,.3);border-radius:8px;padding:12px 16px;font-size:13.5px;color:#9E3B3D;margin-top:16px}
-.done{display:none;text-align:center;padding:16px 0 4px}
-.done .tick{width:54px;height:54px;border-radius:50%;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.done h2{font-family:var(--serif);font-size:24px;margin-bottom:8px}
-.done p{font-size:14px;color:rgba(10,27,46,.78);line-height:1.6}
-.done .n{font-weight:600;color:var(--gold-ink)}
+.err{display:none;background:rgba(46,125,50,.10);border:1px solid rgba(46,125,50,.45);border-radius:8px;padding:12px 16px;font-size:13.5px;color:#256029;margin-top:16px}
+.err.bad{background:rgba(158,59,59,.08);border-color:rgba(158,59,59,.3);color:#9E3B3D}
 .fine{font-size:11.5px;color:rgba(10,27,46,.55);margin-top:20px;line-height:1.6}
 .fine a{color:var(--gold-ink);text-decoration:underline}
 #acct-row{display:none}
@@ -56,12 +52,6 @@ input:focus{outline:none;border-color:var(--gold)}
     <div class="err" id="err" hidden></div>
   </div>
 
-  <div class="done" id="done">
-    <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
-    <h2>Connected.</h2>
-    <p id="done-msg"></p>
-  </div>
-
   <p class="fine" id="fine-print">CRM connections are limited to the length of the campaign and are read only. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
 </div>
 <script>
@@ -73,13 +63,10 @@ var go = document.getElementById('go'),
     tokenIn = document.getElementById('token'),
     acctIn = document.getElementById('acct'),
     err = document.getElementById('err');
-function show(el, msg){ el.textContent = msg; el.hidden = false; }
+function show(el, msg, bad){ el.textContent = msg; el.hidden = false; el.classList.toggle('bad', !!bad); }
 function failState(title, msg){
   document.getElementById('step1').style.display = 'none';
-  var d = document.getElementById('done'); d.style.display = 'block';
-  document.querySelector('.done .tick').style.display = 'none';
-  document.querySelector('.done h2').textContent = title;
-  document.getElementById('done-msg').textContent = msg;
+  show(err, title + ' ' + msg, true);
 }
 if(!tok){
   failState('This link is missing its key.',
@@ -122,19 +109,13 @@ go.addEventListener('click', function(){
   }).then(function(r){ return r.json(); }).then(function(d){
     go.disabled = false; go.textContent = 'Connect';
     if(!d.ok){
-      show(err, d.error || 'That did not go through. Check the token and try again, or email Matt@hayessystems.com.');
+      show(err, d.error || 'The connection was not successful. Check the token and try again, or email Matt@hayessystems.com.', true);
       return;
     }
-    document.getElementById('step1').style.display = 'none';
-    var dn = document.getElementById('done'); dn.style.display = 'block';
-    document.getElementById('done-msg').textContent =
-      (clientName ? clientName + ' is connected to ' : 'Connected to ') +
-      (d.platform_label || 'your CRM') + '. We can see ' +
-      '<span class="n">' + d.contacts_visible + '</span> contacts with a phone number or email. ' +
-      'We take it from here; nothing else is needed from you today.';
+    show(err, 'The connection was successful.');
   }).catch(function(){
     go.disabled = false; go.textContent = 'Connect';
-    show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.');
+    show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.', true);
   });
 });
 </script>
