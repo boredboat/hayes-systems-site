@@ -83,7 +83,7 @@ function renderHow(d){
   clientName = d.client || '';
   connected = !!d.connected;
   var label = d.platform_label || 'your CRM';
-  document.getElementById('pg-title').textContent = 'Connect your ' + label + '.';
+  document.getElementById('pg-title').textContent = 'Connect ' + label + '.';
   document.getElementById('acct-row').style.display = d.needs_account_id ? 'block' : 'none';
   if(connected){
     document.getElementById('pg-sub').textContent =
