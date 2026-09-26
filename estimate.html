@@ -64,6 +64,7 @@ td b{color:var(--ink-on-light)}
       <p><strong>No estimate found in this link.</strong> That usually means the link is missing its numbers or was copied incompletely. Reply to your audit email and we will send a fresh link.</p>
     </div>
 
+    <div id="hasdata">
     <p id="lede">Your audit found <b id="w">-</b> workable leads. Here is what launching a campaign on that list looks like, before you sign anything.</p>
 
     <div class="card">
@@ -83,6 +84,7 @@ td b{color:var(--ink-on-light)}
     <p>One form and a booking connection, and the campaign is scheduled. The paperwork spells out the same terms you see here, and your card is only charged when a campaign finishes.</p>
     <a class="btn" href="onboard.html">Continue to the paperwork</a>
     <p class="small" style="margin-top:14px">Not ready yet? <a href="mailto:Matt@hayessystems.com">Email us</a> with questions; nothing is committed until you sign.</p>
+    </div>
   </div>
 
   <p class="small" style="margin-top:36px">Hayes Systems · Western Massachusetts · Matt@hayessystems.com</p>
@@ -93,7 +95,11 @@ td b{color:var(--ink-on-light)}
   var q = {};
   location.search.replace(/([a-z]+)=([^&]+)/g, function(_, k, v){ q[k] = decodeURIComponent(v); });
   var need = ['w','appts'];
-  if(!q.w || !q.appts){ document.getElementById('nodata').hidden = false; return; }
+  if(!q.w || !q.appts){
+    document.getElementById('nodata').hidden = false;
+    document.getElementById('hasdata').style.display = 'none';
+    return;
+  }
   document.getElementById('w').textContent = q.w;
   document.getElementById('appts').textContent = q.appts;
 })();

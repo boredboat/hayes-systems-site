@@ -74,7 +74,7 @@ nav{position:sticky;top:0;background:#121F2C;border-bottom:1px solid rgba(217,16
 .btn-outline:hover{background:var(--gold-soft)}
 
 /* Hero */
-.hero{position:relative;padding:92px 0 72px;background:radial-gradient(900px 420px at 50% -60px,rgba(217,164,65,.10),transparent 65%),var(--ivory)}
+.hero{position:relative;overflow:hidden;padding:92px 0 72px;background:radial-gradient(900px 420px at 50% -60px,rgba(217,164,65,.10),transparent 65%),var(--ivory)}
 .hero::before{content:'';position:absolute;inset:0;background:url('img/hero-newengland.webp') center/cover no-repeat}
 .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(237,232,221,.97) 0%,rgba(237,232,221,.9) 38%,rgba(237,232,221,.45) 64%,rgba(237,232,221,.08) 100%),linear-gradient(180deg,rgba(237,232,221,.5) 0%,rgba(237,232,221,0) 24%),linear-gradient(0deg,rgba(237,232,221,.9) 0%,rgba(237,232,221,0) 22%)}
 .hero > .container{position:relative;z-index:1}
@@ -204,8 +204,8 @@ details p a{color:var(--gold-ink);text-decoration:underline}
 /* Footer */
 footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:36px 0}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.footer-links{display:flex;gap:22px}
-.footer-links a{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:rgba(244,241,234,.6)}
+.footer-links{display:flex;flex-wrap:wrap;gap:10px 22px}
+.footer-links a{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:rgba(244,241,234,.6);white-space:nowrap}
 .footer-links a:hover{color:var(--gold)}
 .footer-legal{font-size:12.5px;line-height:1.7;max-width:840px;margin-top:18px;color:rgba(244,241,234,.58);font-weight:400}
 </style>

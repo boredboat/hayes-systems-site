@@ -66,7 +66,9 @@ var go = document.getElementById('go'),
 function show(el, msg, bad){ el.textContent = msg; el.hidden = false; el.classList.toggle('bad', !!bad); }
 function failState(title, msg){
   document.getElementById('step1').style.display = 'none';
-  show(err, title + ' ' + msg, true);
+  var sub = document.getElementById('pg-sub');
+  sub.textContent = title + ' ' + msg;
+  sub.style.color = '#9E3B3D';
 }
 if(!tok){
   failState('This link is missing its key.',
