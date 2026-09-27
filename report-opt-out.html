@@ -16,7 +16,7 @@
   "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
 }
 </script>
-<title>Report emails — Hayes Systems</title>
+<title>Report emails | Hayes Systems</title>
 <style>
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
@@ -49,7 +49,7 @@ if (e && t) {
     .then(j => { if (j.ok) { st.textContent = 'You are off the weekly report list. You will still hear from us about your campaign: the kickoff note, billing, and the final report.'; st.className = 'ok'; } else { st.textContent = 'We could not update that preference automatically. Reply to any report email and we will take care of it.'; st.className = 'err'; } })
     .catch(() => {
       // innerHTML is safe here: the only interpolated value (e) passes through
-      // encodeURIComponent inside the mailto body — quotes/angle brackets cannot
+      // encodeURIComponent inside the mailto body - quotes/angle brackets cannot
       // escape the href attribute. Same pattern as unsubscribe.html.
       const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('No weekly reports') +
                    '&body=' + encodeURIComponent('Please stop the weekly report emails for: ' + e + '\nToken: ' + t + '\n');

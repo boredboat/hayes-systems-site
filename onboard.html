@@ -16,7 +16,7 @@
   "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
 }
 </script>
-<title>Onboarding — Hayes Systems</title>
+<title>Onboarding | Hayes Systems</title>
 <meta name="description" content="Fill in your Hayes Systems onboarding details and go.">
 <style>
 :root{
@@ -175,7 +175,7 @@ textarea{resize:vertical;min-height:74px}
 </div>
 <script>
 // render the REAL agreement text (generated from the PDF builders) above the
-// signature — one source of truth, no drift between what they read and sign
+// signature - one source of truth, no drift between what they read and sign
 fetch('/terms.json').then(r => r.json()).then(t => {
   const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const da = document.getElementById('da-terms');
@@ -186,7 +186,7 @@ fetch('/terms.json').then(r => r.json()).then(t => {
 }).catch(e => {
   // if terms fail to load, the form must not be submittable blind
   document.getElementById('submit-btn').disabled = true;
-  document.getElementById('submit-btn').textContent = 'Terms unavailable — reload the page';
+  document.getElementById('submit-btn').textContent = 'Terms unavailable - reload the page';
 });
 </script>
 <script>

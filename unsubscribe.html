@@ -16,7 +16,7 @@
   "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
 }
 </script>
-<title>Unsubscribe — Hayes Systems</title>
+<title>Unsubscribe | Hayes Systems</title>
 <meta name="robots" content="noindex">
 <style>
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
@@ -35,7 +35,7 @@ small{display:block;margin-top:40px;color:rgba(244,241,234,.4);font-size:12.5px}
 <div class="box">
 <h1>Hayes Systems</h1>
 <p id="status">Processing your unsubscribe request…</p>
-<small>Hayes Systems · Western Massachusetts — mailing sent in accordance with CAN-SPAM.</small>
+<small>Hayes Systems · Western Massachusetts · mailing sent in accordance with CAN-SPAM.</small>
 </div>
 <script>
 // The token is HMAC-signed by the sender; without a backend we cannot write to the
@@ -48,7 +48,7 @@ if (e && t) {
   // Record the opt-out server-side FIRST (signed token -> ops API -> opt_outs);
   // the mailto below is the fallback if this fetch cannot reach the API.
   // innerHTML is safe here: the only interpolated value (e) passes through
-  // encodeURIComponent, which escapes < > " ' — no untrusted HTML can enter.
+  // encodeURIComponent, which escapes < > " ' - no untrusted HTML can enter.
   fetch('https://ops.hayessystems.com/api/unsubscribe?e=' + encodeURIComponent(e) + '&t=' + encodeURIComponent(t))
     .then(r => r.json())
     .then(j => { if (j.ok) { st.innerHTML = 'You are unsubscribed from all Hayes Systems outreach. No further emails or texts will be sent.'; st.className = 'ok'; } else { st.textContent = 'This link has expired. Email Matt@hayessystems.com and we will remove you the same day.'; st.className = 'err'; } })

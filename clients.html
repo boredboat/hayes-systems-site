@@ -16,7 +16,7 @@
   "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
 }
 </script>
-<title>Client Portal — Hayes Systems</title>
+<title>Client Portal | Hayes Systems</title>
 <meta name="robots" content="noindex">
 <style>
 :root{
@@ -132,7 +132,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
   var csvText = '';
 
   // One-time upload link arrives in the details email's URL fragment
-  // (#t=...) — fragments never reach servers or logs; the browser sends
+  // (#t=...) - fragments never reach servers or logs; the browser sends
   // the token once, in the upload/launch POST bodies. A valid link swaps
   // the request card for the upload view.
   var token = '';
@@ -152,7 +152,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
     var e0 = document.getElementById('err0');
     if(e0){ e0.hidden = true; }
     // innerHTML below is FULLY STATIC markup (no variables, no user data,
-    // no interpolation) — nothing untrusted enters it; XSS-safe by construction.
+    // no interpolation) - nothing untrusted enters it; XSS-safe by construction.
     var box = document.createElement('div');
     box.id = 'gated';
     box.innerHTML = '<div class="drop" id="drop">'
@@ -192,7 +192,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
         } else if(d.ok && d.expired && d.email_hint){
           // known stale link: one-click resend keyed to the TOKEN (the
           // server resolves the client; the page never sees the full
-          // address). All nodes built with createElement/textContent —
+          // address). All nodes built with createElement/textContent -
           // no untrusted string ever enters innerHTML.
           token = '';
           var e0 = document.getElementById('err0');
