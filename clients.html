@@ -160,7 +160,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       + '<div class="ds" id="ds">One file, any size up to a few MB</div>'
       + '<input type="file" id="file" accept=".csv,text/csv" hidden>'
       + '</div>'
-      + '<button class="btn" id="go" disabled>Run the audit</button>'
+      + '<button class="btn" id="go" disabled>Get my numbers</button>'
       + '<div class="err" id="err" hidden></div>';
     document.getElementById('step1').appendChild(box);
     drop = document.getElementById('drop');
@@ -267,7 +267,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
           return;
         }
         show(err, d.hint || d.error || 'Something went wrong.');
-        go.disabled = false; go.textContent = 'Run the audit'; return; }
+        go.disabled = false; go.textContent = 'Get my numbers'; return; }
       document.getElementById('a-lead').textContent =
         'For ' + d.client.name + ', from the file you uploaded:';
       document.getElementById('a-rows').textContent = d.audit.rows_reviewed;
@@ -294,7 +294,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       window.scrollTo(0, 0);
     }).catch(function(){
       show(err, 'Could not reach the server. Try again in a minute or email Matt@hayessystems.com.');
-      go.disabled = false; go.textContent = 'Run the audit';
+      go.disabled = false; go.textContent = 'Get my numbers';
     });
   }
 
@@ -339,7 +339,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold)}
       document.getElementById('step3').hidden = false;
       window.scrollTo(0, 0);
     }).catch(function(){
-      show(document.getElementById('err2'), 'Could not reach the server. Your audit is safe; try confirming again.');
+      show(document.getElementById('err2'), 'Could not reach the server. Your numbers are safe; try confirming again.');
       b.disabled = false; b.textContent = 'Confirm and launch';
     });
   });

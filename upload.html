@@ -43,7 +43,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,34px);line-
 <div class="card">
   <span class="eyebrow">Hayes Systems</span>
   <h1>Upload your lead list.</h1>
-  <p class="sub">Already connected your CRM? Nothing to upload: we pull your list ourselves. This page is for lists we cannot pull (Podio, spreadsheets, or a file you prefer to send). Straight to our server over a secure connection. The working copy of your list is deleted once the audit is done.</p>
+  <p class="sub">Already connected your CRM? Nothing to upload: we pull your list ourselves. This page is for lists we cannot pull (Podio, spreadsheets, or a file you prefer to send). Straight to our server over a secure connection. The working copy of your list is deleted once we have your numbers.</p>
 
   <div id="step1">
     <div class="drop" id="drop">
@@ -52,17 +52,17 @@ h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,34px);line-
       <div class="file-ok" id="fok"></div>
       <input type="file" id="file" accept=".csv,text/csv" hidden>
     </div>
-    <button class="btn" id="go" disabled>Upload and start my audit</button>
+    <button class="btn" id="go" disabled>Upload my list</button>
     <div class="err" id="err" hidden></div>
   </div>
 
   <div class="done" id="done">
     <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
     <h2>Got it.</h2>
-    <p id="done-msg">Your list is in. The audit is underway and arrives by email.</p>
+    <p id="done-msg">Your list is in. Your numbers are underway and arrive by email.</p>
   </div>
 
-  <p class="fine">Your list is used for one thing: your audit. It is never sold, shared, or used for any other purpose. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
+  <p class="fine">Your list is used for one thing: your numbers. It is never sold, shared, or used for any other purpose. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
 </div>
 <script>
 var drop = document.getElementById('drop'),
@@ -97,11 +97,11 @@ function send(path, body, onok){
     if(d.ok){ onok(d); }
     else {
       show(document.getElementById('err'), d.error || 'Something went wrong. Try again or email Matt@hayessystems.com.');
-      go.disabled = false; go.textContent = 'Upload and start my audit';
+      go.disabled = false; go.textContent = 'Upload my list';
     }
   }).catch(function(){
     show(document.getElementById('err'), 'Could not reach the server. Try again in a minute.');
-    go.disabled = false; go.textContent = 'Upload and start my audit';
+    go.disabled = false; go.textContent = 'Upload my list';
   });
 }
 go.addEventListener('click', function(){
@@ -121,7 +121,7 @@ function done(d){
   var doneEl = document.getElementById('done');
   doneEl.style.display = 'block';
   document.getElementById('done-msg').textContent =
-    'Your list is in: ' + d.numbers.reviewed + ' rows reviewed, ' + d.numbers.workable + ' workable. The audit is underway and arrives by email.';
+    'Your list is in: ' + d.numbers.reviewed + ' rows reviewed, ' + d.numbers.workable + ' workable. Your numbers are underway and arrive by email.';
 }
 if(!tok && !acct){
   document.getElementById('step1').style.display = 'none';
