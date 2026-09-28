@@ -84,8 +84,7 @@ textarea{resize:vertical;min-height:74px}
    <div class="card">
     <h2>1. Your business</h2>
     <div class="row">
-      <div class="field"><label for="business_name">Business name</label><input id="business_name" required>
-        <div class="hint">The name your leads know you by.</div></div>
+      <div class="field"><label for="business_name">Business name</label><input id="business_name" required></div>
       <div class="field"><label for="contact_name">Your name</label><input id="contact_name" required>
         <div class="hint">The person we work with day to day.</div></div>
     </div>
@@ -94,9 +93,9 @@ textarea{resize:vertical;min-height:74px}
       <div class="field"><label for="agency_state">State your agency operates in</label>
         <select id="agency_state" required>
           <option value="">Choose...</option>
-          <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option><option value="DC">Washington, D.C.</option>
+          <option value="AL">AL - Alabama</option><option value="AK" disabled>AK - Alaska (not served)</option><option value="AZ">AZ - Arizona</option><option value="AR">AR - Arkansas</option><option value="CA">CA - California</option><option value="CO">CO - Colorado</option><option value="CT">CT - Connecticut</option><option value="DE">DE - Delaware</option><option value="FL" disabled>FL - Florida (not served)</option><option value="GA">GA - Georgia</option><option value="HI" disabled>HI - Hawaii (not served)</option><option value="ID">ID - Idaho</option><option value="IL">IL - Illinois</option><option value="IN">IN - Indiana</option><option value="IA">IA - Iowa</option><option value="KS">KS - Kansas</option><option value="KY">KY - Kentucky</option><option value="LA" disabled>LA - Louisiana (not served)</option><option value="ME">ME - Maine</option><option value="MD">MD - Maryland</option><option value="MA">MA - Massachusetts</option><option value="MI">MI - Michigan</option><option value="MN">MN - Minnesota</option><option value="MS">MS - Mississippi</option><option value="MO">MO - Missouri</option><option value="MT">MT - Montana</option><option value="NE">NE - Nebraska</option><option value="NV">NV - Nevada</option><option value="NH">NH - New Hampshire</option><option value="NJ">NJ - New Jersey</option><option value="NM">NM - New Mexico</option><option value="NY">NY - New York</option><option value="NC">NC - North Carolina</option><option value="ND">ND - North Dakota</option><option value="OH">OH - Ohio</option><option value="OK">OK - Oklahoma</option><option value="OR">OR - Oregon</option><option value="PA">PA - Pennsylvania</option><option value="RI">RI - Rhode Island</option><option value="SC">SC - South Carolina</option><option value="SD">SD - South Dakota</option><option value="TN">TN - Tennessee</option><option value="TX">TX - Texas</option><option value="UT">UT - Utah</option><option value="VT">VT - Vermont</option><option value="VA">VA - Virginia</option><option value="WA">WA - Washington</option><option value="WV">WV - West Virginia</option><option value="WI">WI - Wisconsin</option><option value="WY">WY - Wyoming</option><option value="DC">DC - Washington, D.C.</option>
         </select>
-        <div class="hint">Call times for your leads follow this state first, then the lead's own number.</div></div>
+        <div class="hint">Two-letter postal code. Call times for your leads follow this state first, then the lead's own number.</div></div>
     </div>
     <div class="field"><label for="lead_phone">Phone number leads should call</label><input id="lead_phone" type="tel" required placeholder="(413) 555-0100">
       <div class="hint">The number we give prospects when they ask for a human.</div></div>
@@ -119,7 +118,7 @@ textarea{resize:vertical;min-height:74px}
         </select>
         <div class="hint">So we connect directly and read your contacts with a link you can revoke anytime - no exports, no file handling. Podio or something else? A CSV upload works too.</div></div>
       <div class="field"><label for="calendar_owner">Email you log into your booking platform with</label><input id="calendar_owner" type="email">
-        <div class="hint">For teams: the account that holds the shared calendar everyone books onto.</div></div>
+        <div class="hint">We connect to the booking account itself, not your CRM - this is the login whose calendar holds your appointment slots. Teams: the account that owns the shared calendar everyone books onto. Solo: your own.</div></div>
     </div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
@@ -130,14 +129,14 @@ textarea{resize:vertical;min-height:74px}
           <option value="gohighlevel">GoHighLevel</option>
           <option value="other">Something else</option>
         </select>
-        <div class="hint">What we book appointments into. Cal.com works on any plan, including free; Calendly needs a paid plan for booking; GoHighLevel is a subscription with no free plan. Working with a team? Cal.com and Calendly need their team plan for shared round-robin booking (about $12-16 per user a month; GoHighLevel includes it). On something else? A free Cal.com account runs alongside it, nothing to switch.</div></div>
+        <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Cal.com's free tier works.</div></div>
       <div class="field"><label for="appts_per_week">Appointments per week your team can run <span class="opt">(optional)</span></label>
       <input id="appts_per_week" type="number" min="1" max="50" step="1" placeholder="No limit">
       <div class="hint">Most teams leave this blank. Set it only if you are a solo agent with limited availability, and we will pace the campaign to fit your week.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Current team members</label>
-      <textarea id="agent_roster" rows="3" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
-      <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar. Leads from team members who have left route to your team as a whole. Solo? Leave it blank.</div></div>
+      <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
+      <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar. Solo? Leave it blank.</div></div>
    </div>
 
    <div class="card">
