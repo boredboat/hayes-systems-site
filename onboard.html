@@ -118,7 +118,7 @@ textarea{resize:vertical;min-height:74px}
         </select>
         <div class="hint">So we connect directly and read your contacts with a link you can revoke anytime - no exports, no file handling. Podio or something else? A CSV upload works too.</div></div>
       <div class="field"><label for="calendar_owner">Email you log into your booking platform with</label><input id="calendar_owner" type="email">
-        <div class="hint">We connect to the booking account itself, not your CRM - this is the login whose calendar holds your appointment slots. Teams: the account that owns the shared calendar everyone books onto. Solo: your own.</div></div>
+        <div class="hint">We connect to the booking account itself, not your CRM - this is the login whose calendar holds your appointment slots. Use the account that owns the shared calendar your team books onto.</div></div>
     </div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
@@ -132,11 +132,11 @@ textarea{resize:vertical;min-height:74px}
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Cal.com's free tier works.</div></div>
       <div class="field"><label for="appts_per_week">Appointments per week your team can run <span class="opt">(optional)</span></label>
       <input id="appts_per_week" type="number" min="1" max="50" step="1" placeholder="No limit">
-      <div class="hint">Most teams leave this blank. Set it only if you are a solo agent with limited availability, and we will pace the campaign to fit your week.</div></div>
+      <div class="hint">Set it only if availability is tight, and we will pace the campaign to fit your week.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Current team members</label>
       <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
-      <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar. Solo? Leave it blank.</div></div>
+      <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar.</div></div>
    </div>
 
    <div class="card">
