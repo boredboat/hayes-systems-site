@@ -130,9 +130,6 @@ textarea{resize:vertical;min-height:74px}
           <option value="other">Something else</option>
         </select>
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Cal.com's free tier works.</div></div>
-      <div class="field"><label for="appts_per_week">Appointments per week your team can run <span class="opt">(optional)</span></label>
-      <input id="appts_per_week" type="number" min="1" max="50" step="1" placeholder="No limit">
-      <div class="hint">Set it only if availability is tight, and we will pace the campaign to fit your week.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Current team members</label>
       <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
@@ -207,7 +204,6 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     agency_state: v('agency_state'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
-    appts_per_week: v('appts_per_week'),
     agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
