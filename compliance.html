@@ -55,7 +55,7 @@ a{color:var(--gold-ink);font-weight:600}
 <body>
 <div class="wrap">
   <h1>Compliance</h1>
-  <div class="updated">Last updated September 27, 2026</div>
+  <div class="updated">Last updated September 28, 2026</div>
 
   <div class="card">
   <h2>Statement of practices</h2>
@@ -63,7 +63,7 @@ a{color:var(--gold-ink);font-weight:600}
 
   <div class="item">
     <h3>Consent basis for telephone contact</h3>
-    <p>No call is placed except on a recorded prior express written consent basis: the recipient replied YES to a written ask that identified the caller as an AI assistant. The consent record preserves the exact wording presented, a timestamp, and an expiry date. The pre-dial gate refuses any call whose consent record is absent, expired, or revoked.</p>
+    <p>No call is placed except on a recorded prior express written consent basis: the recipient replied YES to a written ask that identified the caller as an AI assistant. The consent record preserves the exact wording presented, a timestamp, and an expiry date after which the consent is renewed by a fresh ask or lapses. The pre-dial gate refuses any call whose consent record is absent or expired.</p>
   </div>
 
   <div class="item">
@@ -74,14 +74,12 @@ a{color:var(--gold-ink);font-weight:600}
   <div class="item">
     <h3>Calling times and time-zone accuracy</h3>
     <p>Every call is placed only with the recipient's prior consent, and the
-    time of the call is set by that consent: the campaign asks when the
-    recipient wants to be called and calls at that time. Where the recipient
-    has not named a time, calls are placed between 8 a.m. and 8 p.m. in the
-    recipient's time zone. The time zone is resolved in a fixed order of
-    precedence: the recipient's own statement, the client's records, then the
-    area code of the number dialed. Where signals disagree or no signal
-    exists, calls are confined to the window that is reasonable in every
-    continental United States time zone.</p>
+    time of the call is set by that consent: when a recipient names a time,
+    the call is placed at that time. Where the recipient has not named a
+    time, calls are placed between 8 a.m. and 8 p.m. in the recipient's time
+    zone. The time zone is resolved in a fixed order of precedence: the
+    recipient's own statement, the client's records, the area code of the
+    number dialed, and finally the state where the client's agency operates.</p>
   </div>
 
   <div class="item">
@@ -90,8 +88,13 @@ a{color:var(--gold-ink);font-weight:600}
   </div>
 
   <div class="item">
-    <h3>State telemarketer registration</h3>
-    <p>The registration statutes of several states regulate "telephone solicitation" as each statute defines it; those definitions exclude calls made at the person's request and calls to persons with an existing business relationship, and every call placed by Hayes Systems is consent-backed within the meaning of those exclusions. On that basis the company has determined that registration is not required for its calls in most states. Hayes Systems nonetheless does not call residents of states where its position is under review by counsel: as of the date above, Florida and Louisiana. Email outreach is not affected by these blocks. A registration held by a client does not authorize calls by Hayes Systems.</p>
+    <h3>States not served</h3>
+    <p>Hayes Systems operates in the 48 contiguous states. It places no calls
+    and conducts no campaigns in Alaska, Hawaii, Florida, or Louisiana:
+    Alaska and Hawaii are outside the calling coverage the company operates,
+    and Florida and Louisiana are states where the company's registration
+    position remains under review by counsel. A registration held by a
+    client does not extend Hayes Systems' coverage.</p>
   </div>
 
   <div class="item">
