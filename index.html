@@ -411,22 +411,11 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 </section>
 
 <section id="contact">
-  <div class="container cta-grid">
-    <div>
-      <span class="eyebrow">Request a campaign</span>
-      <h2>Tell us where your list is. We handle the rest.</h2>
-      <p style="color:rgba(10,27,46,.82);margin-top:16px;font-size:18px;font-weight:400;line-height:1.75">Send the request and Matt follows up personally to get your campaign scheduled: the paperwork is one short form, the pricing is $60 per appointment that lands on your calendar, and nothing is owed until appointments actually book.</p>
-      <div class="cta-points">
-        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Takes two minutes to request</span>
-        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>No commitment and no credit card</span>
-        <span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Get a straight answer, not a sales pitch</span>
-      </div>
-      <p style="margin-top:26px;font-size:15px;color:rgba(10,27,46,.82)">Questions before you send anything? Email us directly at <a href="mailto:Matt@hayessystems.com" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">Matt@hayessystems.com</a>.</p>
-    </div>
+  <div class="container" style="max-width:600px">
     <div class="form-card">
       <form id="audit-form" onsubmit="return submitted(event)">
         <h3>Request a campaign</h3>
-        <div class="sub">No commitment, no list to send. Matt follows up personally.</div>
+        <div class="sub">No commitment. We'll reach out to the email you provide.</div>
         <div class="row">
           <div class="field"><label for="f-name">Your name</label><input id="f-name" required></div>
           <div class="field"><label for="f-team">Team / brokerage</label><input id="f-team"></div>
@@ -437,12 +426,12 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
         </div>
         <div class="field"><label for="f-notes">Anything we should know (optional)</label><textarea id="f-notes"></textarea></div>
         <button class="btn btn-primary" type="submit" id="audit-submit" style="width:100%;border:none;cursor:pointer">Request my campaign</button>
-        <div class="form-fine">We do not sell your data or use your email for promotions. <a href="privacy.html" style="color:var(--gold-ink);text-decoration:underline">Privacy policy</a></div>
+        <div class="form-fine">We do not sell your data or use your email for promotions. <a href="privacy.html" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">Privacy policy</a></div>
       </form>
       <div class="form-ok" id="form-ok">
         <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
         <h4>Request received.</h4>
-        <p>Matt will follow up with you shortly.</p>
+        <p>We'll reach out to the email you provided.</p>
       </div>
     </div>
   </div>
