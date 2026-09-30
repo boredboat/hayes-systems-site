@@ -57,6 +57,13 @@ select option:checked,select option:hover{background:#F0EBDD;color:var(--ink-on-
    light scheme stops Firefox treating the list as dark-UI and drawing blank
    rows. */
 select,#agency_state{color-scheme:light}
+/* Firefox: appearance:none + background-image breaks the native popup paint
+   (blank rows until scroll - bug 1441859 family). Firefox-only: restore the
+   native appearance + arrow. Chromium keeps the custom chevron. */
+@supports (-moz-appearance:none){
+  select{-moz-appearance:none;appearance:none;background-image:none;background-color:#fff;padding-right:13px}
+  select option{background:#fff;color:#0A1B2E}
+}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 input::placeholder,textarea::placeholder{color:rgba(10,27,46,.4)}
 textarea{resize:vertical;min-height:74px}
