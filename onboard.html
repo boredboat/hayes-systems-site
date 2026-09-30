@@ -53,6 +53,10 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 select option{background:#fff;color:var(--ink-on-light)}
 #agency_state option{background:#fff;color:var(--ink-on-light)}
 select option:checked,select option:hover{background:#F0EBDD;color:var(--ink-on-light)}
+/* Firefox: the popup paints from color-scheme, not option styles. Forcing
+   light scheme stops Firefox treating the list as dark-UI and drawing blank
+   rows. */
+select,#agency_state{color-scheme:light}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 input::placeholder,textarea::placeholder{color:rgba(10,27,46,.4)}
 textarea{resize:vertical;min-height:74px}
