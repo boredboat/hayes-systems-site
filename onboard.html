@@ -132,6 +132,9 @@ textarea{resize:vertical;min-height:74px}
         </select>
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Other platforms work with a free Cal.com account.</div></div>
     </div>
+    <div class="field"><label for="booking_link">Your booking link (the exact one leads should use)</label><input id="booking_link" type="url" placeholder="https://cal.com/yourname/intro">
+      <div class="hint">Paste the link for the specific event type you want us to book - e.g. https://cal.com/yourname/15min or https://calendly.com/yourname/consultation. Teams with several event types: this picks the right one, so choose carefully. Copy it from your booking platform's share or event page.</div></div>
+    </div>
     <div class="field"><label for="agent_roster">Current team members</label>
       <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
       <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar.</div></div>
@@ -202,6 +205,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     business_name: v('business_name'),
     contact_name: v('contact_name'), contact_email: v('contact_email'),
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
+    booking_link: v('booking_link'),
     agency_state: v('agency_state'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     agent_roster: v('agent_roster'),
