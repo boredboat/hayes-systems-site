@@ -46,7 +46,12 @@ h2{font-family:var(--sans);font-weight:600;font-size:14.5px;letter-spacing:.02em
 label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:rgba(10,27,46,.85)}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid rgba(10,27,46,.25);border-radius:6px;font-family:var(--sans);font-size:15px;background:#fff;color:var(--ink-on-light)}
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237D5C15' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
-#agency_state{height:44px}
+#agency_state{display:none}   /* popup select hidden; the inline listbox below replaced it (9/30) */
+#agency_state_box{width:100%;height:190px;overflow-y:auto;background:#fff;
+  border:1px solid rgba(10,27,46,.25);border-radius:6px;font-size:15px;
+  font-family:var(--sans);color:var(--ink-on-light)}
+#agency_state_box option{padding:6px 13px;background:#fff;color:var(--ink-on-light)}
+#agency_state_box option:checked{background:#F0EBDD;font-weight:600}
 /* Chromium paint bug: a select with appearance:none + background-image can
    render blank option rows in the popup (they fill in lazily on scroll).
    Explicit option paint breaks the inheritance. */
@@ -115,6 +120,8 @@ textarea{resize:vertical;min-height:74px}
           <option value="">Choose...</option>
           <option value="AL">AL - Alabama</option><option value="AK">AK - Alaska</option><option value="AZ">AZ - Arizona</option><option value="AR">AR - Arkansas</option><option value="CA">CA - California</option><option value="CO">CO - Colorado</option><option value="CT">CT - Connecticut</option><option value="DE">DE - Delaware</option><option value="FL" disabled>FL - Florida (not served)</option><option value="GA">GA - Georgia</option><option value="HI">HI - Hawaii</option><option value="ID">ID - Idaho</option><option value="IL">IL - Illinois</option><option value="IN">IN - Indiana</option><option value="IA">IA - Iowa</option><option value="KS">KS - Kansas</option><option value="KY">KY - Kentucky</option><option value="LA" disabled>LA - Louisiana (not served)</option><option value="ME">ME - Maine</option><option value="MD">MD - Maryland</option><option value="MA">MA - Massachusetts</option><option value="MI">MI - Michigan</option><option value="MN">MN - Minnesota</option><option value="MS">MS - Mississippi</option><option value="MO">MO - Missouri</option><option value="MT">MT - Montana</option><option value="NE">NE - Nebraska</option><option value="NV">NV - Nevada</option><option value="NH">NH - New Hampshire</option><option value="NJ">NJ - New Jersey</option><option value="NM">NM - New Mexico</option><option value="NY">NY - New York</option><option value="NC">NC - North Carolina</option><option value="ND">ND - North Dakota</option><option value="OH">OH - Ohio</option><option value="OK">OK - Oklahoma</option><option value="OR">OR - Oregon</option><option value="PA">PA - Pennsylvania</option><option value="RI">RI - Rhode Island</option><option value="SC">SC - South Carolina</option><option value="SD">SD - South Dakota</option><option value="TN">TN - Tennessee</option><option value="TX">TX - Texas</option><option value="UT">UT - Utah</option><option value="VT">VT - Vermont</option><option value="VA">VA - Virginia</option><option value="WA">WA - Washington</option><option value="WV">WV - West Virginia</option><option value="WI">WI - Wisconsin</option><option value="WY">WY - Wyoming</option><option value="DC">DC - Washington, D.C.</option>
         </select>
+        <select id="agency_state_box" size="8" aria-label="State your agency operates in"></select>
+        <div class="hint">Scroll or click to pick your state. Florida and Louisiana are not served.</div>
       </div>
     </div>
     <div class="field"><label for="lead_phone">Phone number leads should call</label><input id="lead_phone" type="tel" required placeholder="(413) 555-0100">
@@ -195,6 +202,29 @@ textarea{resize:vertical;min-height:74px}
   <div class="foot">Hayes Systems · 28 Main St Unit #137, Westfield, MA 01085 · hayessystems.com</div>
   <a class="back" href="/">← Back to hayessystems.com</a>
 </div>
+<script>
+// STATE LISTBOX (9/30, Matt: Firefox popup still broken after two fixes):
+// clone agency_state options into an inline size=8 listbox - no popup, so no
+// popup paint bug anywhere. The hidden original still carries required +
+// the value on submit; validation stays native.
+(function(){
+  var src = document.getElementById('agency_state');
+  var box = document.getElementById('agency_state_box');
+  for (var i = 0; i < src.options.length; i++) {
+    var o = src.options[i];
+    var n = new Option(o.text, o.value, false, o.selected);
+    if (o.disabled) n.disabled = true;
+    box.appendChild(n);
+  }
+  src.addEventListener('change', function(){ box.selectedIndex = src.selectedIndex; });
+  box.addEventListener('change', function(){
+    src.selectedIndex = box.selectedIndex;
+    src.dispatchEvent(new Event('change', {bubbles:true}));
+    src.dispatchEvent(new Event('input', {bubbles:true}));
+  });
+  box.selectedIndex = src.selectedIndex;
+})();
+</script>
 <script>
 // render the REAL agreement text (generated from the PDF builders) above the
 // signature - one source of truth, no drift between what they read and sign
