@@ -45,7 +45,13 @@ h2{font-family:var(--sans);font-weight:600;font-size:14.5px;letter-spacing:.02em
 label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:rgba(10,27,46,.85)}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid rgba(10,27,46,.25);border-radius:6px;font-family:var(--sans);font-size:15px;background:#fff;color:var(--ink-on-light)}
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%237D5C15' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
-#agency_state{height:44px}   /* fixed control height; the OS popup is a tidy scrolled list, not a half-clipped sheet */
+#agency_state{height:44px}
+/* Chromium paint bug: a select with appearance:none + background-image can
+   render blank option rows in the popup (they fill in lazily on scroll).
+   Explicit option paint breaks the inheritance. */
+select option{background:#fff;color:var(--ink-on-light)}
+#agency_state option{background:#fff;color:var(--ink-on-light)}
+select option:checked,select option:hover{background:#F0EBDD;color:var(--ink-on-light)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 input::placeholder,textarea::placeholder{color:rgba(10,27,46,.4)}
 textarea{resize:vertical;min-height:74px}
