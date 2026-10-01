@@ -63,8 +63,19 @@ nav{position:sticky;top:0;background:#121F2C;border-bottom:1px solid rgba(217,16
 .nav-links a:not(.btn){font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,234,.72);text-decoration:none;white-space:nowrap}
 .nav-links a:not(.btn):hover{color:var(--gold)}
 .nav-links .nav-cta{white-space:nowrap;flex-shrink:0;padding:11px 16px;font-size:12.5px}
-@media(max-width:1050px){.nav-links a:not(.btn){display:none}}
-@media(max-width:420px){.nav-links{gap:10px}.nav-links .nav-cta{padding:10px 12px;font-size:11.5px;letter-spacing:.08em}.lockup .divider,.lockup .words{display:none}}
+/* Mobile nav: hamburger + dropdown (Matt 9/30: links + full logo on mobile) */
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;padding:10px;background:transparent;border:1px solid rgba(217,164,65,.35);border-radius:6px;cursor:pointer;flex-shrink:0}
+.nav-toggle span{display:block;height:2px;width:100%;background:var(--gold);border-radius:2px}
+.mobile-menu{display:none;flex-direction:column;gap:4px;padding:10px 24px 20px;background:#121F2C;border-top:1px solid rgba(217,164,65,.16)}
+.mobile-menu a:not(.btn){display:block;padding:12px 4px;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,234,.78);text-decoration:none;border-bottom:1px solid rgba(217,164,65,.12)}
+.mobile-menu a:not(.btn):hover{color:var(--gold)}
+.mobile-menu .btn{margin-top:12px;text-align:center}
+@media(max-width:1050px){
+  .nav-links{display:none}
+  .nav-toggle{display:flex}
+  .mobile-menu.open{display:flex}
+}
+@media(max-width:420px){.nav-links{gap:10px}.nav-links .nav-cta{padding:10px 12px;font-size:11.5px;letter-spacing:.08em}.lockup .divider{display:none}.lockup .hayes-art{width:96px;height:21px}.lockup .systems{font-size:8px;letter-spacing:.3em;margin-right:-.3em}}
 
 /* Buttons */
 .btn{display:inline-block;padding:13px 22px;border-radius:2px;font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:transform .15s ease,background .15s ease,color .15s ease}
@@ -241,6 +252,16 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       <a href="clients.html" style="color:var(--gold)">Already a client?</a>
       <a class="btn btn-primary nav-cta" href="#contact">Request a Campaign</a>
     </div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#problem">The Problem</a>
+    <a href="#how">How It Works</a>
+    <a href="#faq">FAQ</a>
+    <a href="clients.html">Already a client?</a>
+    <a class="btn btn-primary" href="#contact">Request a Campaign</a>
   </div>
 </nav>
 
@@ -490,6 +511,25 @@ function submitted(e){
   });
   return false;
 }
+
+// Mobile nav dropdown
+(function(){
+  var btn = document.getElementById('nav-toggle');
+  var menu = document.getElementById('mobile-menu');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(){
+    var open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+  // close after tapping a link (anchor or page nav)
+  menu.addEventListener('click', function(e){
+    if(e.target.tagName === 'A'){
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
 </script>
 </body>
 </html>
