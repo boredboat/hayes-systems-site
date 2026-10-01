@@ -357,7 +357,21 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
           <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>closeout report: messages, conversations, and appointments - the full numbers</li>
           <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Compliance handled for you: written consent before any call, opt-outs honored instantly and permanently</li>
         </ul>
-        <a class="btn btn-primary" href="#contact">Contact us</a>
+      </div>
+      <div class="plan after">
+        <div class="tier">The request</div>
+        <p class="pitch">Ready when you are: one short request, and Matt follows up personally. No commitment and no credit card required.</p>
+        <form id="pricing-audit-form" onsubmit="return submitted(event)">
+          <div class="row">
+            <div class="field"><label for="p-name">Your name</label><input id="p-name" required></div>
+            <div class="field"><label for="p-email">Email</label><input id="p-email" type="email" required></div>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%;border:none;cursor:pointer">Request my campaign</button>
+        </form>
+        <div class="form-ok" id="pricing-form-ok" style="display:none">
+          <h3>Request received.</h3>
+          <p style="font-size:14.5px;line-height:1.6">Matt will reach out to the email you provided.</p>
+        </div>
       </div>
     </div>
     <div style="max-width:860px;margin:34px auto 0;padding:26px 30px;background:#FCFAF4;border:1px solid rgba(10,27,46,.1);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius)">
@@ -468,23 +482,28 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 function submitted(e){
   e.preventDefault();
   var f = e.target;
-  var v = function(id){ return document.getElementById(id).value.trim(); };
+  var isPricing = (f.id === 'pricing-audit-form');
+  var px = isPricing ? 'p-' : 'f-';
+  var v = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; };
   // hard gate (Matt 9/29): name + email must be real, requirements box ticked.
   // Native `required` covers most of this; this catches whitespace-only and
-  // gives one clear message instead of a browser tooltip.
+  // gives one clear message instead of a browser tooltip. The requirements
+  // checkbox exists only on the contact-section form.
   var missing = [];
-  if (!v('f-name')) missing.push('your name');
-  if (!v('f-email') || v('f-email').indexOf('@') < 1) missing.push('a valid email');
-  if (!document.getElementById('f-reqs').checked) missing.push('the requirements checkbox');
+  if (!v(px + 'name')) missing.push('your name');
+  if (!v(px + 'email') || v(px + 'email').indexOf('@') < 1) missing.push('a valid email');
+  var reqs = document.getElementById('f-reqs');
+  if (!isPricing && reqs && !reqs.checked) missing.push('the requirements checkbox');
   if (missing.length) {
     alert('Please add ' + missing.join(' and ') + ' before requesting your campaign.');
     return false;
   }
   var payload = {
-    name: v('f-name'), team: v('f-team'), email: v('f-email'), phone: v('f-phone'),
-    notes: v('f-notes')
+    name: v(px + 'name'), team: isPricing ? '' : v('f-team'), email: v(px + 'email'),
+    phone: isPricing ? '' : v('f-phone'),
+    notes: isPricing ? 'sent from the pricing section form' : v('f-notes')
   };
-  var btn = document.getElementById('audit-submit');
+  var btn = f.querySelector('button[type="submit"]');
   btn.disabled = true; btn.textContent = 'Sending...';
   fetch('https://ops.hayessystems.com/api/request/web', {
     method: 'POST',
@@ -493,13 +512,17 @@ function submitted(e){
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) {
       btn.disabled = false; btn.textContent = 'Request my campaign';
-      var fine = document.querySelector('#audit-form .form-fine');
-      fine.textContent = 'That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.';
-      fine.style.marginTop = '14px';
+      var fine = document.querySelector('#' + f.id + ' .form-fine');
+      if (fine) {
+        fine.textContent = 'That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.';
+        fine.style.marginTop = '14px';
+      } else {
+        alert('That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.');
+      }
       return;
     }
-    document.getElementById('audit-form').style.display = 'none';
-    var ok = document.getElementById('form-ok');
+    f.style.display = 'none';
+    var ok = document.getElementById(isPricing ? 'pricing-form-ok' : 'form-ok');
     ok.style.display = 'block';
     var p = ok.querySelector('p');
     if (p) p.textContent = 'Request received. Matt will follow up with you at ' + payload.email + '.';
