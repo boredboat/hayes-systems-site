@@ -137,9 +137,8 @@ section{padding:72px 0}
 .step h3{font-family:var(--serif);font-size:22px;margin-bottom:10px;color:var(--ink-on-light)}
 .step p{font-size:15px;color:rgba(10,27,46,.78);font-weight:400;margin:0 auto;max-width:270px;line-height:1.6}
 
-/* Pricing */
-#pricing{background:var(--soft);border-top:1px solid rgba(217,164,65,.16);border-bottom:1px solid rgba(217,164,65,.16)}
-.price-grid{display:grid;grid-template-columns:minmax(0,440px);gap:24px;justify-content:center}
+/* Pricing (cards reused by the contact section's side-by-side layout) */
+.price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,440px));gap:24px;justify-content:center}
 @media(max-width:820px){.price-grid{grid-template-columns:1fr}}
 .plan{border-radius:var(--radius);padding:38px 34px}
 .plan.after{background:#FCFAF4;color:var(--ink-on-light);border:1px solid rgba(217,164,65,.45);box-shadow:0 18px 44px rgba(10,27,46,.10)}
@@ -238,7 +237,6 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
     <div class="nav-links">
       <a href="#problem">The Problem</a>
       <a href="#how">How It Works</a>
-      <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
       <a href="clients.html" style="color:var(--gold)">Already a client?</a>
       <a class="btn btn-primary nav-cta" href="#contact">Request a Campaign</a>
@@ -337,52 +335,6 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
   </div>
 </section>
 
-<section id="pricing">
-  <div class="container">
-    <div class="sec-head">
-      <span class="eyebrow">Pricing</span>
-      <h2>Structured so there's nothing to lose.</h2>
-      <p>We get paid when you get appointments. Every appointment lands on your calendar before a single dollar changes hands, and a campaign starts with one short request.</p>
-    </div>
-    <div class="price-grid">
-      <div class="plan after">
-        <div class="tier">Campaigns</div>
-        <div class="amount">$60</div>
-        <div class="per">/ booked appointment</div>
-        <p class="pitch">A full reactivation program in one campaign: your old leads re-engaged, qualified, and booked straight onto your calendar.</p>
-        <ul>
-          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Unlimited campaign size</li>
-          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Email and opt-in AI calls in one sequence</li>
-          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Weekly progress updates while the campaign runs</li>
-          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>closeout report: messages, conversations, and appointments - the full numbers</li>
-          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Compliance handled for you: written consent before any call, opt-outs honored instantly and permanently</li>
-        </ul>
-      </div>
-      <div class="plan after">
-        <div class="tier">The request</div>
-        <p class="pitch">Ready when you are: one short request, and we follow up personally. No commitment and no credit card required.</p>
-        <form id="pricing-audit-form" onsubmit="return submitted(event)">
-          <div class="row">
-            <div class="field"><label for="p-name">Your name</label><input id="p-name" required></div>
-            <div class="field"><label for="p-email">Email</label><input id="p-email" type="email" required></div>
-          </div>
-          <button class="btn btn-primary" type="submit" style="width:100%;border:none;cursor:pointer">Request my campaign</button>
-        </form>
-        <div class="form-ok" id="pricing-form-ok" style="display:none">
-          <h3>Request received.</h3>
-          <p style="font-size:14.5px;line-height:1.6">We will reach out to the email you provided.</p>
-        </div>
-      </div>
-    </div>
-    <div style="max-width:860px;margin:34px auto 0;padding:26px 30px;background:#FCFAF4;border:1px solid rgba(10,27,46,.1);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius)">
-      <span class="eyebrow" style="color:var(--gold-ink)">Continuous coverage</span>
-      <h3 style="font-family:var(--serif);font-size:22px;margin:8px 0 10px;color:var(--ink-on-light)">Your database is quietly producing opportunity every month. A retainer works it year-round.</h3>
-      <p style="font-size:15px;color:rgba(10,27,46,.82);line-height:1.65">Most agencies wait until the pipeline runs dry to look at their old leads, and by then the best ones already signed with whoever called first. With a retainer we watch your list continually and launch campaigns the moment a workable number of leads age. Retainer clients enjoy a discounted per appointment rate and continual coverage.</p>
-      <a class="btn btn-primary" href="#contact" style="margin-top:16px">Ask about a retainer</a>
-    </div>
-  </div>
-</section>
-
 <section id="faq">
   <div class="container">
     <div class="sec-head">
@@ -409,12 +361,13 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 </section>
 
 <section id="contact">
-  <div class="container" style="max-width:600px">
+  <div class="container" style="max-width:980px">
     <div class="sec-head" style="text-align:center;margin-bottom:28px">
       <span class="eyebrow">Request a campaign</span>
       <h2>Ready to start?</h2>
     </div>
-    <div class="form-card">
+    <div class="price-grid" style="align-items:start">
+      <div class="form-card">
       <form id="audit-form" onsubmit="return submitted(event)">
         <div class="sub" style="margin-bottom:18px">No commitment. We'll reach out to the email you provide.</div>
         <div class="row">
@@ -440,6 +393,20 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
         <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
         <h4>Request received.</h4>
         <p>We'll reach out to the email you provided.</p>
+      </div>
+      </div>
+      <div class="plan after">
+        <div class="tier">Campaigns</div>
+        <div class="amount">$60</div>
+        <div class="per">/ booked appointment</div>
+        <p class="pitch">A full reactivation program in one campaign: your old leads re-engaged, qualified, and booked straight onto your calendar.</p>
+        <ul>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Unlimited campaign size</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Email and opt-in AI calls in one sequence</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Weekly progress updates while the campaign runs</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>closeout report: messages, conversations, and appointments - the full numbers</li>
+          <li><svg class="check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>Compliance handled for you: written consent before any call, opt-outs honored instantly and permanently</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -471,7 +438,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       </span>
       </a>
       <div class="footer-links">
-        <a href="#problem">The Problem</a><a href="#how">How It Works</a><a href="how-it-works.html">The Process</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><a href="compliance.html">Compliance</a><a href="privacy.html">Privacy</a><a href="cancellation.html">Cancellation</a><a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>
+        <a href="#problem">The Problem</a><a href="#how">How It Works</a><a href="how-it-works.html">The Process</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><a href="compliance.html">Compliance</a><a href="privacy.html">Privacy</a><a href="cancellation.html">Cancellation</a><a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>
       </div>
     </div>
     <p class="footer-legal">&copy; 2026 Hayes Systems · Western Massachusetts. Hayes Systems is a marketing service operating in accordance with applicable telephone regulations (TCPA), placing calls only to leads who have given written consent, with permanent opt-out processing; see our <a href="compliance.html" style="color:rgba(244,241,234,.6)">compliance page</a>. Performance figures are illustrative ranges from industry benchmarks; individual results vary with database age, source, and quality. Follow-up statistics reflect widely cited industry research (InsideSales/XANT; NAR 2026 Member Profile).</p>
@@ -482,28 +449,23 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 function submitted(e){
   e.preventDefault();
   var f = e.target;
-  var isPricing = (f.id === 'pricing-audit-form');
-  var px = isPricing ? 'p-' : 'f-';
-  var v = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  var v = function(id){ return document.getElementById(id).value.trim(); };
   // hard gate (Matt 9/29): name + email must be real, requirements box ticked.
   // Native `required` covers most of this; this catches whitespace-only and
-  // gives one clear message instead of a browser tooltip. The requirements
-  // checkbox exists only on the contact-section form.
+  // gives one clear message instead of a browser tooltip.
   var missing = [];
-  if (!v(px + 'name')) missing.push('your name');
-  if (!v(px + 'email') || v(px + 'email').indexOf('@') < 1) missing.push('a valid email');
-  var reqs = document.getElementById('f-reqs');
-  if (!isPricing && reqs && !reqs.checked) missing.push('the requirements checkbox');
+  if (!v('f-name')) missing.push('your name');
+  if (!v('f-email') || v('f-email').indexOf('@') < 1) missing.push('a valid email');
+  if (!document.getElementById('f-reqs').checked) missing.push('the requirements checkbox');
   if (missing.length) {
     alert('Please add ' + missing.join(' and ') + ' before requesting your campaign.');
     return false;
   }
   var payload = {
-    name: v(px + 'name'), team: isPricing ? '' : v('f-team'), email: v(px + 'email'),
-    phone: isPricing ? '' : v('f-phone'),
-    notes: isPricing ? 'sent from the pricing section form' : v('f-notes')
+    name: v('f-name'), team: v('f-team'), email: v('f-email'), phone: v('f-phone'),
+    notes: v('f-notes')
   };
-  var btn = f.querySelector('button[type="submit"]');
+  var btn = document.getElementById('audit-submit');
   btn.disabled = true; btn.textContent = 'Sending...';
   fetch('https://ops.hayessystems.com/api/request/web', {
     method: 'POST',
@@ -512,17 +474,13 @@ function submitted(e){
   }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.ok) {
       btn.disabled = false; btn.textContent = 'Request my campaign';
-      var fine = document.querySelector('#' + f.id + ' .form-fine');
-      if (fine) {
-        fine.textContent = 'That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.';
-        fine.style.marginTop = '14px';
-      } else {
-        alert('That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.');
-      }
+      var fine = document.querySelector('#audit-form .form-fine');
+      fine.textContent = 'That did not go through. Email us at Matt@hayessystems.com and we will get you scheduled.';
+      fine.style.marginTop = '14px';
       return;
     }
-    f.style.display = 'none';
-    var ok = document.getElementById(isPricing ? 'pricing-form-ok' : 'form-ok');
+    document.getElementById('audit-form').style.display = 'none';
+    var ok = document.getElementById('form-ok');
     ok.style.display = 'block';
     var p = ok.querySelector('p');
     if (p) p.textContent = 'Request received. We will follow up with you at ' + payload.email + '.';
