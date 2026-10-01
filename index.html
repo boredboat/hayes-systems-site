@@ -360,7 +360,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       </div>
       <div class="plan after">
         <div class="tier">The request</div>
-        <p class="pitch">Ready when you are: one short request, and Matt follows up personally. No commitment and no credit card required.</p>
+        <p class="pitch">Ready when you are: one short request, and we follow up personally. No commitment and no credit card required.</p>
         <form id="pricing-audit-form" onsubmit="return submitted(event)">
           <div class="row">
             <div class="field"><label for="p-name">Your name</label><input id="p-name" required></div>
@@ -370,7 +370,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
         </form>
         <div class="form-ok" id="pricing-form-ok" style="display:none">
           <h3>Request received.</h3>
-          <p style="font-size:14.5px;line-height:1.6">Matt will reach out to the email you provided.</p>
+          <p style="font-size:14.5px;line-height:1.6">We will reach out to the email you provided.</p>
         </div>
       </div>
     </div>
@@ -393,7 +393,7 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
       <details><summary>Is this compliant? I've heard horror stories about cold outreach.</summary><p>Nothing we do is cold. We work lists your business already has a relationship with, a call only happens after that person replies YES in writing, Opt-outs and the recordkeeping behind them are our responsibility, handled before anything sends. <a href="compliance.html" style="color:var(--gold-ink);font-weight:600;text-decoration:underline">The full picture is on our compliance page.</a></p></details>
       <details><summary>What stops the AI from going off script?</summary><p>"Evelyn", the name given to our AI agent that books appointments, only calls leads who explicitly asked for the call and she opens every conversation by saying she is an AI assistant. Her job is narrow: get the appointment booked. If a lead asks something she cannot know, like whether a specific house is still for sale or what a home might be worth, she says she doesn't have that information and says an appointment with you would be a great way to get answers. Every call is recorded and transcribed so you can hear exactly what was said. Evelyn runs on <a href="https://www.retellai.com/#try-demo" target="_blank" rel="noopener">Retell AI</a>, and you can hear the platform for yourself with their live demo.</p></details>
       <details><summary>Will this annoy my past clients and burn goodwill?</summary><p>Every message is personalized and reads as a friendly check-in from your follow-up team, not an impersonal marketing blast. Each lead receives a maximum of 3 emails, each 3 days apart, during a campaign - and no matter how many teams work the same lead, it gets one outreach attempt from us every 6 months. This prevents leads on multiple lists from ever being spammed, and protects both your reputation and ours.</p></details>
-      <details><summary>What if my leads are old? Like, years old.</summary><p>Older is our specialty: three months quiet is the minimum age we work (fresher leads belong to your own follow-up), and the sweet spot runs from there to a couple of years. Request a campaign and Matt will tell you honestly what yours is worth before anyone commits.</p></details>
+      <details><summary>What if my leads are old? Like, years old.</summary><p>Older is our specialty: three months quiet is the minimum age we work (fresher leads belong to your own follow-up), and the sweet spot runs from there to a couple of years. Request a campaign and we will tell you honestly what yours is worth before anyone commits.</p></details>
       <details><summary>Do you need access to my CRM?</summary><p>Only in the safest way: a revokable read-only connection for Follow Up Boss, kvCORE, LionDesk, HubSpot, and Pipedrive. If your CRM is elsewhere, a CSV export works fine and we have a secure upload method for that. Either way we handle duplicates, dead numbers, inactive emails, and junk entries on our side. Our closeout procedure includes the deactivation of any CRM and calendar link and the deletion of a CSV export for safety.</p></details>
       <details><summary>Why not just build this myself?</summary><p>You can, and some agents try. The pieces exist: email tools, texting apps, automation builders, even AI calling platforms. The hard part isn't any one piece; it's making them all work together. Automations break quietly: a CRM changes its export format, a scheduling link expires, a messaging platform tightens its rules, and the workflow you set up in January is silently doing nothing by March. Someone has to notice, diagnose, and fix it every time, forever. That is a second job, and it is the job we actually do: our sequences are monitored, and when something drifts we fix it before you hear about it. You would also be taking on the compliance side yourself, as the sender of record: consent records, opt-out suppression, calling-hour rules. Build it yourself and you own the maintenance. Work with us and you never think about it; appointments just land on your calendar.</p></details>
       <details><summary>When a lead replies, how fast do you respond?</summary><p>Fast enough that momentum never dies. Industry research puts a big premium on responding within the first hour, and our median reply goes out in about a minute: when a lead says yes, the next question (picking a time) is already on its way. Old leads who finally raise a hand get the same urgency a brand new inquiry would.</p></details>
@@ -448,13 +448,13 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 <section class="founder-sec" style="padding:56px 0 64px">
   <div class="container founder">
     <div class="founder-photo">
-      <img src="matt.jpg?v=3" alt="Matt, founder of Hayes Systems" onload="this.style.display='block';document.getElementById('founder-mono').style.display='none'">
+      <img src="matt.jpg?v=3" alt="The Hayes Systems team photo" onload="this.style.display='block';document.getElementById('founder-mono').style.display='none'">
       <div id="founder-mono" class="founder-mono">M</div>
     </div>
     <div>
-      <span class="eyebrow">The person behind it</span>
-      <h2>Hi, I'm Matt.</h2>
-      <p>I founded and built Hayes Systems with one guiding principle: Honesty. It's why I put my name and face on it. I don't believe in hollow promises or hiding costs behind confusion. Success follows hard work and Hayes Systems promises to work as hard for you as you do for your clients. If you have questions, email me directly at <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>.</p>
+      <span class="eyebrow">The team behind it</span>
+      <h2>Honesty first.</h2>
+      <p>We founded and built Hayes Systems with one guiding principle: Honesty. It's why we put our name on it. We don't believe in hollow promises or hiding costs behind confusion. Success follows hard work and Hayes Systems promises to work as hard for you as you do for your clients. If you have questions, email us directly at <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>.</p>
     </div>
   </div>
 </section>
@@ -525,7 +525,7 @@ function submitted(e){
     var ok = document.getElementById(isPricing ? 'pricing-form-ok' : 'form-ok');
     ok.style.display = 'block';
     var p = ok.querySelector('p');
-    if (p) p.textContent = 'Request received. Matt will follow up with you at ' + payload.email + '.';
+    if (p) p.textContent = 'Request received. We will follow up with you at ' + payload.email + '.';
   }).catch(function(){
     btn.disabled = false; btn.textContent = 'Request my campaign';
     alert('Something went wrong sending the request. Email us directly at Matt@hayessystems.com.');
