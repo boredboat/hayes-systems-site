@@ -48,6 +48,10 @@ input:focus{outline:none;border-color:var(--gold)}
       <label for="acct">Account ID</label>
       <input type="text" id="acct" autocomplete="off" placeholder="From Settings, Account in kvCORE">
     </div>
+    <div id="ghl-loc-row">
+      <label for="ghlloc">Location ID</label>
+      <input type="text" id="ghlloc" autocomplete="off" placeholder="From Settings, Business Profile in GoHighLevel">
+    </div>
     <button class="btn" id="go" disabled>Connect</button>
     <div class="err" id="err" hidden></div>
   </div>
@@ -61,6 +65,7 @@ var tok = m ? m[1] : '';
 var platform = '', clientName = '', connected = false;
 var go = document.getElementById('go'),
     tokenIn = document.getElementById('token'),
+    ghlLocIn = document.getElementById('ghlloc'),
     acctIn = document.getElementById('acct'),
     err = document.getElementById('err');
 function show(el, msg, bad){ el.textContent = msg; el.hidden = false; el.classList.toggle('bad', !!bad); }
@@ -76,9 +81,11 @@ if(!tok){
 }
 tokenIn.addEventListener('input', check);
 acctIn.addEventListener('input', check);
+ghlLocIn.addEventListener('input', check);
 function check(){
   var needAcct = document.getElementById('acct-row').style.display === 'block';
-  go.disabled = !tokenIn.value.trim() || (needAcct && !acctIn.value.trim());
+  var needGhlLoc = document.getElementById('ghl-loc-row').style.display === 'block';
+  go.disabled = !tokenIn.value.trim() || (needAcct && !acctIn.value.trim()) || (needGhlLoc && !ghlLocIn.value.trim());
 }
 function renderHow(d){
   platform = d.platform || '';
@@ -87,6 +94,7 @@ function renderHow(d){
   var label = d.platform_label || 'your CRM';
   document.getElementById('pg-title').textContent = 'Connect ' + label + '.';
   document.getElementById('acct-row').style.display = d.needs_account_id ? 'block' : 'none';
+  document.getElementById('ghl-loc-row').style.display = d.needs_ghl_location ? 'block' : 'none';
   if(connected){
     document.getElementById('pg-sub').textContent =
       'A connection is already active on this page\'s client record. Submitting a new token replaces the old one.';
@@ -107,7 +115,8 @@ go.addEventListener('click', function(){
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({t: tok,
                           token: tokenIn.value.trim(),
-                          account_id: acctIn.value.trim()})
+                          account_id: acctIn.value.trim(),
+                          ghl_location: ghlLocIn.value.trim()})
   }).then(function(r){ return r.json(); }).then(function(d){
     go.disabled = false; go.textContent = 'Connect';
     if(!d.ok){

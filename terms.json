@@ -4,16 +4,16 @@
   "intro": "This agreement covers the lead information you provide to Hayes Systems for a reactivation campaign. It is part of the paperwork you are completing below.",
   "clauses": [
    {
-    "h": "1. What you provide",
-    "b": "A read-only connection to your CRM that we use to pull your past-inquiry leads, revocable by you at any time, or, where your platform has no connection available, a CSV export of those leads, plus the booking connection described in the intake form."
+    "h": "1. What Client provides",
+    "b": "Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by Client at any time, or, where no CRM connection is available, a CSV export of those leads. Client will also provide the booking connection described in the intake form."
    },
    {
-    "h": "2. What you represent",
-    "b": "You represent that the lead information was lawfully collected in the ordinary course of your business, that to the best of your knowledge each person previously contacted your agency about real estate, and that you will relay to Hayes Systems, promptly, any opt-out request you receive directly from a person on the list."
+    "h": "2. Client representations",
+    "b": "Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
     "h": "3. How the data is used",
-    "b": "Hayes Systems uses the list solely to run your campaign: hygiene, consent asks by email, consented AI-assisted phone calls, appointment booking, and reporting. The list is never sold, rented, or used for any other purpose. Of our service providers, only the calling platform that places your calls receives lead contact details (the number being called and the name we greet them by); campaign emails are delivered through an email provider in the ordinary course of sending. Bookings are placed on your own booking service, and no payment processor ever sees your list."
+    "b": "Hayes Systems will use the list solely to perform the engagement: list hygiene, consent requests by email, consented AI-assisted phone calls, appointment scheduling, and reporting. The list will not be sold, rented, or used for any other purpose. Of Hayes Systems' service providers, only the calling platform places calls to the leads and receives the corresponding contact details (the dialed number and the name used in the greeting); campaign emails are delivered through an email provider in the ordinary course of sending. Appointments are booked on Client's own booking service; no payment processor receives the lead list."
    },
    {
     "h": "4. How the data is protected",
@@ -33,32 +33,32 @@
   "title": "Campaign Terms",
   "clauses": [
    {
-    "h": "1. What the campaign is",
-    "b": "One campaign on your dormant leads: import and hygiene, consent asks by email and consented AI-assisted phone calls, appointment booking on your calendar, and a closeout report. The campaign works your entire list."
+    "h": "1. Scope of services",
+    "b": "Hayes Systems will perform one reactivation campaign against the lead list provided by Client. The campaign consists of list import and hygiene, consent requests by email, consented AI-assisted phone calls, appointment scheduling on Client's booking calendar, and a closeout report delivered at the end of the campaign. The campaign addresses all records in the provided list."
    },
    {
-    "h": "2. What it costs",
-    "b": "You pay $60 per booked appointment and nothing else - no setup fee, no monthly minimum, nothing upfront. Billing runs weekly while the campaign is live: each week's invoice covers that week's booked appointments, and the final invoice when the campaign closes covers the remainder. Every invoice is charged automatically to your card on file. If a lead no-shows, that appointment is refunded. If anything on an invoice looks wrong, you have 14 days to raise it and we make it right."
+    "h": "2. Fees and payment",
+    "b": "Client will pay $60 per booked appointment. No other fees apply: there is no setup fee, no monthly minimum, and no payment is due before launch. Billing runs weekly while the campaign is active; each weekly invoice covers that week's booked appointments, and a final invoice at campaign close covers the remainder. Invoices are charged automatically to the card on file. If a lead fails to attend a booked appointment, the appointment fee is refunded. Client may dispute any invoice within 14 days of receipt; Hayes Systems will review and correct confirmed errors."
    },
    {
-    "h": "3. What you provide",
-    "b": "A read-only connection to your CRM that we use to pull your past-inquiry leads, revocable by you at any time, or, where your platform has no connection available, a CSV export of those leads, plus your booking connection (Cal.com, Calendly, or GoHighLevel). The list is used solely to provide the service."
+    "h": "3. Client responsibilities",
+    "b": "Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by Client at any time, or, where no CRM connection is available, a CSV export of those leads. Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
    },
    {
-    "h": "4. Your representations",
-    "b": "You represent that the lead information was lawfully collected in the ordinary course of your business, that to the best of your knowledge each person previously contacted your agency about real estate, and that you will relay to Hayes Systems, promptly, any opt-out request you receive directly from a person on the list."
+    "h": "4. Client representations",
+    "b": "Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
-    "h": "5. How the data is handled",
-    "b": "As in the data agreement: used solely to run this campaign, never sold or rented, contact details purged at closeout, consent and opt-out records retained five years as the legal record. Opt-outs stop every channel immediately and permanently."
+    "h": "5. Data handling",
+    "b": "As set out in the Data Agreement: the lead list is used solely to provide the services under this agreement, is never sold or rented, and contact details are purged at closeout. Consent and opt-out records are retained for five years as the legal record of the campaign. Opt-outs stop all channels immediately and permanently."
    },
    {
-    "h": "6. Ending the campaign",
-    "b": "Either side may end the campaign at any time. Work stops within a business day. Appointments already booked remain payable under clause 2."
+    "h": "6. Term and termination",
+    "b": "Either party may terminate the campaign at any time. Hayes Systems will stop campaign work within one business day of notice. Appointments booked before termination remain payable under clause 2."
    },
    {
-    "h": "7. Results",
-    "b": "The closeout report is generated and delivered to you via email at the end of every campaign and may be used for your purposes under the condition that Hayes Systems branding is left unmodified."
+    "h": "7. Reporting",
+    "b": "Hayes Systems will deliver a closeout report to Client by email at the end of the campaign. Client may use the report for its own purposes, provided the Hayes Systems branding within it is left unmodified."
    }
   ]
  }
