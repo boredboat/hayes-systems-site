@@ -121,8 +121,6 @@ textarea{resize:vertical;min-height:74px}
           <option value="none">None / a spreadsheet</option>
         </select>
         <div class="hint">Select your CRM software. Please note that Podio and other unlisted programs will require a CSV export.</div></div>
-      <div class="field"><label for="calendar_owner">Main calendar account email</label><input id="calendar_owner" type="email">
-        <div class="hint">The login email of the account that owns the calendar you book leads into.</div></div>
     </div>
     <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required onchange="platToggle(this.value)">
@@ -230,7 +228,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     booking_link: v('booking_link'),
     agency_state: v('agency_state'),
-    calendar: v('calendar'), calendar_owner: v('calendar_owner'),
+    calendar: v('calendar'),
     agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
