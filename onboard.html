@@ -123,7 +123,7 @@ textarea{resize:vertical;min-height:74px}
     </div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
-        <select id="calendar" required>
+        <select id="calendar" required onchange="platToggle(this.value)">
           <option value="">Choose...</option>
           <option value="calcom">Cal.com</option>
           <option value="calendly">Calendly</option>
@@ -131,8 +131,8 @@ textarea{resize:vertical;min-height:74px}
           <option value="other">Something else</option>
         </select>
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Other platforms work with a free Cal.com account.</div></div>
-      <div class="field"><label for="booking_link">Your booking link (the exact one we should use to book leads)</label><input id="booking_link" type="url" placeholder="Paste your booking link">
-        <div class="hint">Paste the link for the specific event type you want us to book - copy it from your booking platform's share or event page. This event will be what all leads we generate book under, so check that it is correct.</div></div>
+      <div class="field" id="bl-field" style="display:none"><label for="booking_link">Your Cal.com booking link (the exact event type we should book leads into)</label><input id="booking_link" type="url" placeholder="Paste your Cal.com event type link">
+        <div class="hint">Our system reads the event type from this link to wire up your agent's booking tools - copy it from your Cal.com share or event page.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Current team members</label>
       <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
@@ -179,6 +179,12 @@ textarea{resize:vertical;min-height:74px}
   <a class="back" href="/">← Back to hayessystems.com</a>
 </div>
 <script>
+  function platToggle(plat){
+    var showLink = (plat === 'calcom');
+    document.getElementById('bl-field').style.display = showLink ? '' : 'none';
+  }
+  platToggle(document.getElementById('calendar').value);
+
 // render the REAL agreement text (generated from the PDF builders) above the
 // signature - one source of truth, no drift between what they read and sign
 fetch('/terms.json').then(r => r.json()).then(t => {
