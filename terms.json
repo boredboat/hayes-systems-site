@@ -20,7 +20,7 @@
    },
    {
     "h": "5. Opt-out handling",
-    "b": "Any person on the list may stop all contact by replying STOP to an email, saying so on a call, or using the unsubscribe link in an email. Hayes Systems suppresses that person from every channel immediately and permanently, and honors relayed opt-outs from you within the same day."
+    "b": "Any person on the list may stop all contact by replying STOP to an email, saying so on a call, or using the unsubscribe link in an email. Hayes Systems suppresses that person from every channel immediately and permanently, and honors relayed opt-outs from the Client within the same day."
    },
    {
     "h": "6. Term and end of service",
@@ -37,7 +37,7 @@
    },
    {
     "h": "2. Fees and payment",
-    "b": "Client will pay $60 per booked appointment. No other fees apply: there is no setup fee, no monthly minimum, and no payment is due before launch. Billing runs weekly while the campaign is active; each weekly invoice covers that week's booked appointments, and a final invoice at campaign close covers the remainder. Invoices are charged automatically to the card on file. If a lead fails to attend a booked appointment, the appointment fee is refunded. Client may dispute any invoice within 14 days of receipt; Hayes Systems will review and correct confirmed errors."
+    "b": "Client will pay $60 per booked appointment. Billing runs weekly while the campaign is active; each weekly invoice covers that week's booked appointments. Invoices are charged automatically to the card on file. If a lead fails to attend a booked appointment, the appointment fee is refunded on Client's notice. Client may dispute any invoice within 14 days of receipt; Hayes Systems will review and correct confirmed errors."
    },
    {
     "h": "3. Client responsibilities",
@@ -57,7 +57,7 @@
    },
    {
     "h": "7. Reporting",
-    "b": "Hayes Systems will deliver a closeout report to Client by email at the end of the campaign. Client may use the report for its own purposes, provided the Hayes Systems branding within it is left unmodified."
+    "b": "Hayes Systems will deliver a weekly report during the campaign and a closeout report by email at the end of it. Client may use either report for its own purposes, provided the Hayes Systems branding within it is left unmodified."
    }
   ]
  }
