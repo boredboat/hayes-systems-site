@@ -123,7 +123,7 @@ textarea{resize:vertical;min-height:74px}
     </div>
     <div class="row">
       <div class="field"><label for="calendar">Booking platform</label>
-        <select id="calendar" required>
+        <select id="calendar" required onchange="ghlToggle(this.value)">
           <option value="">Choose...</option>
           <option value="calcom">Cal.com</option>
           <option value="calendly">Calendly</option>
@@ -131,7 +131,17 @@ textarea{resize:vertical;min-height:74px}
           <option value="other">Something else</option>
         </select>
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Other platforms work with a free Cal.com account.</div></div>
-      <div class="field"><label for="booking_link">Your booking link (the exact one we should use to book leads)</label><input id="booking_link" type="url" placeholder="https://cal.com/yourname/intro">
+      <div class="field" id="ghl-token-field" style="display:none">
+        <label for="ghl_token">GoHighLevel Private Integration token</label>
+        <input id="ghl_token" type="password" autocomplete="off" placeholder="paste the token (shown only once when you create it)">
+        <div class="hint">In your sub-account: Settings &gt; Private Integrations &gt; Create new integration, name it Hayes Systems, tick the Calendars and Contacts read scopes, save, copy the token.</div>
+      </div>
+      <div class="field" id="ghl-loc-field" style="display:none">
+        <label for="ghl_location">GoHighLevel Location ID</label>
+        <input id="ghl_location" type="text" autocomplete="off" placeholder="the string after /location/ in your address bar">
+        <div class="hint">Settings &gt; Business Profile shows it; it is also the part of any sub-account URL right after /location/.</div>
+      </div>
+    <div class="field"><label for="booking_link">Your booking link (the exact one we should use to book leads)</label><input id="booking_link" type="url" placeholder="https://cal.com/yourname/intro">
         <div class="hint">Paste the link for the specific event type you want us to book - e.g. https://cal.com/yourname/15min or https://calendly.com/yourname/consultation. This event will be what all leads we generate book under, so check that it is correct. Copy it from your booking platform's share or event page.</div></div>
     </div>
     <div class="field"><label for="agent_roster">Current team members</label>
@@ -179,6 +189,13 @@ textarea{resize:vertical;min-height:74px}
   <a class="back" href="/">← Back to hayessystems.com</a>
 </div>
 <script>
+  function ghlToggle(plat){
+    var on = (plat === 'gohighlevel');
+    document.getElementById('ghl-token-field').style.display = on ? '' : 'none';
+    document.getElementById('ghl-loc-field').style.display = on ? '' : 'none';
+  }
+  ghlToggle(document.getElementById('calendar').value);
+
 // render the REAL agreement text (generated from the PDF builders) above the
 // signature - one source of truth, no drift between what they read and sign
 fetch('/terms.json').then(r => r.json()).then(t => {
@@ -205,6 +222,7 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     contact_name: v('contact_name'), contact_email: v('contact_email'),
     lead_phone: v('lead_phone'), crm_platform: v('crm_platform'),
     booking_link: v('booking_link'),
+    ghl_token: v('ghl_token'), ghl_location: v('ghl_location'),
     agency_state: v('agency_state'),
     calendar: v('calendar'), calendar_owner: v('calendar_owner'),
     agent_roster: v('agent_roster'),
