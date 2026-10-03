@@ -189,6 +189,13 @@ Dave Wilson"></textarea>
   }
   platToggle(document.getElementById('calendar').value);
 
+  /* every text-like field: placeholder clears on focus, restores on blur if empty */
+  document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(function(f){
+    var ph = f.getAttribute('placeholder');
+    f.addEventListener('focus', function(){ f.removeAttribute('placeholder'); });
+    f.addEventListener('blur', function(){ if(!f.value) f.setAttribute('placeholder', ph); });
+  });
+
   var rosterTa = document.getElementById('agent_roster');
   if (rosterTa) {
     var rosterPh = rosterTa.getAttribute('placeholder');
