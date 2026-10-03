@@ -3,12 +3,12 @@
   "title": "Data Agreement",
   "clauses": [
    {
-    "h": "1. What Client provides",
-    "b": "Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by Client at any time, or, where no CRM connection is available, a CSV export of those leads. Client will also provide the booking connection described in the intake form."
+    "h": "1. What the Client provides",
+    "b": "the Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form."
    },
    {
-    "h": "2. Client representations",
-    "b": "Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
+    "h": "2. The Client representations",
+    "b": "the Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
     "h": "3. How the data is used",
@@ -33,19 +33,19 @@
   "clauses": [
    {
     "h": "1. Scope of services",
-    "b": "Hayes Systems will perform one reactivation campaign against the lead list provided by Client. The campaign consists of list import and hygiene, consent requests by email, consented AI-assisted phone calls, appointment scheduling on Client's booking calendar, and a closeout report delivered at the end of the campaign. The campaign addresses all records in the provided list."
+    "b": "Hayes Systems will perform one reactivation campaign against the lead list provided by the Client. The campaign consists of list import and hygiene, consent requests by email, consented AI-assisted phone calls, appointment scheduling on Client's booking calendar, and a closeout report delivered at the end of the campaign. The campaign addresses all records in the provided list."
    },
    {
     "h": "2. Fees and payment",
-    "b": "Client will pay $60 per booked appointment. Billing runs weekly while the campaign is active; each weekly invoice covers that week's booked appointments. Invoices are charged automatically to the card on file. If a lead fails to attend a booked appointment, the appointment fee is refunded on Client's notice. Client may dispute any invoice within 14 days of receipt; Hayes Systems will review and correct confirmed errors."
+    "b": "The Client will pay $60 per booked appointment. Billing runs weekly while the campaign is active; each weekly invoice covers that week's booked appointments. Invoices are charged automatically to the card on file. If a lead fails to attend a booked appointment, the appointment fee is refunded on the Client's notice. The Client may dispute any invoice within 14 days of receipt; Hayes Systems will review and correct confirmed errors."
    },
    {
-    "h": "3. Client responsibilities",
-    "b": "Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by Client at any time, or, where no CRM connection is available, a CSV export of those leads. Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
+    "h": "3. The Client responsibilities",
+    "b": "the Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
    },
    {
-    "h": "4. Client representations",
-    "b": "Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
+    "h": "4. The Client representations",
+    "b": "the Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
     "h": "5. Data handling",
@@ -57,7 +57,7 @@
    },
    {
     "h": "7. Reporting",
-    "b": "Hayes Systems will deliver a weekly report during the campaign and a closeout report by email at the end of it. Client may use either report for its own purposes, provided the Hayes Systems branding within it is left unmodified."
+    "b": "Hayes Systems will deliver a weekly report during the campaign and a closeout report by email at the end of it. The Client may use either report for its own purposes, provided the Hayes Systems branding within it is left unmodified."
    }
   ]
  }
