@@ -121,8 +121,7 @@ textarea{resize:vertical;min-height:74px}
       <div class="field"><label for="calendar_owner">Email of the main account that owns the team calendar</label><input id="calendar_owner" type="email">
         <div class="hint">The login email of the main account that owns the calendar you book leads into.</div></div>
     </div>
-    <div class="row">
-      <div class="field"><label for="calendar">Booking platform</label>
+    <div class="field"><label for="calendar">Booking platform</label>
         <select id="calendar" required onchange="platToggle(this.value)">
           <option value="">Choose...</option>
           <option value="calcom">Cal.com</option>
@@ -133,7 +132,6 @@ textarea{resize:vertical;min-height:74px}
         <div class="hint">What we book appointments into. The free Calendly tier can't be booked by API - paid plan needed there. Other platforms work with a free Cal.com account.</div></div>
       <div class="field" id="bl-field" style="display:none"><label for="booking_link">Your Cal.com booking link (the exact event type we should book leads into)</label><input id="booking_link" type="url" placeholder="Paste your Cal.com event type link">
         <div class="hint">Our system reads the event type from this link to wire up your agent's booking tools - copy it from your Cal.com share or event page.</div></div>
-    </div>
     <div class="field"><label for="agent_roster">Current team members</label>
       <textarea id="agent_roster" rows="5" placeholder="One agent per line, spelled exactly as in your CRM"></textarea>
       <div class="hint">One per line, spelled exactly as in your CRM, so leads reach the right agent and bookings land on the right calendar.</div></div>
