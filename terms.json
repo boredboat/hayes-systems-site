@@ -4,11 +4,11 @@
   "clauses": [
    {
     "h": "1. What the Client provides",
-    "b": "the Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form."
+    "b": "The Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form."
    },
    {
     "h": "2. The Client representations",
-    "b": "the Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
+    "b": "The Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
     "h": "3. How the data is used",
@@ -41,11 +41,11 @@
    },
    {
     "h": "3. The Client responsibilities",
-    "b": "the Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
+    "b": "The Client will provide a read-only connection to Client's CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by the Client at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
    },
    {
     "h": "4. The Client representations",
-    "b": "the Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
+    "b": "The Client represents that the lead information was lawfully collected in the ordinary course of Client's business, that to the best of Client's knowledge each person on the list previously contacted Client's agency about real estate, and that the Client will relay to Hayes Systems, promptly, any opt-out request received directly from a person on the list."
    },
    {
     "h": "5. Data handling",
