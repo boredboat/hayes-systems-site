@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About | Hayes Systems</title>
+<meta name="description" content="The team behind Hayes Systems.">
+<link rel="canonical" href="https://www.hayessystems.com/about.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="fonts/CormorantGaramond-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Montserrat-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Montserrat-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+:root{
+  --navy:#02101F; --navy-lift:#071526; --navy-card:#0B1C30;
+  --ivory:#EDE8DD; --soft:#F4F1EA;
+  --ink-on-light:#0A1B2E; --gold:#D9A441; --gold-ink:#8A6312;
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65;font-weight:400;-webkit-font-smoothing:antialiased}
+@font-face{font-family:'Cormorant Garamond';src:url('fonts/CormorantGaramond-SemiBold.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Montserrat';src:url('fonts/Montserrat-SemiBold.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+.wrap{max-width:760px;margin:0 auto;padding:72px 24px 80px}
+.eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
+h1{font-family:var(--serif);font-size:clamp(34px,5vw,46px);font-weight:600;line-height:1.15;margin:14px 0 6px}
+.updated{font-size:12.5px;color:rgba(10,27,46,.6);margin-bottom:30px}
+h2{font-family:var(--serif);font-weight:600;font-size:24px;margin:34px 0 10px}
+p{font-size:15px;color:rgba(10,27,46,.82);margin-bottom:14px;line-height:1.7}
+a{color:var(--gold-ink);font-weight:600}
+.card{background:#FCFAF4;border:1px solid rgba(10,27,46,.09);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:16px;padding:20px 24px;margin:22px 0}
+.founder{display:flex;align-items:center;gap:30px;flex-wrap:wrap}
+.founder-photo{width:128px;height:128px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);flex-shrink:0;background:var(--navy-card)}
+.founder-photo img{width:100%;height:100%;object-fit:cover;display:none}
+.founder-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:56px;color:var(--gold)}
+.founder p{font-size:15px;color:rgba(10,27,46,.82);font-weight:400;line-height:1.75;margin:0}
+.founder > div:last-child{flex:1;min-width:260px}
+.back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--gold-ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">About</span>
+  <h1>The team behind it.</h1>
+
+  <div class="card">
+    <div class="founder">
+      <div class="founder-photo">
+        <img src="matt.jpg?v=3" alt="The Hayes Systems team photo" onload="this.style.display='block';document.getElementById('founder-mono').style.display='none'">
+        <div id="founder-mono" class="founder-mono">M</div>
+      </div>
+      <div>
+        <h2>Honesty first.</h2>
+        <p>We founded and built Hayes Systems with one guiding principle: Honesty. It's why we put our name on it. We don't believe in hollow promises or hiding costs behind confusion. Success follows hard work and Hayes Systems promises to work as hard for you as you do for your clients. If you have questions, email us directly at <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <a class="back" href="index.html">&larr; Back to Hayes Systems</a>
+</div>
+</body>
+</html>
