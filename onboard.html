@@ -132,12 +132,6 @@ textarea{resize:vertical;min-height:74px}
         <div class="hint">What we book appointments into. It needs a phone call appointment type (a default 15-minute call type works perfectly). The free Calendly tier can't be booked by API - paid plan needed there. Other platforms work with a free Cal.com account.</div></div>
       <div class="field" id="bl-field" style="display:none"><label for="booking_link">Your Cal.com booking link (the exact event type we should book leads into)</label><input id="booking_link" type="url" placeholder="Paste your Cal.com event type link">
         <div class="hint">Paste your phone call event type's link - our system reads it to wire up your agent's booking tools. Copy it from your Cal.com share or event page.</div></div>
-    <div class="field"><label for="agent_roster">Current team members who we assign appointments to</label>
-      <textarea id="agent_roster" rows="5" placeholder="Example:
-John Miller
-Mike Thompson
-Dave Wilson"></textarea>
-      <div class="hint">One per line, spelled exactly as in your CRM. Team members must belong to the shared calendar to be assigned appointments.</div></div>
    </div>
 
    <div class="card">
@@ -192,13 +186,6 @@ Dave Wilson"></textarea>
     f.addEventListener('blur', function(){ if(!f.value) f.setAttribute('placeholder', ph); });
   });
 
-  var rosterTa = document.getElementById('agent_roster');
-  if (rosterTa) {
-    var rosterPh = rosterTa.getAttribute('placeholder');
-    rosterTa.addEventListener('focus', function(){ rosterTa.removeAttribute('placeholder'); });
-    rosterTa.addEventListener('blur', function(){ if(!rosterTa.value) rosterTa.setAttribute('placeholder', rosterPh); });
-  }
-
 // render the REAL agreement text (generated from the PDF builders) above the
 // signature - one source of truth, no drift between what they read and sign
 fetch('/terms.json').then(r => r.json()).then(t => {
@@ -227,7 +214,6 @@ document.getElementById('ob-form').addEventListener('submit', async function(e){
     booking_link: v('booking_link'),
     agency_state: v('agency_state'),
     calendar: v('calendar'),
-    agent_roster: v('agent_roster'),
     agree_terms: document.getElementById('agree').checked,
     signature: v('signature'), date_signed: v('date_signed'),
     da_agency: v('business_name'), da_signer: v('signature'),
