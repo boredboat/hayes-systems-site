@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /clients.html
 Disallow: /unsubscribe.html
+Disallow: /report-opt-out.html
 Disallow: /upload.html
 Disallow: /crm-connect.html
 

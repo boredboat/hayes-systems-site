@@ -18,7 +18,7 @@
 </script>
 <title>Report emails | Hayes Systems</title>
 <meta name="description" content="Stop report emails from Hayes Systems: one click opts your address out of weekly campaign reports and close-out notices.">
-<link rel="canonical" href="https://www.hayessystems.com/report-opt-out.html">
+<meta name="robots" content="noindex">>
 <style>
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
@@ -28,7 +28,8 @@ body{font-family:'Montserrat',-apple-system,sans-serif;background:#02101F;color:
 h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;color:#D9A441;margin-bottom:12px}
 p{font-size:15px;line-height:1.7;color:rgba(244,241,234,.8)}
 #status{margin-top:28px;font-size:17px;min-height:24px}
-.ok{color:#D9A441}.err{color:#c97a7a}
+.ok{color:#D9A441}.info{color:#0A1B2E;margin:14px 0 0}
+.err{color:#c97a7a}
 small{display:block;margin-top:40px;color:rgba(244,241,234,.4);font-size:12.5px}
 </style>
 </head>
@@ -60,8 +61,8 @@ if (e && t) {
       setTimeout(() => { location.href = mail; }, 1200);
     });
 } else {
-  st.textContent = 'Invalid link. Reply to any report email and we will update your preference.';
-  st.className = 'err';
+  st.textContent = 'This page updates your weekly-report preference from a link in one of our emails. Open the link from your email, or reply to any report email and we will update your preference for you.';
+  st.className = 'info';
 }
 </script>
 </body>
