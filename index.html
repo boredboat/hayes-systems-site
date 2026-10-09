@@ -58,6 +58,8 @@ a{color:inherit}
 
 /* Nav */
 nav{position:sticky;top:0;background:#121F2C;border-bottom:1px solid rgba(217,164,65,.16);z-index:50}
+.billing-note{background:#FCFAF4;border-bottom:1px solid rgba(10,27,46,.09)}
+.billing-note p{max-width:1050px;margin:0 auto;padding:14px 24px;font-size:15px;color:var(--ink-on-light);text-align:center}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:74px}
 .nav-links{display:flex;gap:22px;align-items:center}
 .nav-links a:not(.btn){font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,234,.72);text-decoration:none;white-space:nowrap}
@@ -259,6 +261,10 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
     <a class="btn btn-primary" href="#contact">Request a Campaign</a>
   </div>
 </nav>
+
+<div class="billing-note" id="billing-note" hidden>
+  <p id="billing-note-text"></p>
+</div>
 
 <header class="hero">
   <div class="container hero-grid">
@@ -466,6 +472,19 @@ footer{background:var(--navy);border-top:1px solid rgba(217,164,65,.16);padding:
 </footer>
 
 <script>
+// Stripe checkout return: show the client a real message instead of a
+// silent landing on the homepage (the param is one of success/cancelled).
+(function(){
+  var m = window.location.search.match(/[?&]billing=(success|cancelled)/);
+  if (!m) return;
+  var el = document.getElementById('billing-note');
+  var txt = document.getElementById('billing-note-text');
+  if (!el || !txt) return;
+  txt.textContent = (m[1] === 'success')
+    ? 'Your payment details are saved. Your campaign setup continues by email - nothing is charged until appointments land on your calendar.'
+    : 'No problem - the card setup was cancelled. The link in your email works any time you are ready to try again.';
+  el.hidden = false;
+})();
 function submitted(e){
   e.preventDefault();
   var f = e.target;
