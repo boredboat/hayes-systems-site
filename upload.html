@@ -59,7 +59,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,34px);line-
   <div class="done" id="done">
     <div class="tick"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg></div>
     <h2>Got it.</h2>
-    <p id="done-msg">Your list is in. Your numbers are underway and arrive by email.</p>
+    <p id="done-msg">Your list is in. We will confirm the campaign start by email.</p>
   </div>
 
   <p class="fine">Your list is used for one thing: your numbers. It is never sold, shared, or used for any other purpose. See our <a href="https://www.hayessystems.com/privacy.html">privacy policy</a>.</p>
@@ -121,7 +121,7 @@ function done(d){
   var doneEl = document.getElementById('done');
   doneEl.style.display = 'block';
   document.getElementById('done-msg').textContent =
-    'Your list is in: ' + d.numbers.reviewed + ' rows reviewed, ' + d.numbers.workable + ' workable. Your numbers are underway and arrive by email.';
+    'Your list is in: ' + d.numbers.reviewed + ' rows reviewed, ' + d.numbers.workable + ' workable. We will confirm the campaign start by email.';
 }
 if(!tok && !acct){
   document.getElementById('step1').style.display = 'none';
