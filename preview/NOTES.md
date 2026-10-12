@@ -24,3 +24,10 @@ sequence — email first, interested leads get the call, appointment booked ON
 that call (call is the only booking path; the earlier "convos for those who
 want one" framing was wrong and did not ship). CRM row shipped as specced.
 These previews are historical; live index.html is the record.
+
+## Hero accent color pass (10/11) - DECLINED, hero stays as-is
+
+Matt flagged the gold-ink accent phrase as dull; four rounds were offered
+(formatting treatments; lighter golds G-L; brighter non-navy base pairs
+M-R). All declined - do not re-pitch hero heading colors without a new
+ask. The live .accent rule (#7D5C15 on navy base) is the settled state.
