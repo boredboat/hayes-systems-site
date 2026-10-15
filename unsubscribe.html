@@ -6,32 +6,36 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon-512.png" type="image/png" sizes="512x512">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title>Unsubscribe</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Hayes Systems",
+  "url": "https://www.hayessystems.com/",
+  "logo": "https://www.hayessystems.com/favicon-512.png",
+  "description": "Lead reactivation for real estate teams. We revive the dormant leads already sitting in your CRM with email outreach and opt-in AI voice calls. Pay per booked appointment."
+}
+</script>
+<title>Unsubscribe | Hayes Systems</title>
 <meta name="robots" content="noindex">
 <style>
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
-:root{
-  --ivory:#EDE8DD; --ink-on-light:#0A1B2E; --gold-ink:#7D5C15;
-  --card:#FCFAF4; --radius:16px;
-  --serif:'Cormorant Garamond',Georgia,serif;
-  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center}
-.box{background:var(--card);border:1px solid rgba(10,27,46,.09);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:var(--radius);padding:40px 32px;max-width:460px;width:100%}
-h1{font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink-on-light);line-height:1.12;margin-bottom:12px}
-p{font-size:15px;line-height:1.7;color:rgba(10,27,46,.82)}
-#status{margin-top:6px;min-height:24px}
-.ok{color:var(--gold-ink)}.err{color:#9E3B3D}
-a{color:var(--gold-ink)}
+body{font-family:'Montserrat',-apple-system,sans-serif;background:#02101F;color:#EDE8DD;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;text-align:center}
+.box{max-width:460px}
+h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;color:#D9A441;margin-bottom:12px}
+p{font-size:15px;line-height:1.7;color:rgba(244,241,234,.8)}
+#status{margin-top:28px;font-size:17px;min-height:24px}
+.ok{color:#D9A441}.err{color:#c97a7a}
+small{display:block;margin-top:40px;color:rgba(244,241,234,.4);font-size:12.5px}
 </style>
 </head>
 <body>
 <div class="box">
-<h1>Unsubscribe</h1>
-<p id="status">Processing your request…</p>
+<h1>Hayes Systems</h1>
+<p id="status">Processing your unsubscribe request…</p>
+<small>Hayes Systems · Western Massachusetts · mailing sent in accordance with CAN-SPAM.</small>
 </div>
 <script>
 // The token is HMAC-signed by the sender; without a backend we cannot write to the
@@ -47,11 +51,11 @@ if (e && t) {
   // encodeURIComponent, which escapes < > " ' - no untrusted HTML can enter.
   fetch('https://ops.hayessystems.com/api/unsubscribe?e=' + encodeURIComponent(e) + '&t=' + encodeURIComponent(t))
     .then(r => r.json())
-    .then(j => { if (j.ok) { st.textContent = 'You are unsubscribed. No further emails or calls.'; st.className = 'ok'; } else { st.textContent = 'This link has expired. Reply to any email with the word STOP and you will be removed from all lists.'; st.className = 'err'; } })
+    .then(j => { if (j.ok) { st.innerHTML = 'You are unsubscribed from all Hayes Systems outreach. No further emails or calls from us.'; st.className = 'ok'; } else { st.textContent = 'This link has expired. Email Matt@hayessystems.com and we will remove you the same day.'; st.className = 'err'; } })
     .catch(() => {
       const mail = 'mailto:Matt@hayessystems.com?subject=' + encodeURIComponent('UNSUBSCRIBE') +
                    '&body=' + encodeURIComponent('Unsubscribe: ' + e + '\nToken: ' + t + '\n');
-      st.innerHTML = 'You are being unsubscribed. If your email program does not open automatically, <a href="' + mail + '">click here to confirm</a>. Requests are honored the same day and apply to all future outreach.';
+      st.innerHTML = 'You are being unsubscribed. If your email program does not open automatically, <a style="color:#D9A441" href="' + mail + '">click here to confirm</a>. Requests are honored the same day and apply to all future outreach.';
       st.className = 'ok';
       setTimeout(() => { location.href = mail; }, 1200);
     });
