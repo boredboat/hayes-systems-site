@@ -41,7 +41,7 @@
    },
    {
     "h": "3. Client responsibilities",
-    "b": "The Client will provide a read-only connection to their CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
+    "b": "The Client will provide a read-only connection to their CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Follow Up Boss, Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
    },
    {
     "h": "4. Client representations",
