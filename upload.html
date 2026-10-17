@@ -88,7 +88,11 @@ function qs(name){
   var m = window.location.search.match(new RegExp('[?&]' + name + '=([^&]+)'));
   return m ? decodeURIComponent(m[1]) : '';
 }
-var tok = qs('t'), acct = qs('a');
+// F3 (sysreview front-half 10/13): the old ?a= branch posted {email} to
+// the client-upload API with no token, which has answered 401 need_link
+// since 9/17 - dead code. The emailed ?t= link is the only live door;
+// token-less visitors get the missing-key view below.
+var tok = qs('t');
 function send(path, body, onok){
   fetch('https://ops.hayessystems.com' + path, {
     method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -107,14 +111,7 @@ function send(path, body, onok){
 go.addEventListener('click', function(){
   go.disabled = true; go.textContent = 'Uploading...';
   document.getElementById('err').hidden = true;
-  if(tok){
-    send('/api/audit/upload', {token: tok, csv_text: csvText}, done);
-  } else {
-    send('/api/client/upload', {email: acct, csv_text: csvText}, function(d){
-      // returning-client path: preview shows, then they confirm on clients.html
-      done(d);
-    });
-  }
+  send('/api/audit/upload', {token: tok, csv_text: csvText}, done);
 });
 function done(d){
   document.getElementById('step1').style.display = 'none';
@@ -123,7 +120,7 @@ function done(d){
   document.getElementById('done-msg').textContent =
     'Your list is in: ' + d.numbers.reviewed + ' rows reviewed, ' + d.numbers.workable + ' workable. We will confirm the campaign start by email.';
 }
-if(!tok && !acct){
+if(!tok){
   document.getElementById('step1').style.display = 'none';
   document.getElementById('done').style.display = 'block';
   document.getElementById('done').querySelector('.tick').style.display = 'none';
