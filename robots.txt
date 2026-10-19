@@ -4,6 +4,6 @@ Disallow: /unsubscribe.html
 Disallow: /report-opt-out.html
 Disallow: /upload.html
 Disallow: /crm-connect.html
+Disallow: /cal-connect.html
 
 Sitemap: https://www.hayessystems.com/sitemap.xml
-Disallow: /cal-connect.html
