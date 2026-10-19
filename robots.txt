@@ -6,3 +6,4 @@ Disallow: /upload.html
 Disallow: /crm-connect.html
 
 Sitemap: https://www.hayessystems.com/sitemap.xml
+Disallow: /cal-connect.html
