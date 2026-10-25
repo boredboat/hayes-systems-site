@@ -16,7 +16,7 @@ h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing
 .pill.nonepill{background:#ECEFF1;color:#607D8B}
 .pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .muted{font-size:13.5px;color:#90A4AE}
-.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:28px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
 .stat{background:#F8FAFB;border:1px solid #ECEFF1;border-radius:12px;padding:16px 12px;text-align:center}
 .stat .num{font-weight:700;font-size:28px;color:#07223D;line-height:1.1;margin-bottom:4px;letter-spacing:-.02em}
 .stat .lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#78909C}
@@ -70,9 +70,12 @@ td .when{color:#90A4AE;font-size:13px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hide{display:none !important}
-@media(max-width:999px){.stats{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:640px){
+@media(max-width:999px){
 .stats{grid-template-columns:repeat(2,1fr)}
+.stat.wide{grid-column:span 2;display:flex;align-items:center;justify-content:center;gap:14px;padding:20px 12px}
+.stat.wide .lbl{margin:0}
+}
+@media(max-width:640px){
 body{padding:20px 14px}
 h1{font-size:20px}
 .stat .num{font-size:26px}
@@ -97,10 +100,9 @@ h1{font-size:20px}
 <div class="stats" id="stats">
   <div class="stat"><div class="num">1,847</div><div class="lbl">Workable leads</div></div>
   <div class="stat"><div class="num">1,204</div><div class="lbl">Emails sent</div></div>
-  <div class="stat"><div class="num">58</div><div class="lbl">Conversations</div></div>
   <div class="stat"><div class="num">23</div><div class="lbl">Appointments</div></div>
-  <div class="stat"><div class="num">1.9%</div><div class="lbl">Conversion</div></div>
-  <div class="stat"><div class="num">$1,380</div><div class="lbl">Cost to date</div></div>
+  <div class="stat"><div class="num">1.9%</div><div class="lbl">Conversion rate</div></div>
+  <div class="stat wide"><div class="num">$1,380</div><div class="lbl">Cost to date</div></div>
 </div>
 
 <div class="actions">
