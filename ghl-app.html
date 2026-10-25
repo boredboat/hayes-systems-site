@@ -16,7 +16,7 @@ h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing
 .pill.nonepill{background:#ECEFF1;color:#607D8B}
 .pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .muted{font-size:13.5px;color:#90A4AE}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
 .stat{background:#F8FAFB;border:1px solid #ECEFF1;border-radius:12px;padding:16px 12px;text-align:center}
 .stat .num{font-weight:700;font-size:32px;color:#07223D;line-height:1.1;margin-bottom:4px;letter-spacing:-.02em}
 .stat .lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#78909C}
@@ -33,7 +33,7 @@ h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing
 .contact{font-size:13.5px;font-weight:600;color:#2896FB;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .overlay{display:none;position:fixed;inset:0;background:rgba(7,34,61,.45);align-items:center;justify-content:center;z-index:10}
 .overlay.show{display:flex}
-.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;box-shadow:0 20px 60px rgba(7,34,61,.3)}
+.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(7,34,61,.3)}
 .dialog h3{font-weight:700;font-size:18px;color:#07223D;margin-bottom:10px}
 .dialog p{font-size:14px;color:#546E7A;margin-bottom:22px}
 .dialog-actions{display:flex;gap:12px;justify-content:flex-end}
@@ -45,7 +45,7 @@ h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing
 .btn-danger-solid:hover{background:#C62828}
 .sec{margin-top:26px}
 .sec h2{font-weight:700;font-size:16px;color:#07223D;margin-bottom:12px}
-table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px;table-layout:fixed}
 th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#90A4AE;padding:8px 10px;border-bottom:1px solid #ECEFF1}
 td{padding:11px 10px;border-bottom:1px solid #F5F5F5;color:#546E7A}
 td .who{font-weight:600;color:#07223D}
@@ -55,7 +55,7 @@ td .when{color:#90A4AE;font-size:13px}
 .badge.booked{background:#E7F3FE;color:#095DC3}
 .badge.reported{background:rgba(255,184,0,.12);color:#b26a00}
 .appt-wrap{border:1px solid #ECEFF1;border-radius:10px}
-.appt-scroll{max-height:210px;overflow-y:auto}
+.appt-scroll{max-height:260px;overflow:auto;-webkit-overflow-scrolling:touch}
 .appt-scroll::-webkit-scrollbar{width:8px}
 .appt-scroll::-webkit-scrollbar-track{background:#ECEFF1;border-radius:10px}
 .appt-scroll::-webkit-scrollbar-thumb{background:#B0BEC5;border-radius:10px}
@@ -70,6 +70,14 @@ td .when{color:#90A4AE;font-size:13px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hide{display:none !important}
+@media(max-width:640px){
+body{padding:20px 14px}
+h1{font-size:20px}
+.stat .num{font-size:26px}
+.btn{padding:10px 16px;font-size:13.5px}
+.danger-row{flex-wrap:wrap;justify-content:flex-start;gap:14px}
+.danger-row .contact{font-size:12.5px}
+}
 </style></head><body>
 
 <div class="lockup">
