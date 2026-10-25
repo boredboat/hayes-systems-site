@@ -192,6 +192,17 @@ h1{font-size:20px}
   </div>
 </div>
 
+<div class="overlay" id="resendOverlay">
+  <div class="dialog">
+    <h3>Resend the latest report</h3>
+    <p>The most recent report will be emailed to you again.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" data-close="resendOverlay">Not now</button>
+      <button class="btn btn-primary" id="confirmResend">Resend report</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="retainerOverlay">
   <div class="dialog">
     <h3>Retainer service</h3>
@@ -290,8 +301,10 @@ $('confirmNoshow').addEventListener('click', function(){
   toast('That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
 });
 
-// Resend report
-$('resendBtn').addEventListener('click', function(){
+// Resend report (confirm first - one misclick should not re-send mail)
+$('resendBtn').addEventListener('click', function(){ open_('resendOverlay'); });
+$('confirmResend').addEventListener('click', function(){
+  close_('resendOverlay');
   toast('The latest report is on its way to your email.');
 });
 
