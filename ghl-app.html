@@ -65,6 +65,7 @@ td .when{color:#90A4AE;font-size:13px}
 .rns{white-space:nowrap;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:#546E7A;background:#fff;border:1.5px solid #E0E0E0;border-radius:6px;padding:5px 12px;cursor:pointer}
 .rns:hover{border-color:#B0BEC5;color:#37474F}
 .empty{padding:28px 16px;text-align:center;color:#90A4AE;font-size:14px}
+.past-total{margin-top:10px;font-size:12.5px;color:#90A4AE}
 .danger-row{margin-top:22px;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:20px}
 .foot{margin-top:24px;font-size:12.5px;color:#B0BEC5;border-top:1px solid #F5F5F5;padding-top:14px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
@@ -132,6 +133,20 @@ h1{font-size:20px}
   </table>
   </div>
   </div>
+</div>
+
+<div class="sec" id="pastSec">
+  <h2>Past campaigns</h2>
+  <div class="appt-wrap">
+  <div class="appt-scroll">
+  <table>
+    <tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr>
+    <tr><td class="when">Feb 17 - Mar 12, 2026</td><td>1,612</td><td>11</td><td>$660</td></tr>
+    <tr><td class="when">Jun 17 - Jul 11, 2026</td><td>1,890</td><td>16</td><td>$960</td></tr>
+  </table>
+  </div>
+  </div>
+  <div class="past-total">Total to date: 27 appointments for $1,620 in past campaigns.</div>
 </div>
 
 <div class="danger-row">
@@ -238,6 +253,7 @@ function apply(s){
   var has = (s === 'running' || s === 'paused' || s === 'cancelled');
   $('stats').classList.toggle('hide', !has);
   $('apptSec').classList.toggle('hide', s === 'none');
+  $('pastSec').classList.toggle('hide', s === 'none');
   $('resendBtn').classList.toggle('hide', s === 'none');
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
