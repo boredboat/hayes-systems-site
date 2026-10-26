@@ -181,10 +181,8 @@ h1{font-size:20px}
   <div class="ob-card ob-done hide" id="obDone">
     <div class="big">&#10003;</div>
     <h2 style="margin-bottom:8px">You are all set</h2>
-    <p style="font-size:14.5px;color:#546E7A">Your account is set up and
-    your paperwork is on its way to your email. Request your first
-    campaign whenever you are ready.</p>
-    <button class="btn btn-primary" id="obGo" style="margin-top:18px">Request a campaign</button>
+    <p style="font-size:14.5px;color:#546E7A">Your account is set up.</p>
+    <button class="btn btn-primary" id="obGo" style="margin-top:18px">Go to your campaign</button>
   </div>
 </div>
 
@@ -516,7 +514,7 @@ function applyOb(s){
   $('obSubmit').addEventListener('click', function(){
     $('obForm').classList.add('hide');
     $('obDone').classList.remove('hide');
-    toast('Paperwork submitted. A copy is on its way to your email.');
+    toast('Setup complete.');
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
