@@ -273,6 +273,7 @@ h1{font-size:20px}
   <span class="contact" id="helpLink">Help / FAQ</span>
   <span class="contact" id="contactLink">Contact us</span>
   <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
+  <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
 </div>
 
 <div class="foot">Hayes Systems &middot; hayessystems.com</div>
@@ -340,6 +341,19 @@ h1{font-size:20px}
   </div>
 </div>
 
+<div class="overlay" id="cancelRetOverlay">
+  <div class="dialog">
+    <h3>Cancel your retainer?</h3>
+    <p>Outreach stops today and the monthly fee stops with it. Appointments
+    already on your calendar are unaffected, and appointments that land
+    after cancellation are not charged.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="cancelRetOverlay">Keep retainer</button>
+      <button class="btn btn-danger" id="confirmCancelRet">Yes, cancel retainer</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="retainerOverlay">
   <div class="dialog ret-ad">
     <div class="ad-kicker">Retainer service</div>
@@ -396,7 +410,8 @@ function apply(s){
   $('resendBtn').classList.toggle('hide', false);
   $('resendBtn').disabled = (s === 'none');
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
-  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
+  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'retainer');
+  $('cancelRetBtn').classList.toggle('hide', s !== 'retainer');
   $('statusRow').classList.toggle('hide', s === 'none');
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
@@ -486,6 +501,12 @@ $('reqBtn').addEventListener('click', function(){
 
 // Retainer
 $('retainerLink').addEventListener('click', function(){ open_('retainerOverlay'); });
+$('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
+$('confirmCancelRet').addEventListener('click', function(){
+  close_('cancelRetOverlay');
+  S = 'cancelled'; apply('cancelled');
+  toast('Retainer cancelled. Outreach stops today.');
+});
 $('retainerAgree').addEventListener('change', function(){
   $('retainerStart').disabled = !this.checked;
 });
@@ -557,6 +578,7 @@ function applyOb(s){
       var el = $(id); if (el) el.classList.add('hide');
     });
     $('cancelBtn').classList.add('hide');
+    $('cancelRetBtn').classList.add('hide');
     $('reqBtn').classList.add('hide');
   }
   // leaving onboarding: apply(S) owns visibility - applyOb never un-hides
