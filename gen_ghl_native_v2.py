@@ -6,6 +6,11 @@ import pathlib, re, os
 # /api/ghl/page-data + /api/ghl/appointments populate every state) and
 # every action button calls its real endpoint. Demo mode (no locationId
 # param) keeps the original local behavior untouched for review.
+# v2.2 (10/26 pause card t_e91966fa): Pause posts the picked resume date
+# to /api/ghl/pause, Resume calls /api/ghl/resume, and the paused state
+# reads page-data's campaign.paused/paused_until (the pill shows the real
+# date; stats stay live through a pause). Demo mode (?state=paused) is
+# unchanged and never touches the endpoints.
 # States: running | paused | cancelled | none  (?state= for review; in-page
 # transitions flip the same DOM). All copy per house rules: zero em-dashes,
 # no timeline promises, claims match the engine.
@@ -414,7 +419,7 @@ function $(id){return document.getElementById(id);}
 function pill(cls, txt, sub){
   var p = $('pill'); p.className = 'pill ' + cls; $('pillTxt').textContent = txt; $('pillSub').textContent = sub;
 }
-function apply(s){
+function apply(s, until){
   S = s;
   var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer');
   $('stats').classList.toggle('hide', !has);
@@ -437,7 +442,7 @@ function apply(s){
   $('retCardTxt').textContent = on ? 'Retainer on' : 'Retainer off';
   $('retCard').classList.toggle('hide', s === 'onboarding');
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \\u00b7 Ends Oct 30 \\u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
-  if (s === 'paused') { pill('pausepill', 'Paused', 'Paused until Oct 31 \\u00b7 replies still answered \\u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
+  if (s === 'paused') { pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) + ' \\u00b7 replies still answered \\u00b7 appointments still book' : 'Paused until Oct 31 \\u00b7 replies still answered \\u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \\u00b7 appointments on your calendar are unaffected'); }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected \\u00b7 ready when you are'); }
   if (s === 'retainer') { pill('run', 'Active', ''); }
@@ -552,24 +557,49 @@ renderAppts(DEMO_APPTS);
 renderPast(DEMO_PAST);
 
 // Pause / resume
+function isoDay(d){ var x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
 $('pauseBtn').addEventListener('click', function(){
   if (S === 'paused') { open_('resumeOverlay'); }
-  else { $('pauseEnd').value = '2026-10-31'; open_('pauseOverlay'); }
+  else {
+    var today = isoDay(new Date());
+    $('pauseStart').value = today;
+    $('pauseEnd').value = isoDay(new Date(Date.now() + 7 * 86400000));
+    $('pauseEnd').min = today;
+    open_('pauseOverlay');
+  }
 });
 $('confirmPause').addEventListener('click', function(){
+  var end = $('pauseEnd').value;
+  if (!end) { toast('Pick the date outreach resumes.'); return; }
   close_('pauseOverlay');
   if (PAGE.live) {
-    // honest 501 until the engine grows pause machinery; toast the message
-    api('/api/ghl/pause', {}).then(function(j){
-      toast(j.message || j.error || 'Pausing is not available yet.');
-    }).catch(function(){ toast('Pausing is not available right now.'); });
+    api('/api/ghl/pause', {resume_on: end}).then(function(j){
+      if (j.ok) {
+        apply('paused', j.paused_until || end);
+        toast('Paused until ' + fmtLongDate(j.paused_until || end) + '. Replies are still answered and appointments still book.');
+      } else {
+        toast(j.message || j.error || 'The pause did not go through. Try again in a moment.');
+      }
+    }).catch(function(){ toast('The pause did not go through. Try again in a moment.'); });
     return;
   }
-  apply('paused');
+  apply('paused', end);
   toast('Paused. Replies are still answered and appointments still book.');
 });
 $('confirmResume').addEventListener('click', function(){
-  close_('resumeOverlay'); apply('running');
+  close_('resumeOverlay');
+  if (PAGE.live) {
+    api('/api/ghl/resume', {}).then(function(j){
+      if (j.ok) {
+        apply('running');
+        toast('Campaign resumed. Outreach starts again.');
+      } else {
+        toast(j.error || 'The resume did not go through. Try again in a moment.');
+      }
+    }).catch(function(){ toast('The resume did not go through. Try again in a moment.'); });
+    return;
+  }
+  apply('running');
   toast('Campaign resumed. Outreach starts again.');
 });
 
@@ -744,8 +774,11 @@ function loadPageData(){
 }
 function applyFromData(d){
   var st = (d.client && d.client.state) || 'none';
-  apply(st);
   var c = d.campaign;
+  // a live campaign inside its pause window shows the paused state;
+  // the server keeps state 'running' (the campaign stays fully alive)
+  if (st === 'running' && c && c.paused) st = 'paused';
+  apply(st, c && c.paused_until);
   if (st === 'running' && c) {
     var sub = c.stopping
       ? 'Ending this week \\u00b7 appointments on your calendar are unaffected'
@@ -753,6 +786,10 @@ function applyFromData(d){
         + (c.projected_ends ? ' \\u00b7 Ends ' + fmtDay(c.projected_ends) : '')
         + (c.updated ? ' \\u00b7 Updated ' + fmtDay(c.updated) : '');
     pill(c.stopping ? 'stoppill' : 'run', c.stopping ? 'Ending' : 'Running', sub);
+    setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
+             c.conversion_pct, c.cost_to_date);
+  } else if (st === 'paused' && c) {
+    // stats stay live through a pause (replies and bookings keep landing)
     setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
              c.conversion_pct, c.cost_to_date);
   } else if (st === 'retainer') {
@@ -913,4 +950,4 @@ html = html.replace('@@HOUSE@@', house).replace('@@PANES@@', panes)
 (SITE/'ghl-app.html').write_text(
     html.replace('<meta charset="utf-8">',
                  '<meta charset="utf-8"><meta name="robots" content="noindex">', 1))
-print('staged interactive v2.1 (review twin + deployed ghl-app.html)')
+print('staged interactive v2.2 (review twin + deployed ghl-app.html)')
