@@ -66,6 +66,24 @@ td .when{color:#90A4AE;font-size:13px}
 .rns:hover{border-color:#B0BEC5;color:#37474F}
 .empty{padding:28px 16px;text-align:center;color:#90A4AE;font-size:14px}
 .past-total{margin-top:10px;font-size:12.5px;color:#90A4AE}
+.ob-card{background:#fff;border:1px solid #ECEFF1;border-radius:14px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(7,34,61,.06)}
+.ob-card h2{font-weight:700;font-size:21px;color:#07223D;margin-bottom:6px}
+.ob-card .ob-sub{font-size:13.5px;color:#78909C;margin-bottom:24px}
+.ob-step{margin-bottom:26px}
+.ob-step h3{font-weight:600;font-size:14px;color:#07223D;margin-bottom:8px}
+.ob-step p{font-size:14px;line-height:1.65;color:#546E7A}
+.ob-step p b{color:#07223D;font-weight:600}
+.ob-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ob-field label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#78909C;margin-bottom:6px}
+.ob-field input{width:100%;padding:11px 13px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:#07223D;background:#fff}
+.ob-field input:focus{outline:none;border-color:#2896FB}
+.ob-terms{background:#F8FAFB;border:1px solid #ECEFF1;border-radius:10px;padding:16px 18px;font-size:13px;line-height:1.6;color:#546E7A;max-height:170px;overflow-y:auto;margin-bottom:14px}
+.ob-terms a{color:#2896FB;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.ob-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#37474F;margin-bottom:16px}
+.ob-check input{width:17px;height:17px;margin-top:1px;accent-color:#2896FB}
+.ob-sign{display:grid;grid-template-columns:1fr 140px;gap:14px;margin-bottom:22px}
+.ob-done{text-align:center;padding:30px 10px}
+.ob-done .big{font-size:34px;margin-bottom:10px}
 .danger-row{margin-top:22px;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:20px}
 .foot{margin-top:24px;font-size:12.5px;color:#B0BEC5;border-top:1px solid #F5F5F5;padding-top:14px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
@@ -92,7 +110,73 @@ h1{font-size:20px}
 </div>
 
 <h1>Your campaign</h1>
-<div class="status-row">
+<div id="obGate" class="hide">
+  <div class="ob-card" id="obForm">
+    <h2>Welcome to Hayes Systems</h2>
+    <div class="ob-sub">Two minutes of setup and your campaign can start.</div>
+
+    <div class="ob-step">
+      <h3>What this is</h3>
+      <p>We run done-for-you reactivation campaigns on the dormant leads in
+      this account: personalized email outreach to every workable contact,
+      and interested leads get a phone call from our conversational agent
+      powered by Retell AI to book a time. Appointments land straight on
+      your calendar. You pay <b>$60 per appointment that lands on your
+      calendar</b> and nothing else. No-shows are refunded when you report
+      them. Cancel any time from this page.</p>
+    </div>
+
+    <div class="ob-step">
+      <h3>Your details</h3>
+      <div class="ob-fields">
+        <div class="ob-field"><label for="obBusiness">Business name</label>
+          <input id="obBusiness" value="Summit Realty Group"></div>
+        <div class="ob-field"><label for="obPhone">Phone number prospects should call</label>
+          <input id="obPhone" value="+1 (413) 555-0142"></div>
+      </div>
+    </div>
+
+    <div class="ob-step">
+      <h3>The agreements</h3>
+      <div class="ob-terms">
+        <b>Data Agreement and Campaign Terms.</b> You authorize Hayes
+        Systems to contact the leads you provide on your behalf by email
+        and by consented AI-assisted phone call. We read your contacts in
+        read-only mode, we never write to your account, and every access
+        token is deleted at the end of the engagement. Working copies of
+        your list are deleted once your campaign is planned. You may stop
+        all outreach at any time.
+        <span id="obTermsFull" class="hide"> The full agreement text
+        appears here at launch, loaded from the same source the website
+        signs against, so what you sign is exactly what every client
+        signs. <a href="https://www.hayessystems.com/privacy.html" target="_blank">Privacy
+        policy</a> &middot; <a href="https://www.hayessystems.com/terms.html" target="_blank">Full
+        terms</a></span>
+      </div>
+      <label class="ob-check"><input type="checkbox" id="obAgree">
+        <span>I have read and agree to the Data Agreement and the Campaign
+        Terms.</span></label>
+      <div class="ob-sign">
+        <div class="ob-field"><label for="obSign">Type your name to sign</label>
+          <input id="obSign" placeholder="Your name"></div>
+        <div class="ob-field"><label for="obDate">Date</label>
+          <input id="obDate" value="Oct 26, 2026" readonly></div>
+      </div>
+      <button class="btn btn-primary" id="obSubmit" style="width:100%" disabled>Agree and finish setup</button>
+    </div>
+  </div>
+
+  <div class="ob-card ob-done hide" id="obDone">
+    <div class="big">&#10003;</div>
+    <h2 style="margin-bottom:8px">You are all set</h2>
+    <p style="font-size:14.5px;color:#546E7A">Your account is set up and
+    your paperwork is on its way to your email. Request your first
+    campaign whenever you are ready.</p>
+    <button class="btn btn-primary" id="obGo" style="margin-top:18px">Request a campaign</button>
+  </div>
+</div>
+
+<div class="status-row" id="statusRow">
   <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
   <span class="muted" id="pillSub">Week 3 of 4 &middot; Ends Oct 30 &middot; Updated Oct 18</span>
 </div>
@@ -257,6 +341,7 @@ function apply(s){
   $('resendBtn').classList.toggle('hide', s === 'none');
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
+  $('statusRow').classList.toggle('hide', s === 'none');
   $('cooldown').classList.toggle('hide', s === 'none');
   $('retainerLine').classList.toggle('hide', s === 'none');
   var req = $('reqBtn');
@@ -395,9 +480,43 @@ var PAGE = {token: null, name: null};
   } catch (e) {}
 })();
 
+// ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
+// are told what it is and sign). state=onboarding shows ONLY the gate.
+function applyOb(s){
+  var on = (s === 'onboarding');
+  $('obGate').classList.toggle('hide', !on);
+  ['statusRow','stats','resendBtn','pauseBtn','cooldown','retainerLine',
+   'apptSec','pastSec'].forEach(function(id){
+    var el = $(id); if (el) el.classList.toggle('hide', on);
+  });
+  $('cancelBtn').classList.toggle('hide', on || S === 'none' || S === 'cancelled');
+  $('reqBtn').classList.toggle('hide', on);
+}
+(function(){
+  $('obAgree').addEventListener('change', function(){
+    $('obTermsFull').classList.toggle('hide', !this.checked);
+    updateObBtn();
+  });
+  function updateObBtn(){
+    $('obSubmit').disabled = !($('obAgree').checked && $('obSign').value.trim().length > 1);
+  }
+  $('obSign').addEventListener('input', updateObBtn);
+  $('obSubmit').addEventListener('click', function(){
+    $('obForm').classList.add('hide');
+    $('obDone').classList.remove('hide');
+    toast('Paperwork submitted. A copy is on its way to your email.');
+  });
+  $('obGo').addEventListener('click', function(){
+    S = 'none'; apply('none'); applyOb('done');
+  });
+})();
+
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
-apply(['running','paused','cancelled','none'].indexOf(q) > -1 ? q : 'running');
+var init = (['running','paused','cancelled','none','onboarding'].indexOf(q) > -1 ? q : 'running');
+S = init;
+apply(init);
+applyOb(init);
 </script>
 
 </body></html>
