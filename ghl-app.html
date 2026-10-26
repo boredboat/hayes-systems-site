@@ -240,17 +240,8 @@ h1{font-size:20px}
   <div class="appt-wrap">
   <div class="appt-scroll">
   <table>
-    <tr><th>Lead</th><th>When</th><th style="width:140px">Status</th><th style="width:150px"></th></tr>
-    <tr><td><span class="who">R. Delgado</span></td><td class="when">Fri Oct 24 &middot; 9:45 AM</td><td><span class="badge booked">Booked</span></td><td></td></tr>
-    <tr><td><span class="who">M. Okafor</span></td><td class="when">Mon Oct 27 &middot; 11:15 AM</td><td><span class="badge booked">Booked</span></td><td></td></tr>
-    <tr><td><span class="who">T. Whitfield</span></td><td class="when">Wed Oct 29 &middot; 3:00 PM</td><td><span class="badge booked">Booked</span></td><td></td></tr>
-    <tr data-days="9"><td><span class="who">S. Chen</span></td><td class="when">Wed Oct 15 &middot; 2:30 PM</td><td><span class="badge held">Held</span></td><td><button class="rns">Report no-show</button></td></tr>
-    <tr data-days="10"><td><span class="who">D. Martinez</span></td><td class="when">Tue Oct 14 &middot; 10:00 AM</td><td><span class="badge held">Held</span></td><td><button class="rns">Report no-show</button></td></tr>
-    <tr><td><span class="who">J. Alvarez</span></td><td class="when">Fri Oct 10 &middot; 1:30 PM</td><td><span class="badge reported">No-show reported</span></td><td></td></tr>
-    <tr data-days="15"><td><span class="who">K. Brennan</span></td><td class="when">Thu Oct 9 &middot; 4:15 PM</td><td><span class="badge held">Held</span></td><td></td></tr>
-    <tr data-days="17"><td><span class="who">P. Novak</span></td><td class="when">Tue Oct 7 &middot; 9:00 AM</td><td><span class="badge held">Held</span></td><td></td></tr>
-    <tr data-days="18"><td><span class="who">L. Fontaine</span></td><td class="when">Mon Oct 6 &middot; 11:45 AM</td><td><span class="badge held">Held</span></td><td></td></tr>
-    <tr data-days="21"><td><span class="who">A. Osei</span></td><td class="when">Fri Oct 3 &middot; 2:00 PM</td><td><span class="badge held">Held</span></td><td></td></tr>
+    <thead><tr><th>Lead</th><th>When</th><th style="width:140px">Status</th><th style="width:150px"></th></tr></thead>
+    <tbody id="apptBody"></tbody>
   </table>
   </div>
   </div>
@@ -261,9 +252,8 @@ h1{font-size:20px}
   <div class="appt-wrap">
   <div class="appt-scroll">
   <table>
-    <tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr>
-    <tr><td class="when">Feb 17 - Mar 12, 2026</td><td>1,612</td><td>11</td><td>$660</td></tr>
-    <tr><td class="when">Jun 17 - Jul 11, 2026</td><td>1,890</td><td>16</td><td>$960</td></tr>
+    <thead><tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr></thead>
+    <tbody id="pastBody"></tbody>
   </table>
   </div>
   </div>
@@ -378,6 +368,8 @@ h1{font-size:20px}
     <div class="ad-price">$250 per month + $40 per appointment</div>
     <label class="ad-check"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after clicking "Start retainer service".</span></label>
+    <div class="ob-field" style="margin:-6px 0 18px"><label for="retSign">Type your name to sign</label>
+      <input id="retSign" placeholder="Your name" autocomplete="name"></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay">Not now</button>
       <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
@@ -441,13 +433,119 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3400);
 }
 
+// ── REAL-DATA LAYER (10/26 build): API base + helpers ─────────────────
+// Demo mode (no locationId) never touches the network: every handler
+// below branches on PAGE.live.
+var API = 'https://ops.hayessystems.com';
+function auth(){ return {'Content-Type': 'application/json', 'X-Hayes-Token': PAGE.token}; }
+function api(path, body){
+  return fetch(API + path, {method: body ? 'POST' : 'GET', headers: auth(),
+                            body: body ? JSON.stringify(body) : undefined})
+    .then(function(r){
+      return r.json().then(function(j){ j._status = r.status; return j; })
+        .catch(function(){ return {ok: false, _status: r.status, error: 'no response'}; });
+    });
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtNum(n){ return Number(n || 0).toLocaleString('en-US'); }
+function fmtMoney(n){ return '$' + fmtNum(n); }
+function fmtDay(iso){ var s = String(iso || '');
+  // date-only stamps parse as UTC midnight and would display a day early
+  // behind UTC; force local midnight for the YYYY-MM-DD shape
+  var d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}); }
+function fmtLongDate(iso){ var s = String(iso || '');
+  var d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}); }
+function fmtWhen(iso){ var d = new Date(iso); if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
+    + ' \u00b7 ' + d.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}); }
+function setStats(w, lp, e, a, cv, cost){
+  var nums = document.querySelectorAll('#stats .num');
+  if (nums.length < 6) return;
+  nums[0].textContent = fmtNum(w); nums[1].textContent = (lp || 0) + '%';
+  nums[2].textContent = fmtNum(e); nums[3].textContent = fmtNum(a);
+  nums[4].textContent = (cv || 0) + '%'; nums[5].textContent = fmtMoney(cost);
+}
+
+// ── Appointments + past campaigns tables (demo rows first, real rows
+// replace them once page-data lands) ───────────────────────────────────
+var DEMO_APPTS = [
+  {name: 'R. Delgado',   when: 'Fri Oct 24 \u00b7 9:45 AM', status: 'booked',   reportable: false, ref: 'demo1'},
+  {name: 'M. Okafor',    when: 'Mon Oct 27 \u00b7 11:15 AM', status: 'booked',  reportable: false, ref: 'demo2'},
+  {name: 'T. Whitfield', when: 'Wed Oct 29 \u00b7 3:00 PM', status: 'booked',   reportable: false, ref: 'demo3'},
+  {name: 'S. Chen',      when: 'Wed Oct 15 \u00b7 2:30 PM', status: 'held',     reportable: true,  ref: 'demo4'},
+  {name: 'D. Martinez',  when: 'Tue Oct 14 \u00b7 10:00 AM', status: 'held',    reportable: true,  ref: 'demo5'},
+  {name: 'J. Alvarez',   when: 'Fri Oct 10 \u00b7 1:30 PM', status: 'reported', reportable: false, ref: 'demo6'},
+  {name: 'K. Brennan',   when: 'Thu Oct 9 \u00b7 4:15 PM', status: 'held',      reportable: false, ref: 'demo7'},
+  {name: 'P. Novak',     when: 'Tue Oct 7 \u00b7 9:00 AM', status: 'held',      reportable: false, ref: 'demo8'},
+  {name: 'L. Fontaine',  when: 'Mon Oct 6 \u00b7 11:45 AM', status: 'held',     reportable: false, ref: 'demo9'},
+  {name: 'A. Osei',      when: 'Fri Oct 3 \u00b7 2:00 PM', status: 'held',      reportable: false, ref: 'demo10'}
+];
+var DEMO_PAST = [
+  {period: 'Feb 17 - Mar 12, 2026', leads_worked: 1612, appointments: 11, cost: 660},
+  {period: 'Jun 17 - Jul 11, 2026', leads_worked: 1890, appointments: 16, cost: 960}
+];
+var noshowRow = null;
+function bindNoshow(){
+  document.querySelectorAll('tr[data-ref] .rns').forEach(function(b){
+    var tr = b.closest('tr');
+    b.addEventListener('click', function(){
+      noshowRow = tr;
+      var who = tr.querySelector('.who').textContent;
+      var when = tr.querySelector('.when').textContent;
+      $('noshowBody').textContent = who + ', ' + when + '. This refunds the appointment. Report it only if the lead did not show.';
+      open_('noshowOverlay');
+    });
+  });
+}
+function renderAppts(rows){
+  var tb = $('apptBody'); if (!tb) return;
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="empty">No appointments yet. Booked calls land here.</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(function(a){
+    var badge = a.status === 'booked' ? '<span class="badge booked">Booked</span>'
+      : a.status === 'reported' ? '<span class="badge reported">No-show reported</span>'
+      : '<span class="badge held">Held</span>';
+    var btn = a.reportable ? '<button class="rns">Report no-show</button>' : '';
+    return '<tr data-ref="' + esc(a.ref) + '"><td><span class="who">' + esc(a.name)
+      + '</span></td><td class="when">' + esc(a.when) + '</td><td>' + badge
+      + '</td><td>' + btn + '</td></tr>';
+  }).join('');
+  bindNoshow();
+}
+function renderPast(rows){
+  var tb = $('pastBody'); if (!tb) return;
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="empty">Your campaign history appears here.</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(function(p){
+    return '<tr><td class="when">' + esc(p.period) + '</td><td>' + fmtNum(p.leads_worked)
+      + '</td><td>' + fmtNum(p.appointments) + '</td><td>' + fmtMoney(p.cost) + '</td></tr>';
+  }).join('');
+}
+renderAppts(DEMO_APPTS);
+renderPast(DEMO_PAST);
+
 // Pause / resume
 $('pauseBtn').addEventListener('click', function(){
   if (S === 'paused') { open_('resumeOverlay'); }
   else { $('pauseEnd').value = '2026-10-31'; open_('pauseOverlay'); }
 });
 $('confirmPause').addEventListener('click', function(){
-  close_('pauseOverlay'); apply('paused');
+  close_('pauseOverlay');
+  if (PAGE.live) {
+    // honest 501 until the engine grows pause machinery; toast the message
+    api('/api/ghl/pause', {}).then(function(j){
+      toast(j.message || j.error || 'Pausing is not available yet.');
+    }).catch(function(){ toast('Pausing is not available right now.'); });
+    return;
+  }
+  apply('paused');
   toast('Paused. Replies are still answered and appointments still book.');
 });
 $('confirmResume').addEventListener('click', function(){
@@ -458,45 +556,68 @@ $('confirmResume').addEventListener('click', function(){
 // Cancel
 $('cancelBtn').addEventListener('click', function(){ open_('confirmOverlay'); });
 $('confirmCancel').addEventListener('click', function(){
-  close_('confirmOverlay'); apply('cancelled');
+  close_('confirmOverlay');
+  if (PAGE.live) {
+    api('/api/ghl/cancel-campaign', {}).then(function(j){
+      if (j.ok) {
+        apply('cancelled');
+        toast('Campaign cancelled. Appointments already on your calendar are unaffected.');
+      } else {
+        toast(j.error || 'The cancel did not go through. Try again or write Matt@hayessystems.com.');
+      }
+    }).catch(function(){ toast('The cancel did not go through. Try again in a moment.'); });
+    return;
+  }
+  apply('cancelled');
   toast('Campaign cancelled. Appointments already on your calendar are unaffected.');
 });
 
 // No-show report: confirm, then the row flips and the button never returns
-// for that appointment. Rows older than the 14-day window carry no button
-// (data-days >= 14 renders none).
-var noshowRow = null;
-document.querySelectorAll('tr[data-days]').forEach(function(tr){
-  if (parseInt(tr.getAttribute('data-days'), 10) >= 14) return;
-  var b = tr.querySelector('.rns');
-  if (!b) return;
-  b.addEventListener('click', function(){
-    noshowRow = tr;
-    var who = tr.querySelector('.who').textContent;
-    var when = tr.querySelector('.when').textContent;
-    $('noshowBody').textContent = who + ', ' + when + '. This refunds the appointment. Report it only if the lead did not show.';
-    open_('noshowOverlay');
-  });
-});
+// for that appointment (the 14-day window is decided server-side now;
+// rows outside it simply render without a button).
 $('confirmNoshow').addEventListener('click', function(){
   close_('noshowOverlay');
-  if (noshowRow) {
-    noshowRow.querySelector('.badge').className = 'badge reported';
-    noshowRow.querySelector('.badge').textContent = 'No-show reported';
-    var cell = noshowRow.cells[3]; cell.textContent = '';
+  function flip(){
+    if (noshowRow) {
+      noshowRow.querySelector('.badge').className = 'badge reported';
+      noshowRow.querySelector('.badge').textContent = 'No-show reported';
+      var cell = noshowRow.cells[3]; cell.textContent = '';
+    }
+    toast('That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
   }
-  toast('That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
+  if (PAGE.live && noshowRow) {
+    api('/api/ghl/report-no-show',
+        {appointment_ref: noshowRow.getAttribute('data-ref') || ''}).then(function(j){
+      if (j.ok) { flip(); }
+      else { toast(j.error || 'The report did not go through. Try again in a moment.'); }
+    }).catch(function(){ toast('The report did not go through. Try again in a moment.'); });
+    return;
+  }
+  flip();
 });
 
 // Resend report (confirm first - one misclick should not re-send mail)
 $('resendBtn').addEventListener('click', function(){ open_('resendOverlay'); });
 $('confirmResend').addEventListener('click', function(){
   close_('resendOverlay');
+  if (PAGE.live) {
+    api('/api/ghl/resend-report', {}).then(function(j){
+      if (j.ok) { toast('The latest report is on its way to your email.'); }
+      else { toast(j.message || j.error || 'No report is available to resend yet.'); }
+    }).catch(function(){ toast('The resend did not go through. Try again in a moment.'); });
+    return;
+  }
   toast('The latest report is on its way to your email.');
 });
 
 // Request campaign (enabled only with no active campaign)
 $('reqBtn').addEventListener('click', function(){
+  if (PAGE.live) {
+    api('/api/ghl/request-campaign', {}).then(function(j){
+      toast(j.message || j.error || 'Request received. We will be in touch shortly.');
+    }).catch(function(){ toast('The request did not go through. Try again in a moment.'); });
+    return;
+  }
   toast('Request received. We will follow up by email.');
 });
 
@@ -505,14 +626,41 @@ $('retainerLink').addEventListener('click', function(){ open_('retainerOverlay')
 $('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
+  if (PAGE.live) {
+    api('/api/ghl/cancel-retainer', {}).then(function(j){
+      if (j.ok) {
+        apply(j.status === 'campaign-running' ? 'running' : 'none');
+        toast('Retainer cancelled.' + (j.chapter ? ' Your current campaign runs to its finish.' : ''));
+      } else {
+        toast(j.error || 'The cancel did not go through. Try again in a moment.');
+      }
+    }).catch(function(){ toast('The cancel did not go through. Try again in a moment.'); });
+    return;
+  }
   S = 'cancelled'; apply('cancelled');
   toast('Retainer cancelled. Outreach stops today.');
 });
-$('retainerAgree').addEventListener('change', function(){
-  $('retainerStart').disabled = !this.checked;
-});
+function retGate(){
+  $('retainerStart').disabled = !($('retainerAgree').checked
+                                  && $('retSign').value.trim().length > 1);
+}
+$('retainerAgree').addEventListener('change', retGate);
+$('retSign').addEventListener('input', retGate);
 $('retainerStart').addEventListener('click', function(){
   close_('retainerOverlay');
+  if (PAGE.live) {
+    api('/api/ghl/start-retainer',
+        {agreed: $('retainerAgree').checked, signature: $('retSign').value.trim()})
+      .then(function(j){
+        if (j.ok) {
+          S = 'retainer'; apply('retainer');
+          toast('Retainer active. Your coverage is now continuous.');
+        } else {
+          toast(j.error || 'Retainer signup did not go through. Try again in a moment.');
+        }
+      }).catch(function(){ toast('Retainer signup did not go through. Try again in a moment.'); });
+    return;
+  }
   S = 'retainer'; apply('retainer');
   toast('Retainer active. Your coverage is now continuous.');
 });
@@ -523,47 +671,114 @@ $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@
 
 // INSTALL-TIME QUALIFICATION POPUP (Matt 10/25): first-run pass/fail on
 // workable leads. ?install=pass|fail|checking demos each; state=none
-// shows it by default (the real page reads the install_check evidence).
-var INSTALL = {
-  checking: {html: '<div class="spin"></div><h3>Reading your CRM</h3>'
+// shows it by default; the live page reads the install_check evidence
+// from page-data (first_run only).
+function installHTML(mode, workable, total){
+  if (mode === 'checking') return '<div class="spin"></div><h3>Reading your CRM</h3>'
     + '<p style="margin-bottom:0">Counting your workable leads. This page'
-    + ' updates when the count is ready.</p>'},
-  pass: {html: '<h3>Your list qualifies</h3>'
-    + '<p>5,214 workable leads after hygiene, out of 6,102 total.</p>'
+    + ' updates when the count is ready.</p>';
+  if (mode === 'pass') return '<h3>Your list qualifies</h3>'
+    + '<p>' + fmtNum(workable) + ' workable leads after hygiene, out of ' + fmtNum(total) + ' total.</p>'
     + '<div class="dialog-actions" style="justify-content:center;margin-bottom:0">'
-    + '<button class="btn btn-primary" onclick="closeInstall()">Request a new campaign</button></div>'},
-  fail: {html: '<h3>Not enough workable leads yet</h3>'
-    + '<p>A campaign needs at least 5,000 workable leads. Your list has'
-    + ' 1,340 workable of 3,900 total. Duplicates, unreachable entries, and'
-    + ' opted-out contacts are removed before counting.</p>'
+    + '<button class="btn btn-primary" onclick="closeInstall()">Request a new campaign</button></div>';
+  return '<h3>Not enough workable leads yet</h3>'
+    + '<p>A campaign needs at least 5,000 workable leads. Your list has '
+    + fmtNum(workable) + ' workable of ' + fmtNum(total) + ' total. Duplicates,'
+    + ' unreachable entries, and opted-out contacts are removed before counting.</p>'
     + '<div class="dialog-actions" style="justify-content:center;margin-bottom:0">'
-    + '<button class="btn btn-ghost" onclick="closeInstall()">Got it</button></div>'}
-};
+    + '<button class="btn btn-ghost" onclick="closeInstall()">Got it</button></div>';
+}
+function showInstall(mode, workable, total){
+  document.getElementById('installBody').innerHTML = installHTML(mode, workable, total);
+  setTimeout(function(){ open_('installOverlay'); }, 400);
+}
 function closeInstall(){ close_('installOverlay'); }
 (function(){
   var q = new URLSearchParams(location.search);
   var mode = q.get('install') || (q.get('state') === 'none' ? 'pass' : null);
-  if (mode && INSTALL[mode]) {
-    document.getElementById('installBody').innerHTML = INSTALL[mode].html;
-    setTimeout(function(){ open_('installOverlay'); }, 400);
-  }
+  if (mode === 'pass') { showInstall('pass', 5214, 6102); }
+  else if (mode === 'fail') { showInstall('fail', 1340, 3900); }
+  else if (mode === 'checking') { showInstall('checking', 0, 0); }
 })();
 
-// IDENTITY SEAM BOOTSTRAP: inside the GHL frame the URL carries the
-// location's id; exchange it once for a signed session token that every
-// future data/action call will carry. Demo mode (no locationId param)
-// skips this silently.
-var PAGE = {token: null, name: null};
+// IDENTITY SEAM BOOTSTRAP + REAL DATA BOOT: inside the GHL frame the URL
+// carries the location's id; exchange it once for a signed session token,
+// then pull page-data + appointments and populate every state from real
+// data. Demo mode (no locationId param) skips all of this silently.
+var PAGE = {token: null, name: null, data: null, live: false};
+function loadPageData(){
+  if (!PAGE.token) return Promise.resolve();
+  return api('/api/ghl/page-data').then(function(d){
+    if (!d || !d.ok) return;
+    PAGE.data = d;
+    applyFromData(d);
+    return api('/api/ghl/appointments').then(function(a){
+      if (!a || !a.ok) return;
+      renderAppts((a.appointments || []).map(function(x){
+        return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
+                reportable: !!x.reportable, ref: x.ref};
+      }));
+      if ((a.appointments || []).length) $('apptSec').classList.remove('hide');
+    });
+  }).catch(function(){});
+}
+function applyFromData(d){
+  var st = (d.client && d.client.state) || 'none';
+  apply(st);
+  var c = d.campaign;
+  if (st === 'running' && c) {
+    var sub = c.stopping
+      ? 'Ending this week \u00b7 appointments on your calendar are unaffected'
+      : 'Week ' + c.week + ' of 4'
+        + (c.projected_ends ? ' \u00b7 Ends ' + fmtDay(c.projected_ends) : '')
+        + (c.updated ? ' \u00b7 Updated ' + fmtDay(c.updated) : '');
+    pill(c.stopping ? 'stoppill' : 'run', c.stopping ? 'Ending' : 'Running', sub);
+    setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
+             c.conversion_pct, c.cost_to_date);
+  } else if (st === 'retainer') {
+    if (c) {
+      pill('run', 'Active', 'Chapter ' + c.week
+           + (c.updated ? ' \u00b7 Updated ' + fmtDay(c.updated) : ''));
+      setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
+               c.conversion_pct, c.cost_to_date);
+    } else {
+      pill('run', 'Active', 'Continual coverage \u00b7 the next chapter starts automatically');
+    }
+  }
+  var cd = d.cooldown;
+  if (st !== 'retainer' && cd && cd.next_opens) {
+    $('cooldown').classList.remove('hide');
+    $('cooldown').textContent = 'Campaigns need at least 3 months between runs. Your next campaign opens '
+      + fmtLongDate(cd.next_opens) + '.';
+  } else if (st === 'none') {
+    $('cooldown').classList.add('hide');
+  }
+  renderPast(d.past_campaigns || []);
+  // a client with history keeps their past-campaign table (and the
+  // retainer offer) visible even with no live campaign - apply('none')
+  // hides them for the fresh-install screen, real data brings them back
+  if ((d.past_campaigns || []).length) {
+    $('pastSec').classList.remove('hide');
+    $('retainerLine').classList.remove('hide');
+  }
+  if (d.first_run && d.install_check) {
+    showInstall(d.install_check.pass ? 'pass' : 'fail',
+                d.install_check.workable || 0, d.install_check.total || 0);
+  }
+}
 (function(){
   var loc = new URLSearchParams(location.search).get('locationId');
   if (!loc) return;
   try {
-    fetch('https://ops.hayessystems.com/api/ghl/session', {
+    fetch(API + '/api/ghl/session', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({locationId: loc})
     }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
-      if (d && d.ok) { PAGE.token = d.token; PAGE.name = d.name; }
+      if (d && d.ok) {
+        PAGE.token = d.token; PAGE.name = d.name; PAGE.live = true;
+        loadPageData();
+      }
     }).catch(function(){});
   } catch (e) {}
 })();
@@ -611,7 +826,7 @@ function applyOb(s){
   }
   function _pollCard() {
     if (!PAGE.token) return;
-    fetch('https://ops.hayessystems.com/api/ghl/card-status', {
+    fetch(API + '/api/ghl/card-status', {
       headers: {'X-Hayes-Token': PAGE.token}
     }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
       if (d && d.ok && d.card_on_file) {
@@ -634,7 +849,7 @@ function applyOb(s){
     if (_updateCardStep()) { _maybeComplete(); return; }
     // open Stripe checkout in a new tab (top-level: reliable for 3DS)
     if (PAGE.token) {
-      fetch('https://ops.hayessystems.com/api/ghl/stripe-setup', {
+      fetch(API + '/api/ghl/stripe-setup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
                   'X-Hayes-Token': PAGE.token},
@@ -656,6 +871,8 @@ function applyOb(s){
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
+    // live mode: skip the demo none-state and boot from real data instead
+    if (PAGE.live) loadPageData();
   });
 })();
 
