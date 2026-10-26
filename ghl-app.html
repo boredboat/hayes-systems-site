@@ -241,7 +241,6 @@ h1{font-size:20px}
   </table>
   </div>
   </div>
-  <div class="past-total">Total to date: 27 appointments for $1,620 in past campaigns.</div>
 </div>
 
 <div class="danger-row">
@@ -318,10 +317,13 @@ h1{font-size:20px}
 <div class="overlay" id="retainerOverlay">
   <div class="dialog">
     <h3>Retainer service</h3>
-    <p>Continuous coverage instead of one campaign at a time. Retainers run month to month: $250 a month plus $40 per booked appointment.</p>
+    <p>Continuous coverage instead of one campaign at a time: your list
+    works year round, with every appointment billed at $40 instead of $60.
+    The retainer is $250 a month, runs month to month, and you can cancel
+    any time.</p>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" data-close="retainerOverlay">Back</button>
-      <button class="btn btn-primary" id="retainerEmail">Email us</button>
+      <button class="btn btn-ghost" data-close="retainerOverlay">Not now</button>
+      <button class="btn btn-primary" id="retainerStart">Start retainer service</button>
     </div>
   </div>
 </div>
@@ -345,7 +347,7 @@ function pill(cls, txt, sub){
 }
 function apply(s){
   S = s;
-  var has = (s === 'running' || s === 'paused' || s === 'cancelled');
+  var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer');
   $('stats').classList.toggle('hide', !has);
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
@@ -354,15 +356,17 @@ function apply(s){
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
   $('statusRow').classList.toggle('hide', s === 'none');
-  $('cooldown').classList.toggle('hide', s === 'none');
-  $('retainerLine').classList.toggle('hide', s === 'none');
+  $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
+  $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
   req.textContent = 'Request a new campaign';
   req.disabled = (s !== 'none');
+  $('reqBtn').classList.toggle('hide', s === 'retainer');
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Ends Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected \u00b7 ready when you are'); }
+  if (s === 'retainer') { pill('run', 'Active', 'Retainer \u00b7 continuous coverage'); }
 }
 function open_(id){ $(id).classList.add('show'); }
 function close_(id){ $(id).classList.remove('show'); }
@@ -436,9 +440,10 @@ $('reqBtn').addEventListener('click', function(){
 
 // Retainer
 $('retainerLink').addEventListener('click', function(){ open_('retainerOverlay'); });
-$('retainerEmail').addEventListener('click', function(){
+$('retainerStart').addEventListener('click', function(){
   close_('retainerOverlay');
-  window.open('mailto:Matt@hayessystems.com?subject=Retainer%20service', '_blank');
+  S = 'retainer'; apply('retainer');
+  toast('Retainer active. Your coverage is now continuous.');
 });
 
 // Help / contact open outside the iframe
@@ -497,12 +502,17 @@ var PAGE = {token: null, name: null};
 function applyOb(s){
   var on = (s === 'onboarding');
   $('obGate').classList.toggle('hide', !on);
-  ['statusRow','stats','resendBtn','pauseBtn','cooldown','retainerLine',
-   'apptSec','pastSec'].forEach(function(id){
-    var el = $(id); if (el) el.classList.toggle('hide', on);
-  });
-  $('cancelBtn').classList.toggle('hide', on || S === 'none' || S === 'cancelled');
-  $('reqBtn').classList.toggle('hide', on);
+  if (on) {
+    ['statusRow','stats','resendBtn','pauseBtn','cooldown','retainerLine',
+     'apptSec','pastSec'].forEach(function(id){
+      var el = $(id); if (el) el.classList.add('hide');
+    });
+    $('cancelBtn').classList.add('hide');
+    $('reqBtn').classList.add('hide');
+  }
+  // leaving onboarding: apply(S) owns visibility - applyOb never un-hides
+  // (the old toggle('hide', on) shape un-hid EVERYTHING for non-onboarding
+  // states, clobbering the none/retainer exclusions).
 }
 (function(){
   $('obAgree').addEventListener('change', function(){
@@ -525,7 +535,7 @@ function applyOb(s){
 
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
-var init = (['running','paused','cancelled','none','onboarding'].indexOf(q) > -1 ? q : 'running');
+var init = (['running','paused','cancelled','none','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
 S = init;
 apply(init);
 applyOb(init);
