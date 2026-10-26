@@ -21,7 +21,7 @@ h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing
 .stat .num{font-weight:700;font-size:28px;color:#07223D;line-height:1.1;margin-bottom:4px;letter-spacing:-.02em}
 .stat .lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#78909C}
 .actions{display:flex;gap:12px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:11px 22px;font-size:14.5px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:11px 22px;font-size:14.5px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background .15s}
 .btn-primary{background:#2896FB;color:#fff}
 .btn-primary:hover{background:#095DC3}
 .btn-primary:disabled{background:#CBD9E8;color:#7A8CA3;cursor:not-allowed}
@@ -113,21 +113,33 @@ h1{font-size:20px}
 <div id="obGate" class="hide">
   <div class="ob-card" id="obForm">
     <h2>Welcome to Hayes Systems</h2>
-    <div class="ob-sub">Two minutes of setup and your campaign can start.</div>
 
     <div class="ob-step">
-      <h3>What this is</h3>
-      <p>We run done-for-you reactivation campaigns on the dormant leads in
-      this account: personalized email outreach to every workable contact,
-      and interested leads get a phone call from our conversational agent
-      powered by Retell AI to book a time. Appointments land straight on
-      your calendar. You pay <b>$60 per appointment that lands on your
-      calendar</b> and nothing else. No-shows are refunded when you report
-      them. Cancel any time from this page.</p>
+      <h3>What we do</h3>
+      <p>We run hands-free lead reactivation campaigns on all leads older
+      than 90-days, utilizing personalized and professional email outreach
+      combined with a Retell AI powered booking agent who assists leads in
+      choosing a free slot on your calendar. Campaigns typically run 1-2
+      months depending on list size and our outreach messages are timed to
+      land during favorable days and hours to boost engagement. Leads
+      receive 6 emails over the course of a month maximum.</p>
     </div>
 
     <div class="ob-step">
-      <h3>Your details</h3>
+      <h3>What you pay</h3>
+      <p>$60 per booked appointment. No other fees are charged.</p>
+    </div>
+
+    <div class="ob-step">
+      <h3>Your data</h3>
+      <p>Sensitive data is removed from our system at closeout. For full
+      details please review our data agreement.</p>
+    </div>
+
+    <div class="ob-step">
+      <h3>Agency details</h3>
+      <p>Please provide your business name and phone number you would like
+      leads to see in our outreach.</p>
       <div class="ob-fields">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
@@ -137,7 +149,7 @@ h1{font-size:20px}
     </div>
 
     <div class="ob-step">
-      <h3>The agreements</h3>
+      <h3>Data Agreement and Campaign Terms</h3>
       <div class="ob-terms">
         <b>Data Agreement and Campaign Terms.</b> You authorize Hayes
         Systems to contact the leads you provide on your behalf by email
