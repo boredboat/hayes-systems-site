@@ -357,8 +357,8 @@ function apply(s){
   $('cooldown').classList.toggle('hide', s === 'none');
   $('retainerLine').classList.toggle('hide', s === 'none');
   var req = $('reqBtn');
-  if (s === 'none') { req.disabled = false; req.textContent = 'Request a campaign'; }
-  else { req.disabled = true; req.textContent = 'Request a new campaign'; }
+  req.textContent = 'Request a new campaign';
+  req.disabled = (s !== 'none');
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Ends Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
@@ -455,7 +455,7 @@ var INSTALL = {
   pass: {html: '<h3>Your list qualifies</h3>'
     + '<p>5,214 workable leads after hygiene, out of 6,102 total.</p>'
     + '<div class="dialog-actions" style="justify-content:center;margin-bottom:0">'
-    + '<button class="btn btn-primary" onclick="closeInstall()">Request a campaign</button></div>'},
+    + '<button class="btn btn-primary" onclick="closeInstall()">Request a new campaign</button></div>'},
   fail: {html: '<h3>Not enough workable leads yet</h3>'
     + '<p>A campaign needs at least 5,000 workable leads. Your list has'
     + ' 1,340 workable of 3,900 total. Duplicates, unreachable entries, and'
