@@ -99,6 +99,13 @@ td .when{color:#90A4AE;font-size:13px}
 .ob-sign{display:grid;grid-template-columns:1fr 140px;gap:14px;margin-bottom:22px}
 .ob-done{text-align:center;padding:30px 10px}
 .ob-done .big{font-size:34px;margin-bottom:10px}
+.ob-card-step{border:1.5px solid #E0E0E0;border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.ob-card-step .cs-icon{width:36px;height:36px;border-radius:8px;background:#E7F3FE;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ob-card-step .cs-txt{flex:1;font-size:13.5px;line-height:1.5;color:#546E7A}
+.ob-card-step .cs-txt b{display:block;color:#07223D;font-size:14px;font-weight:600}
+.ob-card-step .cs-state{font-size:12px;font-weight:600;white-space:nowrap}
+.ob-card-step.done{border-color:#17D94B;background:rgba(23,217,75,.05)}
+.ob-card-step.done .cs-state{color:#0e9e33}
 .danger-row{margin-top:22px;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:20px}
 .foot{margin-top:24px;font-size:12.5px;color:#B0BEC5;border-top:1px solid #F5F5F5;padding-top:14px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
@@ -188,6 +195,11 @@ h1{font-size:20px}
           <input id="obSign" placeholder="Your name"></div>
         <div class="ob-field"><label for="obDate">Date</label>
           <input id="obDate" value="Oct 26, 2026" readonly></div>
+      </div>
+      <div class="ob-card-step" id="obCardStep" style="display:none">
+        <div class="cs-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="1" y="4" width="18" height="12" rx="2.5" fill="none" stroke="#07223D" stroke-width="1.6"/><path d="M1 8h18" stroke="#07223D" stroke-width="1.6"/><rect x="13" y="10.5" width="4" height="2.4" rx="1" fill="#07223D"/></svg></div>
+        <div class="cs-txt"><b>Payment card</b>Charged only when appointments land on your calendar.</div>
+        <span class="cs-state" id="obCardState"></span>
       </div>
       <button class="btn btn-primary" id="obSubmit" style="width:100%" disabled>Agree and finish setup</button>
     </div>
@@ -561,10 +573,64 @@ function applyOb(s){
     $('obSubmit').disabled = !($('obAgree').checked && $('obSign').value.trim().length > 1);
   }
   $('obSign').addEventListener('input', updateObBtn);
-  $('obSubmit').addEventListener('click', function(){
+  var _cardOk = false, _pollTimer = null;
+  function _updateCardStep() {
+    var step = $('obCardStep'), state = $('obCardState');
+    step.style.display = 'flex';
+    if (_cardOk) {
+      step.classList.add('done');
+      state.textContent = 'On file';
+      state.style.color = '#0e9e33';
+      return true;
+    }
+    state.textContent = 'Needed';
+    state.style.color = '#C62828';
+    return false;
+  }
+  function _pollCard() {
+    if (!PAGE.token) return;
+    fetch('https://ops.hayessystems.com/api/ghl/card-status', {
+      headers: {'X-Hayes-Token': PAGE.token}
+    }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+      if (d && d.ok && d.card_on_file) {
+        _cardOk = true; _updateCardStep();
+        if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+        _maybeComplete();
+      }
+    }).catch(function(){});
+  }
+  var _signed = false;
+  function _maybeComplete() {
+    if (!_signed || !_cardOk) return;
+    if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     $('obForm').classList.add('hide');
     $('obDone').classList.remove('hide');
     toast('Setup complete.');
+  }
+  $('obSubmit').addEventListener('click', function(){
+    _signed = true;
+    if (_updateCardStep()) { _maybeComplete(); return; }
+    // open Stripe checkout in a new tab (top-level: reliable for 3DS)
+    if (PAGE.token) {
+      fetch('https://ops.hayessystems.com/api/ghl/stripe-setup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json',
+                  'X-Hayes-Token': PAGE.token},
+        body: JSON.stringify({locationId:
+          new URLSearchParams(location.search).get('locationId') || ''})
+      }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+        if (d && d.checkout_url) window.open(d.checkout_url, '_blank');
+        else toast('Card setup is unavailable right now. We will reach out.');
+      }).catch(function(){ toast('Card setup is unavailable right now.'); });
+    } else {
+      // demo mode: simulate the card landing after a moment
+      setTimeout(function(){ _cardOk = true; _updateCardStep(); _maybeComplete(); }, 1600);
+    }
+    _pollTimer = setInterval(_pollCard, 3000);
+    _pollCard();
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden && _signed && !_cardOk) _pollCard();
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
