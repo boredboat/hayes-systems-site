@@ -67,6 +67,16 @@ td .when{color:#90A4AE;font-size:13px}
 .rns:hover{border-color:#B0BEC5;color:#37474F}
 .empty{padding:28px 16px;text-align:center;color:#90A4AE;font-size:14px}
 .past-total{margin-top:10px;font-size:12.5px;color:#90A4AE}
+.ret-ad{max-width:520px;text-align:left}
+.ret-ad h3{font-size:22px;margin-bottom:4px}
+.ret-ad .ad-kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2896FB;margin-bottom:8px}
+.ret-ad ul{list-style:none;margin:18px 0;display:grid;gap:11px}
+.ret-ad li{display:flex;align-items:flex-start;gap:11px;font-size:14.5px;line-height:1.5;color:#37474F}
+.ret-ad li svg{flex-shrink:0;margin-top:2px}
+.ret-ad .ad-price{background:#E7F3FE;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:600;color:#07223D;margin-bottom:16px}
+.ret-ad .ad-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#37474F;margin-bottom:18px}
+.ret-ad .ad-check input{width:17px;height:17px;margin-top:1px;accent-color:#2896FB}
+.ret-ad .ad-check a{color:#2896FB;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .ob-card{background:#fff;border:1px solid #ECEFF1;border-radius:14px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(7,34,61,.06)}
 .ob-card h2{font-weight:700;font-size:21px;color:#07223D;margin-bottom:6px}
 .ob-card .ob-sub{font-size:13.5px;color:#78909C;margin-bottom:24px}
@@ -315,15 +325,26 @@ h1{font-size:20px}
 </div>
 
 <div class="overlay" id="retainerOverlay">
-  <div class="dialog">
-    <h3>Retainer service</h3>
-    <p>Continuous coverage instead of one campaign at a time: your list
-    works year round, with every appointment billed at $40 instead of $60.
-    The retainer is $250 a month, runs month to month, and you can cancel
-    any time.</p>
+  <div class="dialog ret-ad">
+    <div class="ad-kicker">Retainer service</div>
+    <h3>Your list, working year round.</h3>
+    <ul>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Every appointment billed at $40 instead of $60</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        No waiting between campaigns - new chapters start as your leads
+        come back around</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Runs month to month. Cancel any time, no fees</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Same reports, same calendar booking, same team</li>
+    </ul>
+    <div class="ad-price">$250 a month. That is the whole retainer fee.</div>
+    <label class="ad-check"><input type="checkbox" id="retainerAgree">
+      <span>I agree to the <a href="https://www.hayessystems.com/terms.html" target="_blank">retainer terms</a>.</span></label>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay">Not now</button>
-      <button class="btn btn-primary" id="retainerStart">Start retainer service</button>
+      <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
     </div>
   </div>
 </div>
@@ -440,6 +461,9 @@ $('reqBtn').addEventListener('click', function(){
 
 // Retainer
 $('retainerLink').addEventListener('click', function(){ open_('retainerOverlay'); });
+$('retainerAgree').addEventListener('change', function(){
+  $('retainerStart').disabled = !this.checked;
+});
 $('retainerStart').addEventListener('click', function(){
   close_('retainerOverlay');
   S = 'retainer'; apply('retainer');
