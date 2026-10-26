@@ -67,6 +67,10 @@ td .when{color:#90A4AE;font-size:13px}
 .rns:hover{border-color:#B0BEC5;color:#37474F}
 .empty{padding:28px 16px;text-align:center;color:#90A4AE;font-size:14px}
 .past-total{margin-top:10px;font-size:12.5px;color:#90A4AE}
+.ret-card{display:flex;align-items:center;gap:9px;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:600;width:fit-content;margin-bottom:20px}
+.ret-card.on{background:rgba(23,217,75,.1);color:#0e9e33}
+.ret-card.off{background:rgba(198,40,40,.08);color:#C62828}
+.ret-card .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .ret-ad{max-width:520px;text-align:left}
 .ret-ad h3{font-size:22px;margin-bottom:4px}
 .ret-ad .ad-kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2896FB;margin-bottom:8px}
@@ -197,6 +201,7 @@ h1{font-size:20px}
   </div>
 </div>
 
+<div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
 <div class="status-row" id="statusRow">
   <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
   <span class="muted" id="pillSub">Week 3 of 4 &middot; Ends Oct 30 &middot; Updated Oct 18</span>
@@ -388,11 +393,15 @@ function apply(s){
   req.textContent = 'Request a new campaign';
   req.disabled = (s !== 'none');
   $('reqBtn').classList.toggle('hide', s === 'retainer');
+  var on = (s === 'retainer');
+  $('retCard').className = 'ret-card ' + (on ? 'on' : 'off');
+  $('retCardTxt').textContent = on ? 'Retainer on' : 'Retainer off';
+  $('retCard').classList.toggle('hide', s === 'onboarding');
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Ends Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected \u00b7 ready when you are'); }
-  if (s === 'retainer') { pill('run', 'Active', 'Retainer \u00b7 continuous coverage'); }
+  if (s === 'retainer') { pill('run', 'Active', ''); }
 }
 function open_(id){ $(id).classList.add('show'); }
 function close_(id){ $(id).classList.remove('show'); }
