@@ -376,6 +376,25 @@ function closeInstall(){ close_('installOverlay'); }
   }
 })();
 
+// IDENTITY SEAM BOOTSTRAP: inside the GHL frame the URL carries the
+// location's id; exchange it once for a signed session token that every
+// future data/action call will carry. Demo mode (no locationId param)
+// skips this silently.
+var PAGE = {token: null, name: null};
+(function(){
+  var loc = new URLSearchParams(location.search).get('locationId');
+  if (!loc) return;
+  try {
+    fetch('https://ops.hayessystems.com/api/ghl/session', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({locationId: loc})
+    }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+      if (d && d.ok) { PAGE.token = d.token; PAGE.name = d.name; }
+    }).catch(function(){});
+  } catch (e) {}
+})();
+
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
 apply(['running','paused','cancelled','none'].indexOf(q) > -1 ? q : 'running');
