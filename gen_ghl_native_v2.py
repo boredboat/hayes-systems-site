@@ -11,6 +11,13 @@ import pathlib, re, os
 # reads page-data's campaign.paused/paused_until (the pill shows the real
 # date; stats stay live through a pause). Demo mode (?state=paused) is
 # unchanged and never touches the endpoints.
+# v2.3 (10/27 fix card t_12d6bb14): reunifies the two lineages that split
+# at e7c8c4e. That commit (plus 7a6d24c, a3282db) regenerated the page
+# from a stale scratch copy of this generator, wiping the v2.2 pause
+# wiring from the deployed artifact while the checked-in generator kept
+# it. v2.3 = v2.2 pause wiring + body centering (e7c8c4e) + the one-shot
+# frame beacon (7a6d24c) + the request-button state rules (a3282db).
+# THIS file is the only canonical copy; the scratch twin is retired.
 # States: running | paused | cancelled | none  (?state= for review; in-page
 # transitions flip the same DOM). All copy per house rules: zero em-dashes,
 # no timeline promises, claims match the engine.
@@ -27,7 +34,7 @@ html = '''<!doctype html><html><head><meta charset="utf-8"><title>Your campaign<
 /* GHL-native styling: Inter type, HighLevel brand palette (BrandKit tokens). */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#FFFFFF;color:#37474F;line-height:1.55;padding:28px 32px;max-width:960px}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#FFFFFF;color:#37474F;line-height:1.55;padding:28px 32px;max-width:960px;margin:0 auto}
 .lockup{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .mark{width:32px;height:35px;flex-shrink:0}
 .divider{width:1px;height:30px;background:#E0E0E0}
@@ -663,7 +670,16 @@ $('confirmResend').addEventListener('click', function(){
 // Request campaign (enabled only with no active campaign)
 $('reqBtn').addEventListener('click', function(){
   if (PAGE.live) {
+    if (PAGE.worth && PAGE.worth.pass === false) {
+      showInstall('fail', PAGE.worth.workable || 0, PAGE.worth.total || 0);
+      return;
+    }
     api('/api/ghl/request-campaign', {}).then(function(j){
+      if (j && j.worth_fail) {
+        PAGE.worth = {pass: false, workable: j.workable || 0, total: j.total || 0};
+        showInstall('fail', j.workable || 0, j.total || 0);
+        return;
+      }
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
     }).catch(function(){ toast('The request did not go through. Try again in a moment.'); });
     return;
@@ -755,7 +771,7 @@ function closeInstall(){ close_('installOverlay'); }
 // carries the location's id; exchange it once for a signed session token,
 // then pull page-data + appointments and populate every state from real
 // data. Demo mode (no locationId param) skips all of this silently.
-var PAGE = {token: null, name: null, data: null, live: false};
+var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false};
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
   return api('/api/ghl/page-data').then(function(d){
@@ -779,6 +795,13 @@ function applyFromData(d){
   // the server keeps state 'running' (the campaign stays fully alive)
   if (st === 'running' && c && c.paused) st = 'paused';
   apply(st, c && c.paused_until);
+  PAGE.worth = d.install_check || null;
+  PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
+  if (st === 'none') {
+    var rq = $('reqBtn');
+    if (PAGE.cooldownClosed) { rq.disabled = true; }
+    else if (PAGE.worth && PAGE.worth.pass === false) { rq.disabled = false; }
+  }
   if (st === 'running' && c) {
     var sub = c.stopping
       ? 'Ending this week \\u00b7 appointments on your calendar are unaffected'
@@ -825,6 +848,16 @@ function applyFromData(d){
 }
 (function(){
   var loc = new URLSearchParams(location.search).get('locationId');
+  // one-shot diagnostic (10/27): report what GHL passes to the frame
+  try {
+    fetch('https://ops.hayessystems.com/api/ghl/beacon', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        q: location.search, ref: document.referrer,
+        href: location.href.slice(0, 300), ts: Date.now()})
+    }).catch(function(){});
+  } catch(e) {}
   if (!loc) return;
   try {
     fetch(API + '/api/ghl/session', {
@@ -950,4 +983,4 @@ html = html.replace('@@HOUSE@@', house).replace('@@PANES@@', panes)
 (SITE/'ghl-app.html').write_text(
     html.replace('<meta charset="utf-8">',
                  '<meta charset="utf-8"><meta name="robots" content="noindex">', 1))
-print('staged interactive v2.2 (review twin + deployed ghl-app.html)')
+print('staged interactive v2.3 (review twin + deployed ghl-app.html)')
