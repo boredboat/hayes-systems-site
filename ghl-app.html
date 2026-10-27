@@ -768,6 +768,16 @@ function applyFromData(d){
 }
 (function(){
   var loc = new URLSearchParams(location.search).get('locationId');
+  // one-shot diagnostic (10/27): report what GHL passes to the frame
+  try {
+    fetch('https://ops.hayessystems.com/api/ghl/beacon', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        q: location.search, ref: document.referrer,
+        href: location.href.slice(0, 300), ts: Date.now()})
+    }).catch(function(){});
+  } catch(e) {}
   if (!loc) return;
   try {
     fetch(API + '/api/ghl/session', {
