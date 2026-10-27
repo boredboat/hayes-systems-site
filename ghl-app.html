@@ -613,7 +613,16 @@ $('confirmResend').addEventListener('click', function(){
 // Request campaign (enabled only with no active campaign)
 $('reqBtn').addEventListener('click', function(){
   if (PAGE.live) {
+    if (PAGE.worth && PAGE.worth.pass === false) {
+      showInstall('fail', PAGE.worth.workable || 0, PAGE.worth.total || 0);
+      return;
+    }
     api('/api/ghl/request-campaign', {}).then(function(j){
+      if (j && j.worth_fail) {
+        PAGE.worth = {pass: false, workable: j.workable || 0, total: j.total || 0};
+        showInstall('fail', j.workable || 0, j.total || 0);
+        return;
+      }
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
     }).catch(function(){ toast('The request did not go through. Try again in a moment.'); });
     return;
@@ -705,7 +714,7 @@ function closeInstall(){ close_('installOverlay'); }
 // carries the location's id; exchange it once for a signed session token,
 // then pull page-data + appointments and populate every state from real
 // data. Demo mode (no locationId param) skips all of this silently.
-var PAGE = {token: null, name: null, data: null, live: false};
+var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false};
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
   return api('/api/ghl/page-data').then(function(d){
@@ -725,6 +734,13 @@ function loadPageData(){
 function applyFromData(d){
   var st = (d.client && d.client.state) || 'none';
   apply(st);
+  PAGE.worth = d.install_check || null;
+  PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
+  if (st === 'none') {
+    var rq = $('reqBtn');
+    if (PAGE.cooldownClosed) { rq.disabled = true; }
+    else if (PAGE.worth && PAGE.worth.pass === false) { rq.disabled = false; }
+  }
   var c = d.campaign;
   if (st === 'running' && c) {
     var sub = c.stopping
