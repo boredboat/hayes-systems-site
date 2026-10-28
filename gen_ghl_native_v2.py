@@ -848,7 +848,14 @@ function applyFromData(d){
   // a live campaign inside its pause window shows the paused state;
   // the server keeps state 'running' (the campaign stays fully alive)
   if (st === 'running' && c && c.paused) st = 'paused';
+  var _wasOb = (S === 'onboarding');
   apply(st, c && c.paused_until);
+  // THE GATE IS DATA-DRIVEN (10/28 live bug): page-data saying
+  // onboarding must OPEN the wizard (apply alone never showed it - the
+  // boot default stayed rendered: demo running stats), and leaving
+  // onboarding must close the gate
+  if (st === 'onboarding') { applyOb('onboarding'); }
+  else if (_wasOb) { $('obGate').classList.add('hide'); }
   PAGE.worth = d.install_check || null;
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
