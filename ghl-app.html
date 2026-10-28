@@ -1079,6 +1079,15 @@ function applyOb(s){
     if (_updateCardStep()) { _maybeComplete(); return; }
     // open Stripe checkout in a new tab (top-level: reliable for 3DS)
     if (PAGE.token) {
+      // record the signed agreement + business details (the gate's signature
+      // step was display-only until 10/28)
+      if (PAGE.token) {
+        api('/api/ghl/agreement', {
+          signed_by: $('obSign').value.trim(),
+          business: $('obBusiness').value.trim(),
+          phone: $('obPhone').value.trim()
+        }).catch(function(){});
+      }
       fetch(API + '/api/ghl/stripe-setup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
