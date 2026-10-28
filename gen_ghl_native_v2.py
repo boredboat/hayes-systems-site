@@ -145,6 +145,8 @@ td .when{color:#90A4AE;font-size:13px}
 .hide{display:none !important}
 .spin{width:22px;height:22px;border:3px solid #E7F3FE;border-top-color:#2896FB;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
+body.billing-close>*:not(#billingCloser){display:none!important}
+#billingCloser{margin-top:26px}
 .ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
 .ob-progress span{flex:1;height:4px;border-radius:2px;background:#E3EBF3}
 .ob-progress span.on{background:#2896FB}
@@ -172,6 +174,13 @@ h1{font-size:20px}
   <div class="divider"></div>
   <span class="bname">Hayes Systems &middot; Lead Reactivation</span>
 </div>
+
+<div class="ob-card hide" id="billingCloser">
+    <h2 id="bcTitle">Payment confirmed</h2>
+    <p id="bcBody" style="font-size:14px;color:#546E7A">Your card is saved.
+    Close this tab and return to the Hayes Systems app in your GHL
+    dashboard to finish setting up.</p>
+  </div>
 
 <h1>Your campaign</h1>
 <div id="obGate" class="hide">
@@ -478,6 +487,23 @@ h1{font-size:20px}
 <div id="toast"></div>
 
 <script>
+// STRIPE RETURN (10/28): the checkout tab lands back here with
+// billing=success|cancelled - it must be a closer screen, not a second
+// copy of the app (the wizard tab owns completion). Flags the boot off.
+(function(){
+  var _bp = new URLSearchParams(location.search).get('billing');
+  if (_bp !== 'success' && _bp !== 'cancelled') return;
+  document.body.classList.add('billing-close');
+  document.getElementById('billingCloser').classList.remove('hide');
+  if (_bp === 'cancelled') {
+    document.getElementById('bcTitle').textContent = 'Card setup cancelled';
+    document.getElementById('bcBody').textContent = 'No card was saved.'
+      + ' Close this tab and return to the Hayes Systems app in your GHL'
+      + ' dashboard to try again.';
+  }
+  window.__BILLING_DONE = true;
+})();
+
 // State machine. States: running | paused | cancelled | none.
 // ?state= sets the initial state for review; every in-page action runs
 // through the same apply() so what you click is what ships.
@@ -931,6 +957,7 @@ function applyFromData(d){
   }
 }
 (function(){
+  if (window.__BILLING_DONE) return;
   var loc = new URLSearchParams(location.search).get('locationId');
   // one-shot diagnostic (10/27): report what GHL passes to the frame
   try {
@@ -1204,6 +1231,7 @@ function applyOb(s){
 
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
+if (!window.__BILLING_DONE) {
 var init = (['running','paused','cancelled','none','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
 if (init === 'onboarding' && !location.search.includes('locationId=')) {
   PAGE.needsConnect = true;   // demo the gate's Step 1 for review
@@ -1211,6 +1239,7 @@ if (init === 'onboarding' && !location.search.includes('locationId=')) {
 S = init;
 apply(init);
 applyOb(init);
+}
 </script>
 
 </body></html>'''
