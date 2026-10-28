@@ -286,6 +286,16 @@ h1{font-size:20px}
       automatically</li>
       <li>Appointments land straight on your calendar</li>
     </ul>
+    <div id="noticeEmailRow" class="hide" style="margin-top:16px;padding-top:14px;border-top:1px solid #E3EBF3">
+      <p style="font-size:13px;color:#546E7A;margin:0 0 8px 0">Service notices
+      (like when your next campaign window opens) go to:</p>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <b id="noticeEmail" style="font-size:13.5px;color:#07223D"></b>
+        <input id="noticeEmailEdit" class="hide" placeholder="new@email.com"
+               style="flex:1;min-width:170px;padding:7px 10px;border:1px solid #C9D6E2;border-radius:7px;font-size:13px">
+        <button class="btn btn-ghost" id="noticeEmailBtn" style="padding:7px 12px;font-size:12.5px">Change</button>
+      </div>
+    </div>
     <button class="btn btn-primary" id="obGo" style="margin-top:18px">Go to your campaign</button>
   </div>
 </div>
@@ -993,6 +1003,35 @@ function applyOb(s){
     state.style.color = '#C62828';
     return false;
   }
+  var _neEditing = false;
+  $('noticeEmailBtn').addEventListener('click', function(){
+    if (!_neEditing) {
+      _neEditing = true;
+      $('noticeEmail').classList.add('hide');
+      $('noticeEmailEdit').classList.remove('hide');
+      this.textContent = 'Save';
+      $('noticeEmailEdit').focus();
+      return;
+    }
+    var em = $('noticeEmailEdit').value.trim();
+    if (!em) { toast('Enter an email address.'); return; }
+    var btn = this;
+    btn.disabled = true;
+    api('/api/ghl/notice-email', {email: em}).then(function(j){
+      btn.disabled = false;
+      if (j && j.ok) {
+        _neEditing = false;
+        $('noticeEmail').textContent = j.email;
+        $('noticeEmail').classList.remove('hide');
+        $('noticeEmailEdit').classList.add('hide');
+        btn.textContent = 'Change';
+        toast('Notices will go to ' + j.email);
+      } else {
+        toast((j && j.error) || 'Could not save that address.');
+      }
+    }).catch(function(){ btn.disabled = false;
+      toast('Could not save that address.'); });
+  });
   function _pollCard() {
     if (!PAGE.token) return;
     fetch(API + '/api/ghl/card-status', {
@@ -1000,6 +1039,10 @@ function applyOb(s){
     }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
       if (d && d.ok && d.card_on_file) {
         _cardOk = true; _updateCardStep();
+        if (d.notice_email) {
+          $('noticeEmailRow').classList.remove('hide');
+          $('noticeEmail').textContent = d.notice_email;
+        }
         if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
         _maybeComplete();
       }
