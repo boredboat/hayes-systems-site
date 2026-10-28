@@ -145,6 +145,16 @@ td .when{color:#90A4AE;font-size:13px}
 .hide{display:none !important}
 .spin{width:22px;height:22px;border:3px solid #E7F3FE;border-top-color:#2896FB;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
+.ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
+.ob-progress span{flex:1;height:4px;border-radius:2px;background:#E3EBF3}
+.ob-progress span.on{background:#2896FB}
+.ob-walk{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:18px}
+.ob-walk .spacer{flex:1}
+.ob-setup{margin:14px 0 0 0;padding:0;list-style:none;color:#5B7085}
+.ob-setup li{margin:7px 0;padding-left:26px;position:relative}
+.ob-setup li:before{content:'';position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:50%;background:#E3EBF3}
+.ob-setup li b{color:#07223D}
+
 @media(max-width:999px){.stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:640px){
 .stats{grid-template-columns:repeat(2,1fr)}
@@ -165,11 +175,28 @@ h1{font-size:20px}
 
 <h1>Your campaign</h1>
 <div id="obGate" class="hide">
-  <div class="ob-card" id="obForm">
+  <div class="ob-card" id="obWelcome">
     <h2>Welcome to Hayes Systems</h2>
+    <p>We reactivate the aged leads already sitting in your CRM with
+    personalized email outreach and an AI booking agent that puts
+    appointments straight on your calendar. You pay only for appointments
+    that land.</p>
+    <p style="margin-bottom:6px"><b>Setup takes about two minutes:</b></p>
+    <ul class="ob-setup">
+      <li><b>Connect</b> your location (one click, read-only)</li>
+      <li><b>Review</b> how the service works</li>
+      <li><b>Confirm</b> your business details</li>
+      <li><b>Agree</b> to the terms and add a payment card</li>
+    </ul>
+    <p style="margin-top:12px;color:#90A4AE;font-size:12.5px">Nothing is
+    charged until appointments land on your calendar.</p>
+    <button class="btn btn-primary" id="obStart" style="margin-top:6px">Get started</button>
+  </div>
+  <div class="ob-card hide" id="obForm">
+    <div class="ob-progress" id="obProgress"></div>
 
     <div class="ob-step" id="obConnectStep" style="display:none">
-      <h3>Step 1 &middot; Connect your location</h3>
+      <h3>Connect your location</h3>
       <p>One click connects us to this location in read-only mode, so we
       can count your workable leads and plan your campaign. We never
       write to your account.</p>
@@ -177,7 +204,7 @@ h1{font-size:20px}
       <span class="cs-state" id="obConnectState" style="margin-left:10px"></span>
     </div>
 
-    <div class="ob-step">
+    <div class="ob-step" data-ob="2">
       <h3>What we do</h3>
       <p>We run hands-free lead reactivation campaigns on all leads older
       than 90-days, utilizing personalized and professional email outreach
@@ -186,20 +213,15 @@ h1{font-size:20px}
       months depending on list size and our outreach messages are timed to
       land during favorable days and hours to boost engagement. Leads
       receive 6 emails over the course of a month maximum.</p>
-    </div>
-
-    <div class="ob-step">
-      <h3>What you pay</h3>
+      <h3 style="margin-top:22px">What you pay</h3>
       <p>$60 per booked appointment. No other fees are charged.</p>
-    </div>
 
-    <div class="ob-step">
-      <h3>Your data</h3>
+      <h3 style="margin-top:22px">Your data</h3>
       <p>Sensitive data is removed from our system at closeout. For full
       details please review our data agreement.</p>
     </div>
 
-    <div class="ob-step">
+    <div class="ob-step" data-ob="3">
       <h3>Agency details</h3>
       <p>Please provide your business name and phone number you would like
       leads to see in our outreach.</p>
@@ -211,7 +233,7 @@ h1{font-size:20px}
       </div>
     </div>
 
-    <div class="ob-step">
+    <div class="ob-step" data-ob="4">
       <h3>Data Agreement and Campaign Terms</h3>
       <div class="ob-terms">
         <b>Data Agreement and Campaign Terms.</b> You authorize Hayes
@@ -249,7 +271,16 @@ h1{font-size:20px}
   <div class="ob-card ob-done hide" id="obDone">
     <div class="big">&#10003;</div>
     <h2 style="margin-bottom:8px">You are all set</h2>
-    <p style="font-size:14.5px;color:#546E7A">Your account is set up.</p>
+    <p style="font-size:14.5px;color:#546E7A;margin-bottom:6px">Here is
+    what happens next:</p>
+    <ul class="ob-setup" style="margin-top:0">
+      <li>We read your CRM in read-only mode and count your workable
+      leads</li>
+      <li>Your qualification result appears right on this page</li>
+      <li>When your list qualifies, request a campaign and it launches
+      automatically</li>
+      <li>Appointments land straight on your calendar</li>
+    </ul>
     <button class="btn btn-primary" id="obGo" style="margin-top:18px">Go to your campaign</button>
   </div>
 </div>
@@ -910,6 +941,8 @@ function applyOb(s){
   var on = (s === 'onboarding');
   $('obGate').classList.toggle('hide', !on);
   if (on) {
+    $('obWelcome').classList.remove('hide');
+    $('obForm').classList.add('hide');
     ['statusRow','stats','resendBtn','pauseBtn','cooldown','retainerLine',
      'apptSec','pastSec'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
@@ -960,6 +993,57 @@ function applyOb(s){
       }
     }).catch(function(){});
   }
+  // WIZARD: one step at a time, progress bar, back/continue injected.
+  // The welcome screen opens first (obStart); gate entry resets there.
+  var _obSteps = [], _obCur = -1;
+  function _obInit() {
+    _obSteps = Array.prototype.slice.call(
+      document.querySelectorAll('#obForm .ob-step')).filter(function(el){
+        return el.id !== 'obConnectStep'
+          || (PAGE.needsConnect && !_connectDone);
+      });
+    var pr = $('obProgress'); pr.innerHTML = '';
+    _obSteps.forEach(function(){ pr.appendChild(document.createElement('span')); });
+    _obSteps.forEach(function(el, i){
+      var row = document.createElement('div'); row.className = 'ob-walk';
+      if (i > 0) {
+        var b = document.createElement('button');
+        b.className = 'btn btn-ghost'; b.textContent = 'Back';
+        b.addEventListener('click', function(){ _obGo(i - 1); });
+        row.appendChild(b);
+      }
+      var sp = document.createElement('div'); sp.className = 'spacer';
+      row.appendChild(sp);
+      if (el.id === 'obConnectStep') {
+        var cb = $('obConnectBtn');
+        if (cb) { row.insertBefore(cb, sp); }   // one footer row
+      }
+      if (i < _obSteps.length - 1) {
+        var c = document.createElement('button');
+        c.className = 'btn btn-primary'; c.textContent = 'Continue';
+        if (el.id === 'obConnectStep') { c.id = 'obNextConnect'; }
+        c.addEventListener('click', function(){ _obGo(i + 1); });
+        row.appendChild(c);
+      }
+      el.appendChild(row);
+    });
+  }
+  function _obGo(i) {
+    if (i < 0 || i >= _obSteps.length) return;
+    _obCur = i;
+    _obSteps.forEach(function(el, j){ el.style.display = (j === i) ? '' : 'none'; });
+    Array.prototype.slice.call($('obProgress').children).forEach(function(s, j){
+      s.classList.toggle('on', j <= i);
+    });
+    var nc = $('obNextConnect');
+    if (nc) { nc.disabled = !_connectOk(); }
+  }
+  $('obStart').addEventListener('click', function(){
+    $('obWelcome').classList.add('hide');
+    $('obForm').classList.remove('hide');
+    _obInit(); _obGo(0);
+  });
+
   // STEP 1: location connect (only shown when the credential is
   // company-scoped; hidden entirely for location-connected clients)
   var _connectDone = false, _connectPoll = null;
@@ -967,10 +1051,10 @@ function applyOb(s){
   function _updateConnectStep() {
     var st = $('obConnectStep');
     if (!st) return;
-    var needed = PAGE.needsConnect && !_connectDone;
-    st.style.display = needed ? '' : 'none';
     $('obConnectState').textContent = _connectDone ? '\u2713 Connected' : '';
     $('obConnectBtn').classList.toggle('hide', _connectDone);
+    var nc = $('obNextConnect');
+    if (nc) { nc.disabled = !_connectOk(); }
     $('obSubmit').disabled = !($('obAgree').checked
       && $('obSign').value.trim().length > 1
       && _connectOk());
@@ -979,7 +1063,8 @@ function applyOb(s){
     var btn = this; btn.disabled = true;
     if (!PAGE.token) {   // demo mode: simulate the round trip
       setTimeout(function(){ _connectDone = true; PAGE.needsConnect = false;
-        _updateConnectStep(); toast('Location connected.'); }, 1200);
+        _updateConnectStep(); toast('Location connected.');
+        if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); } }, 1200);
       return;
     }
     api('/api/ghl/connect-location', {}).then(function(j){
@@ -997,6 +1082,7 @@ function applyOb(s){
         if (!_connectDone && !PAGE.needsConnect) {
           _connectDone = true; clearInterval(_connectPoll); _connectPoll = null;
           _updateConnectStep(); toast('Location connected.');
+          if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); }
         }
       });
     }, 4000);
@@ -1007,6 +1093,7 @@ function applyOb(s){
           if (!PAGE.needsConnect) {
             _connectDone = true; _updateConnectStep();
             toast('Location connected.');
+            if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); }
           }
         }); }
   });
