@@ -446,11 +446,10 @@ h1{font-size:20px}
   </div>
 </div>
 
-<div class="overlay" id="installOverlay">
-  <div class="dialog" style="text-align:center">
-    <div id="installBody"></div>
+<div class="card hide" id="worthNotice" style="border-left:4px solid #E8A13A">
+    <h3 style="margin:0 0 6px 0">Not enough workable leads yet</h3>
+    <p id="worthBody" style="margin:0;font-size:13.5px;color:#546E7A"></p>
   </div>
-</div>
 
 <div id="toast"></div>
 
@@ -483,7 +482,8 @@ function pill(cls, txt, sub){
 function apply(s, until){
   S = s;
   var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer');
-  $('stats').classList.toggle('hide', !has);
+  $('stats').classList.remove('hide');
+  if (!has) { setStats(0, 0, 0, 0, 0, 0); }
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
   $('resendBtn').classList.toggle('hide', false);
@@ -733,16 +733,7 @@ $('connectLocBtn').addEventListener('click', function(){
 });
 $('reqBtn').addEventListener('click', function(){
   if (PAGE.live) {
-    if (PAGE.worth && PAGE.worth.pass === false && PAGE.worth.ok !== false) {
-      showInstall('fail', PAGE.worth.workable || 0, PAGE.worth.total || 0);
-      return;
-    }
     api('/api/ghl/request-campaign', {}).then(function(j){
-      if (j && j.worth_fail) {
-        PAGE.worth = {pass: false, workable: j.workable || 0, total: j.total || 0};
-        showInstall('fail', j.workable || 0, j.total || 0);
-        return;
-      }
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
     }).catch(function(){ toast('The request did not go through. Try again in a moment.'); });
     return;
@@ -802,7 +793,8 @@ $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@
 // workable leads. ?install=pass|fail|checking demos each; state=none
 // shows it by default; the live page reads the install_check evidence
 // from page-data (first_run only).
-function installHTML(mode, workable, total){
+// RETIRED 10/28 (Matt: the verdict lives on the page, not a popup)
+function _installHTML_retired(mode, workable, total){
   if (mode === 'checking') return '<div class="spin"></div><h3>Reading your CRM</h3>'
     + '<p style="margin-bottom:0">Counting your workable leads. This page'
     + ' updates when the count is ready.</p>';
@@ -823,11 +815,7 @@ function showInstall(mode, workable, total){
 }
 function closeInstall(){ close_('installOverlay'); }
 (function(){
-  var q = new URLSearchParams(location.search);
-  var mode = q.get('install') || (q.get('state') === 'none' ? 'pass' : null);
-  if (mode === 'pass') { showInstall('pass', 5214, 6102); }
-  else if (mode === 'fail') { showInstall('fail', 1340, 3900); }
-  else if (mode === 'checking') { showInstall('checking', 0, 0); }
+  // 10/28: ?install= demos retired with the popup
 })();
 
 // IDENTITY SEAM BOOTSTRAP + REAL DATA BOOT: inside the GHL frame the URL
@@ -851,6 +839,19 @@ function loadPageData(){
     });
   }).catch(function(){});
 }
+function _renderWorth(){
+  var w = PAGE.worth;
+  var show = !!(w && w.ok !== false && w.pass === false
+                && S !== 'onboarding' && !PAGE.needsConnect);
+  $('worthNotice').classList.toggle('hide', !show);
+  if (show) {
+    $('worthBody').textContent =
+      'A campaign needs at least 5,000 workable leads. Your list has '
+      + fmtNum(w.workable || 0) + ' workable of ' + fmtNum(w.total || 0)
+      + ' total. Duplicates, unreachable entries, and opted-out contacts'
+      + ' are removed before counting.';
+  }
+}
 function applyFromData(d){
   var st = (d.client && d.client.state) || 'none';
   var c = d.campaign;
@@ -868,6 +869,7 @@ function applyFromData(d){
   PAGE.worth = d.install_check || null;
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
+  _renderWorth();
   // the gate's Step 1 owns the first-run connect; the banner is the
   // fallback for already-onboarded clients (reinstall, revoked token)
   $('connectBanner').style.display =
@@ -876,8 +878,9 @@ function applyFromData(d){
   if (PAGE.needsConnect) { $('reqBtn').disabled = true; }
   else if (st === 'none') {
     var rq = $('reqBtn');
-    if (PAGE.cooldownClosed) { rq.disabled = true; }
-    else if (PAGE.worth && PAGE.worth.pass === false) { rq.disabled = false; }
+    if (PAGE.cooldownClosed
+        || (PAGE.worth && PAGE.worth.ok !== false
+            && PAGE.worth.pass === false)) { rq.disabled = true; }
   }
   if (st === 'running' && c) {
     var sub = c.stopping
@@ -917,11 +920,6 @@ function applyFromData(d){
   if ((d.past_campaigns || []).length) {
     $('pastSec').classList.remove('hide');
     $('retainerLine').classList.remove('hide');
-  }
-  if (d.first_run && d.install_check && d.install_check.ok !== false
-      && S !== 'onboarding') {
-    showInstall(d.install_check.pass ? 'pass' : 'fail',
-                d.install_check.workable || 0, d.install_check.total || 0);
   }
 }
 (function(){
