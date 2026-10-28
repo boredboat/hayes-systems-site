@@ -114,6 +114,13 @@ td .when{color:#90A4AE;font-size:13px}
 .spin{width:22px;height:22px;border:3px solid #E7F3FE;border-top-color:#2896FB;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 body.billing-close>*:not(#billingCloser){display:none!important}
+body.boot-loading #statusRow, body.boot-loading #stats,
+body.boot-loading #apptSec, body.boot-loading #pastSec,
+body.boot-loading #connectBanner, body.boot-loading #worthNotice,
+body.boot-loading .actions,
+body.boot-loading .danger-row, body.boot-loading #cooldown{display:none!important}
+#bootSpinner{padding:48px 0;text-align:center}
+#bootSpinner p{font-size:13.5px;color:#90A4AE}
 #billingCloser{margin-top:26px}
 .ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
 .ob-progress span{flex:1;height:4px;border-radius:2px;background:#E3EBF3}
@@ -151,6 +158,7 @@ h1{font-size:20px}
   </div>
 
 <h1>Your campaign</h1>
+<div id="bootSpinner" class="hide"><div class="spin"></div><p>Loading</p></div>
 <div id="obGate" class="hide">
   <div class="ob-card" id="obWelcome">
     <h2>Welcome to Hayes Systems</h2>
@@ -843,6 +851,11 @@ function _renderWorth(){
   }
 }
 function applyFromData(d){
+  if (window.__LIVE_BOOT) {
+    window.__LIVE_BOOT = false;
+    document.body.classList.remove('boot-loading');
+    document.getElementById('bootSpinner').classList.add('hide');
+  }
   var st = (d.client && d.client.state) || 'none';
   var c = d.campaign;
   // a live campaign inside its pause window shows the paused state;
@@ -915,6 +928,7 @@ function applyFromData(d){
 (function(){
   if (window.__BILLING_DONE) return;
   var loc = new URLSearchParams(location.search).get('locationId');
+  if (loc) { window.__LIVE_BOOT = true; }
   // one-shot diagnostic (10/27): report what GHL passes to the frame
   try {
     fetch('https://ops.hayessystems.com/api/ghl/beacon', {
@@ -1188,6 +1202,20 @@ function applyOb(s){
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
 if (!window.__BILLING_DONE) {
+if (window.__LIVE_BOOT) {
+  // live boot: no demo flash - the page waits for page-data; a 7s
+  // timeout falls back to the honest zeroed state so it can never hang
+  document.body.classList.add('boot-loading');
+  document.getElementById('bootSpinner').classList.remove('hide');
+  setTimeout(function(){
+    if (window.__LIVE_BOOT) {
+      window.__LIVE_BOOT = false;
+      document.body.classList.remove('boot-loading');
+      document.getElementById('bootSpinner').classList.add('hide');
+      apply('none');
+    }
+  }, 7000);
+} else {
 var init = (['running','paused','cancelled','none','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
 if (init === 'onboarding' && !location.search.includes('locationId=')) {
   PAGE.needsConnect = true;   // demo the gate's Step 1 for review
@@ -1195,6 +1223,7 @@ if (init === 'onboarding' && !location.search.includes('locationId=')) {
 S = init;
 apply(init);
 applyOb(init);
+}
 }
 </script>
 
