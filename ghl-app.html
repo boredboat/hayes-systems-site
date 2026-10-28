@@ -120,6 +120,9 @@ body.boot-loading #connectBanner, body.boot-loading #worthNotice,
 body.boot-loading .actions,
 body.boot-loading .danger-row, body.boot-loading #cooldown{display:none!important}
 #bootSpinner{padding:48px 0;text-align:center}
+.notice-card{background:#fff;border:1px solid #ECEFF1;border-left:4px solid #E8A13A;border-radius:12px;padding:16px 20px}
+.notice-card h3{margin:0 0 6px 0}
+.notice-card p{margin:0;font-size:13.5px;color:#546E7A;line-height:1.6}
 #bootSpinner p{font-size:13.5px;color:#90A4AE}
 #billingCloser{margin-top:26px}
 .ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
@@ -276,9 +279,9 @@ h1{font-size:20px}
 </div>
 
 <div class="sec" id="worthNotice" style="display:none;margin-bottom:18px">
-    <div class="card" style="border-left:4px solid #E8A13A">
-      <h3 style="margin:0 0 6px 0">Not enough workable leads yet</h3>
-      <p id="worthBody" style="margin:0;font-size:13.5px;color:#546E7A"></p>
+    <div class="notice-card">
+      <h3>Not enough workable leads yet</h3>
+      <p id="worthBody"></p>
     </div>
   </div>
 
@@ -297,8 +300,8 @@ h1{font-size:20px}
 </div>
 
 <div class="actions">
-  <div class="card" id="connectBanner" style="display:none;border-left:4px solid var(--hl,#1a73e8);margin-bottom:14px">
-    <h3 style="margin:0 0 6px 0">Finish setting up your account</h3>
+  <div class="notice-card" id="connectBanner" style="display:none;border-left-color:#2896FB;margin-bottom:14px">
+    <h3>Finish setting up your account</h3>
     <p style="margin:0 0 12px 0">One more step: connect your location so we can read your CRM and count your workable leads. Takes one click.</p>
     <button class="btn btn-primary" id="connectLocBtn">Connect your location</button>
   </div>
