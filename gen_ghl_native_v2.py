@@ -307,6 +307,13 @@ h1{font-size:20px}
   </div>
 </div>
 
+<div class="sec" id="worthNotice" style="display:none">
+    <div class="card" style="border-left:4px solid #E8A13A;margin-bottom:0">
+      <h3 style="margin:0 0 6px 0">Not enough workable leads yet</h3>
+      <p id="worthBody" style="margin:0;font-size:13.5px;color:#546E7A"></p>
+    </div>
+  </div>
+
 <div class="status-row" id="statusRow">
   <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
   <div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
@@ -475,11 +482,6 @@ h1{font-size:20px}
     </div>
   </div>
 </div>
-
-<div class="card hide" id="worthNotice" style="border-left:4px solid #E8A13A">
-    <h3 style="margin:0 0 6px 0">Not enough workable leads yet</h3>
-    <p id="worthBody" style="margin:0;font-size:13.5px;color:#546E7A"></p>
-  </div>
 
 <div id="toast"></div>
 
@@ -873,7 +875,7 @@ function _renderWorth(){
   var w = PAGE.worth;
   var show = !!(w && w.ok !== false && w.pass === false
                 && S !== 'onboarding' && !PAGE.needsConnect);
-  $('worthNotice').classList.toggle('hide', !show);
+  $('worthNotice').style.display = show ? '' : 'none';
   if (show) {
     $('worthBody').textContent =
       'A campaign needs at least 5,000 workable leads. Your list has '
