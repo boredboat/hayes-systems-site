@@ -186,7 +186,7 @@ h1{font-size:20px}
       <li><b>Connect</b> your location</li>
       <li><b>Review</b> how the service works</li>
       <li><b>Confirm</b> your business details</li>
-      <li><b>Agree</b> to the terms and add a payment card</li>
+      <li><b>Agree</b> to the terms and set up payment details with Stripe</li>
     </ul>
     <button class="btn btn-primary" id="obStart" style="margin-top:6px">Get started</button>
   </div>
