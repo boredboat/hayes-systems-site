@@ -260,6 +260,11 @@ h1{font-size:20px}
 </div>
 
 <div class="actions">
+  <div class="card" id="connectBanner" style="display:none;border-left:4px solid var(--hl,#1a73e8);margin-bottom:14px">
+    <h3 style="margin:0 0 6px 0">Finish setting up your account</h3>
+    <p style="margin:0 0 12px 0">One more step: connect your location so we can read your CRM and count your workable leads. Takes one click.</p>
+    <button class="btn btn-primary" id="connectLocBtn">Connect your location</button>
+  </div>
   <button class="btn btn-primary" id="reqBtn" disabled>Request a new campaign</button>
   <button class="btn btn-ghost" id="resendBtn">Resend latest report</button>
   <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
@@ -668,6 +673,15 @@ $('confirmResend').addEventListener('click', function(){
 });
 
 // Request campaign (enabled only with no active campaign)
+$('connectLocBtn').addEventListener('click', function(){
+  this.disabled = true;
+  var btn = this;
+  api('/api/ghl/connect-location', {}).then(function(j){
+    btn.disabled = false;
+    if (j && j.ok && j.url) { window.open(j.url, '_blank'); }
+    else { toast((j && j.error) || 'Could not start the connection. Try again.'); }
+  }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
+});
 $('reqBtn').addEventListener('click', function(){
   if (PAGE.live) {
     if (PAGE.worth && PAGE.worth.pass === false) {
@@ -771,7 +785,7 @@ function closeInstall(){ close_('installOverlay'); }
 // carries the location's id; exchange it once for a signed session token,
 // then pull page-data + appointments and populate every state from real
 // data. Demo mode (no locationId param) skips all of this silently.
-var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false};
+var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false, needsConnect: false};
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
   return api('/api/ghl/page-data').then(function(d){
@@ -797,7 +811,10 @@ function applyFromData(d){
   apply(st, c && c.paused_until);
   PAGE.worth = d.install_check || null;
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
-  if (st === 'none') {
+  PAGE.needsConnect = !!d.needs_location_connect;
+  $('connectBanner').style.display = PAGE.needsConnect ? '' : 'none';
+  if (PAGE.needsConnect) { $('reqBtn').disabled = true; }
+  else if (st === 'none') {
     var rq = $('reqBtn');
     if (PAGE.cooldownClosed) { rq.disabled = true; }
     else if (PAGE.worth && PAGE.worth.pass === false) { rq.disabled = false; }
