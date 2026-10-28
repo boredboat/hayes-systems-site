@@ -693,7 +693,7 @@ $('connectLocBtn').addEventListener('click', function(){
 });
 $('reqBtn').addEventListener('click', function(){
   if (PAGE.live) {
-    if (PAGE.worth && PAGE.worth.pass === false) {
+    if (PAGE.worth && PAGE.worth.pass === false && PAGE.worth.ok !== false) {
       showInstall('fail', PAGE.worth.workable || 0, PAGE.worth.total || 0);
       return;
     }
@@ -871,7 +871,8 @@ function applyFromData(d){
     $('pastSec').classList.remove('hide');
     $('retainerLine').classList.remove('hide');
   }
-  if (d.first_run && d.install_check) {
+  if (d.first_run && d.install_check && d.install_check.ok !== false
+      && S !== 'onboarding') {
     showInstall(d.install_check.pass ? 'pass' : 'fail',
                 d.install_check.workable || 0, d.install_check.total || 0);
   }
