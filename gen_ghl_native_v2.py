@@ -207,16 +207,21 @@ h1{font-size:20px}
       <p>We run hands-free lead reactivation campaigns on all leads older
       than 90-days, utilizing personalized and professional email outreach
       combined with a Retell AI powered booking agent who assists leads in
-      choosing a free slot on your calendar. Campaigns typically run 1-2
-      months depending on list size and our outreach messages are timed to
-      land during favorable days and hours to boost engagement. Leads
-      receive 6 emails over the course of a month maximum.</p>
+      choosing a free slot on your calendar.</p>
+
+      <p>Campaigns typically run 1-3 months depending on list size. Leads
+      receive 6 emails over the course of a month and may respond at any
+      time during the campaign to book an appointment. We do not qualify
+      leads as to not interfere in your own qualification process.</p>
+
       <h3 style="margin-top:22px">What you pay</h3>
-      <p>$60 per booked appointment. No other fees are charged.</p>
+      <p>$60 per booked appointment is our only fee. Billing is on a weekly
+      cycle and includes all appointments made by our service during that
+      period.</p>
 
       <h3 style="margin-top:22px">Your data</h3>
       <p>Sensitive data is removed from our system at closeout. For full
-      details please review our data agreement.</p>
+      details please review our <a href="https://www.hayessystems.com/terms.html" target="_blank">data agreement</a>.</p>
     </div>
 
     <div class="ob-step" data-ob="3">
