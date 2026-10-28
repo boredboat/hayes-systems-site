@@ -136,6 +136,15 @@ h1{font-size:20px}
   <div class="ob-card" id="obForm">
     <h2>Welcome to Hayes Systems</h2>
 
+    <div class="ob-step" id="obConnectStep" style="display:none">
+      <h3>Step 1 &middot; Connect your location</h3>
+      <p>One click connects us to this location in read-only mode, so we
+      can count your workable leads and plan your campaign. We never
+      write to your account.</p>
+      <button class="btn btn-primary" id="obConnectBtn">Connect your location</button>
+      <span class="cs-state" id="obConnectState" style="margin-left:10px"></span>
+    </div>
+
     <div class="ob-step">
       <h3>What we do</h3>
       <p>We run hands-free lead reactivation campaigns on all leads older
@@ -780,7 +789,11 @@ function applyFromData(d){
   PAGE.worth = d.install_check || null;
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
-  $('connectBanner').style.display = PAGE.needsConnect ? '' : 'none';
+  // the gate's Step 1 owns the first-run connect; the banner is the
+  // fallback for already-onboarded clients (reinstall, revoked token)
+  $('connectBanner').style.display =
+    (PAGE.needsConnect && S !== 'onboarding') ? '' : 'none';
+  if (typeof _updateConnectStep === 'function') { _updateConnectStep(); }
   if (PAGE.needsConnect) { $('reqBtn').disabled = true; }
   else if (st === 'none') {
     var rq = $('reqBtn');
@@ -872,6 +885,7 @@ function applyOb(s){
     $('cancelRetBtn').classList.add('hide');
     $('reqBtn').classList.add('hide');
   }
+  if (typeof _updateConnectStep === 'function') { _updateConnectStep(); }
   // leaving onboarding: apply(S) owns visibility - applyOb never un-hides
   // (the old toggle('hide', on) shape un-hid EVERYTHING for non-onboarding
   // states, clobbering the none/retainer exclusions).
@@ -882,7 +896,9 @@ function applyOb(s){
     updateObBtn();
   });
   function updateObBtn(){
-    $('obSubmit').disabled = !($('obAgree').checked && $('obSign').value.trim().length > 1);
+    $('obSubmit').disabled = !($('obAgree').checked
+      && $('obSign').value.trim().length > 1
+      && _connectOk());
   }
   $('obSign').addEventListener('input', updateObBtn);
   var _cardOk = false, _pollTimer = null;
@@ -911,6 +927,57 @@ function applyOb(s){
       }
     }).catch(function(){});
   }
+  // STEP 1: location connect (only shown when the credential is
+  // company-scoped; hidden entirely for location-connected clients)
+  var _connectDone = false, _connectPoll = null;
+  function _connectOk() { return _connectDone || !PAGE.needsConnect; }
+  function _updateConnectStep() {
+    var st = $('obConnectStep');
+    if (!st) return;
+    var needed = PAGE.needsConnect && !_connectDone;
+    st.style.display = needed ? '' : 'none';
+    $('obConnectState').textContent = _connectDone ? '✓ Connected' : '';
+    $('obConnectBtn').classList.toggle('hide', _connectDone);
+    $('obSubmit').disabled = !($('obAgree').checked
+      && $('obSign').value.trim().length > 1
+      && _connectOk());
+  }
+  $('obConnectBtn').addEventListener('click', function(){
+    var btn = this; btn.disabled = true;
+    if (!PAGE.token) {   // demo mode: simulate the round trip
+      setTimeout(function(){ _connectDone = true; PAGE.needsConnect = false;
+        _updateConnectStep(); toast('Location connected.'); }, 1200);
+      return;
+    }
+    api('/api/ghl/connect-location', {}).then(function(j){
+      btn.disabled = false;
+      if (j && j.ok && j.url) { window.open(j.url, '_blank'); _startConnectPoll(); }
+      else { toast((j && j.error) || 'Could not start the connection.'); }
+    }).catch(function(){ btn.disabled = false;
+      toast('The connection could not start.'); });
+  });
+  function _startConnectPoll() {
+    if (_connectPoll) return;
+    _connectPoll = setInterval(function(){
+      if (_connectDone) { clearInterval(_connectPoll); _connectPoll = null; return; }
+      loadPageData().then(function(){
+        if (!_connectDone && !PAGE.needsConnect) {
+          _connectDone = true; clearInterval(_connectPoll); _connectPoll = null;
+          _updateConnectStep(); toast('Location connected.');
+        }
+      });
+    }, 4000);
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden && PAGE.needsConnect && !_connectDone
+        && S === 'onboarding') { loadPageData().then(function(){
+          if (!PAGE.needsConnect) {
+            _connectDone = true; _updateConnectStep();
+            toast('Location connected.');
+          }
+        }); }
+  });
+
   var _signed = false;
   function _maybeComplete() {
     if (!_signed || !_cardOk) return;
@@ -954,6 +1021,9 @@ function applyOb(s){
 // Initial state for review: ?state=running|paused|cancelled|none
 var q = new URLSearchParams(location.search).get('state') || 'running';
 var init = (['running','paused','cancelled','none','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
+if (init === 'onboarding' && !location.search.includes('locationId=')) {
+  PAGE.needsConnect = true;   // demo the gate's Step 1 for review
+}
 S = init;
 apply(init);
 applyOb(init);
