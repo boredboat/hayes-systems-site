@@ -295,6 +295,18 @@ h1{font-size:20px}
     </div>
   </div>
 
+<div class="sec" id="schedCard" style="display:none;margin-bottom:18px">
+    <div class="notice-card" style="border-left-color:#2896FB">
+      <h3>Where do appointments live at your business?</h3>
+      <p id="schedBody"></p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="schedGhl">Our GoHighLevel calendars</button>
+        <button class="btn" id="schedCal">Calendly</button>
+        <button class="btn" id="schedOther">Something else</button>
+      </div>
+    </div>
+  </div>
+
 <div class="status-row" id="statusRow">
   <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
   <div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
@@ -902,6 +914,45 @@ function _renderWorth(){
       + fmtNum(bar) + ' workable leads';
   }
 }
+// Scheduling-surface verify (10/29): the scan's raw tally is shown, the
+// client's own answer is the record. Card stays hidden until a scan
+// result exists, and hides permanently once verified.
+function _renderSched(){
+  var card = $('schedCard');
+  if (!card) return;
+  if (PAGE.schedVerified) { card.style.display = 'none'; return; }
+  var s = PAGE.sched;
+  if (!s) return;
+  card.style.display = '';
+  var parts = [];
+  var a = s.appointments || {};
+  if (s.ok === false) {
+    parts.push('We could not read your calendar history right now.');
+  } else if (a.found > 0) {
+    var seen = Object.keys(a.sources || {}).map(function(k){
+      return k + ' (' + a.sources[k] + ')';
+    }).join(', ');
+    parts.push('We read ' + fmtNum(a.found)
+               + (a.found === 1 ? ' appointment' : ' appointments')
+               + ' in your account. Booking sources we saw: ' + seen + '.');
+  } else {
+    parts.push('We did not find appointments in your account yet.');
+  }
+  parts.push('Where does your team schedule appointments with leads?');
+  $('schedBody').textContent = parts.join(' ');
+}
+function _schedAnswer(v){
+  api('/api/ghl/sched-verify', {surface: v}).then(function(j){
+    if (j && j.ok) {
+      PAGE.schedVerified = v;
+      _renderSched();
+      toast('Saved.');
+    } else { toast((j && j.error) || 'Could not save. Try again.'); }
+  });
+}
+$('schedGhl').addEventListener('click', function(){ _schedAnswer('ghl'); });
+$('schedCal').addEventListener('click', function(){ _schedAnswer('calendly'); });
+$('schedOther').addEventListener('click', function(){ _schedAnswer('other'); });
 function applyFromData(d){
   if (window.__LIVE_BOOT) {
     window.__LIVE_BOOT = false;
@@ -922,9 +973,12 @@ function applyFromData(d){
   if (st === 'onboarding') { applyOb('onboarding'); }
   else if (_wasOb) { $('obGate').classList.add('hide'); }
   PAGE.worth = d.install_check || null;
+  PAGE.sched = d.sched_scan || null;
+  PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
   _renderWorth();
+  _renderSched();
   // the gate's Step 1 owns the first-run connect; the banner is the
   // fallback for already-onboarded clients (reinstall, revoked token)
   $('connectBanner').style.display =
