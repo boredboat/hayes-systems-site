@@ -84,6 +84,8 @@ td .when{color:var(--mut);font-size:13px}
 .btn-primary:disabled{background:#c4cad3;color:#fff;cursor:not-allowed}
 .btn-ghost{background:#fff;border:1px solid #d1d5db;color:var(--acc)}
 .btn-ghost:hover:not(:disabled){border-color:var(--acc)}
+.btn-ghost:disabled{color:#9ca3af;border-color:#e5e7eb}
+.spin-sm{width:13px;height:13px;border:2px solid #d1d5db;border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite;display:inline-block;flex-shrink:0}
 .btn:disabled{cursor:not-allowed}
 .btn-danger{background:#fff;border:1px solid #f3c1c1;color:#dc2626}
 .btn-danger:hover{background:#fef2f2}
@@ -1068,14 +1070,19 @@ function _renderListCheck(){
 }
 $('listCheckBtn').addEventListener('click', function(){
   var btn = this;
-  btn.disabled = true;
+  // working state: grey + spinner + honest label for the whole poll
+  // (Matt 10/29: a disabled-but-blue button still looked clickable)
+  function _work(){ btn.disabled = true;
+    btn.innerHTML = '<span class="spin-sm"></span>Checking your list'; }
+  function _reset(){ btn.disabled = false; btn.textContent = 'Check again'; }
+  _work();
   api('/api/ghl/recheck-list', {}).then(function(j){
     if (j && j.ok) {
       toast(j.already
         ? 'A check is already running. Your list updates in a moment.'
         : 'Checking your list. This takes a minute or two.');
     } else {
-      btn.disabled = false;
+      _reset();
       toast((j && j.error) || 'Could not start the check. Try again.');
       return;
     }
@@ -1091,16 +1098,17 @@ $('listCheckBtn').addEventListener('click', function(){
           PAGE.data = d;
           applyFromData(d);
           clearInterval(iv);
-          btn.disabled = false;
+          _reset();
           toast('Your list is up to date.');
         }
       }).catch(function(){});
       if (tries >= 36) {
         clearInterval(iv);
-        btn.disabled = false;
+        _reset();
+        toast('Still checking. Give it another minute and refresh.');
       }
     }, 10000);
-  }).catch(function(){ btn.disabled = false;
+  }).catch(function(){ _reset();
     toast('Could not start the check. Try again.'); });
 });
 
