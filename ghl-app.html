@@ -637,7 +637,7 @@ function apply(s, until){
     var lp = (PAGE && PAGE.lastPast) || null;
     pill('donepill', 'Completed', lp ? lp.period + ' \u00b7 ' + fmtNum(lp.appointments) + ' appointments' : 'Your campaign has finished');
   }
-  if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected \u00b7 ready when you are'); }
+  if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected'); }
   if (s === 'retainer') { pill('run', 'Active', ''); }
 }
 function open_(id){ $(id).classList.add('show'); }
