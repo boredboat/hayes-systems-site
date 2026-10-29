@@ -493,7 +493,7 @@ h1{font-size:20px}
 <div class="overlay" id="settingsOverlay">
   <div class="dialog">
     <h3>Account settings</h3>
-    <div class="field"><label>Notices email</label>
+    <div class="field"><label>Email for app notices</label>
       <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Business name</label>
       <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
