@@ -25,8 +25,7 @@ h1{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--tx)}
 .pill.donepill{background:#e8f4fe;color:var(--acch)}
 .pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
 .ret-card{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;width:fit-content}
-.ret-card.on{background:var(--grnb);color:var(--grnd)}
-.ret-card.off{background:rgba(198,40,40,.08);color:#C62828}
+.ret-card{background:var(--grnb);color:var(--grnd)}
 .ret-card .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
 /* hero band */
 .hero{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px 24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
@@ -348,7 +347,7 @@ body{padding:0}
   <div class="state" id="statusRow">
     <div class="pillrow">
       <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
-      <div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
+      <div class="ret-card on hide" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer</span></div>
     </div>
     <h1 id="stateH1">Campaign 3</h1>
     <div class="sub" id="pillSub">Week 3 of 4 &middot; Ends Oct 30 &middot; Updated Oct 18</div>
@@ -621,10 +620,10 @@ function apply(s, until){
   var req = $('reqBtn');
   req.textContent = 'Request a new campaign';
   req.disabled = !(s === 'none' || s === 'completed');
-  var on = (s === 'retainer');
-  $('retCard').className = 'ret-card ' + (on ? 'on' : 'off');
-  $('retCardTxt').textContent = on ? 'Retainer on' : 'Retainer off';
-  $('retCard').classList.toggle('hide', ob);
+  // retainer badge is an ACTIVE-ONLY green card (Matt 10/29: the old
+  // always-on red "Retainer off" read like an error)
+  $('retCardTxt').textContent = 'Retainer';
+  $('retCard').classList.toggle('hide', s !== 'retainer');
   // hero title: campaign numbering follows real history when present
   var n = (PAGE && PAGE.pastN) || 0;
   if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = n ? 'Campaign ' + (n + 1) : 'Your campaign'; setSpine(3); }
