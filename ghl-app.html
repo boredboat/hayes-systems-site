@@ -1,174 +1,206 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Your campaign</title><style>
-/* GHL-native styling: Inter type, HighLevel brand palette (BrandKit tokens). */
+<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Hayes Systems · Lead Reactivation</title><style>
+/* GHL-native restyle (Matt 10/29): tokens pulled from GHL's own app CSS.
+   Accent #188bf6 / hover #095dc3 / surface #f6f6f6 / border #e5e7eb /
+   text #111827 / muted #6b7280 / success #17d94b. Mission Control layout:
+   hero band (state + 5 metrics), campaign spine, tabs, bottom action row. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#FFFFFF;color:#37474F;line-height:1.55;padding:28px 32px;max-width:960px;margin:0 auto}
-.lockup{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.mark{width:32px;height:35px;flex-shrink:0}
-.divider{width:1px;height:30px;background:#E0E0E0}
-.bname{font-weight:700;font-size:11px;letter-spacing:.18em;color:#07223D;text-transform:uppercase}
-h1{font-weight:700;font-size:24px;color:#07223D;margin-bottom:6px;letter-spacing:-.01em}
-.status-row{display:flex;align-items:center;gap:12px;margin-bottom:26px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600}
-.pill.run{background:rgba(23,217,75,.1);color:#0e9e33}
-.pill.pausepill{background:rgba(255,184,0,.12);color:#b26a00}
-.pill.stoppill{background:rgba(239,108,0,.1);color:#c05100}
-.pill.nonepill{background:#ECEFF1;color:#607D8B}
-.pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
-.muted{font-size:13.5px;color:#90A4AE}
-.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:28px}
-.stat{background:#F8FAFB;border:1px solid #ECEFF1;border-radius:12px;padding:16px 12px;text-align:center}
-.stat .num{font-weight:700;font-size:28px;color:#07223D;line-height:1.1;margin-bottom:4px;letter-spacing:-.02em}
-.stat .lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#78909C}
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:11px 22px;font-size:14.5px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background .15s}
-.btn-primary{background:#2896FB;color:#fff}
-.btn-primary:hover{background:#095DC3}
-.btn-primary:disabled{background:#CBD9E8;color:#7A8CA3;cursor:not-allowed}
-.cooldown{margin-top:12px;font-size:12.5px;color:#90A4AE}
-.retainer{color:#2896FB;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.btn-ghost{background:#fff;border:1.5px solid #E0E0E0;color:#37474F}
-.btn-ghost:hover:not(:disabled){border-color:#B0BEC5}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-danger{background:#fff;border:1.5px solid #FFCDD2;color:#C62828}
-.contact{font-size:13.5px;font-weight:600;color:#2896FB;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.overlay{display:none;position:fixed;inset:0;background:rgba(7,34,61,.45);align-items:center;justify-content:center;z-index:10}
+:root{--acc:#188bf6;--acch:#095dc3;--bg:#f6f6f6;--bd:#e5e7eb;--tx:#111827;--mut:#6b7280;--grn:#17d94b;--grnd:#15803d;--grnb:#e8f9ee}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--tx);line-height:1.55;padding:0 0 50px}
+.bar{display:flex;align-items:center;gap:12px;padding:13px 28px;background:#fff;border-bottom:1px solid var(--bd);margin-bottom:22px}
+.mark{width:28px;height:31px;flex-shrink:0}
+.divider{width:1px;height:24px;background:var(--bd)}
+.bname{font-weight:700;font-size:11px;letter-spacing:.14em;color:var(--tx);text-transform:uppercase}
+.bar .spacer{flex:1}
+.barlink{font-size:13px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:none;margin-left:18px}
+.barlink:hover{color:var(--acch);text-decoration:underline;text-underline-offset:3px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 28px}
+h1{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--tx)}
+.muted{font-size:13px;color:var(--mut)}
+.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.pill.run{background:var(--grnb);color:var(--grnd)}
+.pill.pausepill{background:#fff7e0;color:#a16207}
+.pill.stoppill{background:#fee2e2;color:#b91c1c}
+.pill.nonepill{background:#f3f4f6;color:#4b5563}
+.pill.donepill{background:#e8f4fe;color:var(--acch)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.ret-card{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;width:fit-content}
+.ret-card.on{background:var(--grnb);color:var(--grnd)}
+.ret-card.off{background:rgba(198,40,40,.08);color:#C62828}
+.ret-card .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+/* hero band */
+.hero{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px 24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hero .state{min-width:210px}
+.hero .state .pillrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hero .sub{font-size:13px;color:var(--mut);margin-top:3px}
+.nums{display:flex;flex:1;justify-content:space-evenly;gap:26px;padding:6px 10px 6px 28px;border-left:1px solid var(--bd);flex-wrap:nowrap}
+.hnum{min-width:0;text-align:center}
+.hnum .num{font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--tx);line-height:1.2}
+.hnum .num.good{color:var(--grnd)}
+.hnum .lbl{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+/* campaign spine */
+.spine{display:flex;align-items:center;margin:16px 4px 18px}
+.step{flex:1;display:flex;align-items:center;gap:8px;color:#9ca3af;font-size:12.5px;font-weight:600;white-space:nowrap}
+.step .d{width:21px;height:21px;border-radius:50%;background:var(--bd);color:var(--mut);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step.done .d{background:var(--grn);color:#fff}
+.step.now .d{background:var(--acc);color:#fff}
+.step.now{color:var(--tx)}
+.step .line{flex:1;height:2px;background:var(--bd);margin:0 8px}
+.step.done .line{background:#a7ebbc}
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--bd);overflow-x:auto}
+.tab{padding:11px 16px;font-size:13.5px;font-weight:600;color:var(--mut);cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;font-family:'Inter',sans-serif;white-space:nowrap}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+.tab .ct{background:#f3f4f6;color:var(--mut);font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:7px}
+.pane{display:none;background:#fff;border:1px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;padding:4px 0 8px}
+.pane.on{display:block}
+table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px;table-layout:fixed}
+th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);padding:12px 22px 8px}
+td{padding:11px 22px;border-top:1px solid #f3f4f6;color:#374151;vertical-align:middle}
+tr:hover td{background:#f8fafc}
+td .who{font-weight:600;color:var(--tx)}
+td .when{color:var(--mut);font-size:13px}
+.badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.badge.held{background:var(--grnb);color:var(--grnd)}
+.badge.booked{background:#e8f4fe;color:var(--acch)}
+.badge.reported{background:#fff7e0;color:#a16207}
+.appt-scroll{max-height:300px;overflow:auto;-webkit-overflow-scrolling:touch}
+.appt-scroll::-webkit-scrollbar{width:8px}
+.appt-scroll::-webkit-scrollbar-track{background:#f3f4f6;border-radius:10px}
+.appt-scroll::-webkit-scrollbar-thumb{background:#c4cad3;border-radius:10px}
+.appt-scroll::-webkit-scrollbar-thumb:hover{background:#9ca3af}
+.rns{white-space:nowrap;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:var(--acc);background:none;border:none;cursor:pointer;padding:0}
+.rns:hover{text-decoration:underline;color:var(--acch)}
+.empty{padding:28px 16px;text-align:center;color:var(--mut);font-size:14px}
+.feedrow{display:flex;justify-content:space-between;gap:14px;padding:11px 22px;border-top:1px solid #f3f4f6;font-size:14px}
+.feedrow:first-child{border-top:none}
+.feedrow .fw{color:var(--mut);font-size:12.5px;white-space:nowrap}
+/* action row */
+.actrow{display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-primary{background:var(--acc);color:#fff}
+.btn-primary:hover{background:var(--acch)}
+.btn-primary:disabled{background:#c4cad3;color:#fff;cursor:not-allowed}
+.btn-ghost{background:#fff;border:1px solid #d1d5db;color:var(--acc)}
+.btn-ghost:hover:not(:disabled){border-color:var(--acc)}
+.btn:disabled{cursor:not-allowed}
+.btn-danger{background:#fff;border:1px solid #f3c1c1;color:#dc2626}
+.btn-danger:hover{background:#fef2f2}
+.cooldown{font-size:13px;color:var(--mut)}
+.retainer{color:var(--acc);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.contact{font-size:13.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+/* overlays */
+.overlay{display:none;position:fixed;inset:0;background:rgba(17,24,39,.45);align-items:center;justify-content:center;z-index:10}
 .overlay.show{display:flex}
-.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(7,34,61,.3)}
-.dialog h3{font-weight:700;font-size:18px;color:#07223D;margin-bottom:10px}
-.dialog p{font-size:14px;color:#546E7A;margin-bottom:22px}
+.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(17,24,39,.3)}
+.dialog h3{font-weight:700;font-size:18px;color:var(--tx);margin-bottom:10px}
+.dialog p{font-size:14px;color:#4b5563;margin-bottom:22px}
 .dialog-actions{display:flex;gap:12px;justify-content:flex-end}
 .field{margin-bottom:16px}
-.field label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#78909C;margin-bottom:6px}
-.field input[type=date]{width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:#07223D;background:#fff}
-.field input[type=date]:focus{outline:none;border-color:#2896FB}
+.field label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.field input[type=date]{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--tx);background:#fff}
+.field input[type=date]:focus{outline:none;border-color:var(--acc)}
 .btn-danger-solid{background:#E53935;color:#fff}
 .btn-danger-solid:hover{background:#C62828}
-.sec{margin-top:26px}
-.sec h2{font-weight:700;font-size:16px;color:#07223D;margin-bottom:12px}
-table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px;table-layout:fixed}
-th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#90A4AE;padding:8px 10px;border-bottom:1px solid #ECEFF1}
-td{padding:11px 10px;border-bottom:1px solid #F5F5F5;color:#546E7A}
-td .who{font-weight:600;color:#07223D}
-td .when{color:#90A4AE;font-size:13px}
-.badge{display:inline-block;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600;white-space:nowrap}
-.badge.held{background:rgba(23,217,75,.1);color:#0e9e33}
-.badge.booked{background:#E7F3FE;color:#095DC3}
-.badge.reported{background:rgba(255,184,0,.12);color:#b26a00}
-.appt-wrap{border:1px solid #ECEFF1;border-radius:10px}
-.appt-scroll{max-height:260px;overflow:auto;-webkit-overflow-scrolling:touch}
-.appt-scroll::-webkit-scrollbar{width:8px}
-.appt-scroll::-webkit-scrollbar-track{background:#ECEFF1;border-radius:10px}
-.appt-scroll::-webkit-scrollbar-thumb{background:#B0BEC5;border-radius:10px}
-.appt-scroll::-webkit-scrollbar-thumb:hover{background:#90A4AE}
-.appt-scroll table{margin:0}
-.appt-scroll th{position:sticky;top:0;background:#fff;z-index:1}
-.rns{white-space:nowrap;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:#546E7A;background:#fff;border:1.5px solid #E0E0E0;border-radius:6px;padding:5px 12px;cursor:pointer}
-.rns:hover{border-color:#B0BEC5;color:#37474F}
-.empty{padding:28px 16px;text-align:center;color:#90A4AE;font-size:14px}
-.past-total{margin-top:10px;font-size:12.5px;color:#90A4AE}
-.ret-card{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;width:fit-content}
-.ret-card.on{background:rgba(23,217,75,.1);color:#0e9e33}
-.ret-card.off{background:rgba(198,40,40,.08);color:#C62828}
-.ret-card .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
-.ret-ad{max-width:520px;text-align:left}
-.ret-ad h3{font-size:22px;margin-bottom:4px}
-.ret-ad .ad-kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2896FB;margin-bottom:8px}
-.ret-ad ul{list-style:none;margin:18px 0;display:grid;gap:11px}
-.ret-ad li{display:flex;align-items:flex-start;gap:11px;font-size:14.5px;line-height:1.5;color:#37474F}
-.ret-ad li svg{flex-shrink:0;margin-top:2px}
-.ret-ad .ad-price{background:#E7F3FE;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:600;color:#07223D;margin-bottom:16px;text-align:center}
-.ret-ad .ad-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#37474F;margin-bottom:18px}
-.ret-ad .ad-check input{width:17px;height:17px;margin-top:1px;accent-color:#2896FB}
-.ret-ad .ad-check a{color:#2896FB;font-weight:600;text-decoration:underline;text-underline-offset:2px}
-.ob-card{background:#fff;border:1px solid #ECEFF1;border-radius:14px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(7,34,61,.06)}
-.ob-card h2{font-weight:700;font-size:21px;color:#07223D;margin-bottom:6px}
-.ob-card .ob-sub{font-size:13.5px;color:#78909C;margin-bottom:24px}
+/* notice cards (worth, sched, connect) */
+.notice-card{background:#fff;border:1px solid var(--bd);border-left:4px solid #E8A13A;border-radius:10px;padding:16px 20px}
+.notice-card h3{margin:0 0 6px 0;font-size:15px;color:var(--tx)}
+.notice-card p{margin:0;font-size:13.5px;color:#4b5563;line-height:1.6}
+.worth-track{height:8px;border-radius:4px;background:#e5e7eb;overflow:hidden;margin-top:12px}
+.worth-fill{height:100%;border-radius:4px;background:var(--acc);transition:width .6s ease}
+.worth-count{font-size:12.5px;color:var(--mut);margin-top:6px}
+.listcheck{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.listcheck h3{margin:0;font-size:15px;color:var(--tx)}
+.listcheck p{margin:4px 0 0 0;font-size:13.5px;color:#4b5563}
+/* onboarding wizard */
+.ob-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(17,24,39,.06)}
+.ob-card h2{font-weight:700;font-size:21px;color:var(--tx);margin-bottom:6px}
+.ob-card .ob-sub{font-size:13.5px;color:var(--mut);margin-bottom:24px}
 .ob-step{margin-bottom:26px}
-.ob-step h3{font-weight:600;font-size:14px;color:#07223D;margin-bottom:8px}
-.ob-step p{font-size:14px;line-height:1.65;color:#546E7A;margin:0 0 12px 0}
-.ob-step p b{color:#07223D;font-weight:600}
+.ob-step h3{font-weight:600;font-size:14px;color:var(--tx);margin-bottom:8px}
+.ob-step p{font-size:14px;line-height:1.65;color:#4b5563;margin:0 0 12px 0}
+.ob-step p b{color:var(--tx);font-weight:600}
 .ob-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.ob-field label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#78909C;margin-bottom:6px}
-.ob-field input{width:100%;padding:11px 13px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:#07223D;background:#fff}
-.ob-field input:focus{outline:none;border-color:#2896FB}
-.ob-terms{background:#F8FAFB;border:1px solid #ECEFF1;border-radius:10px;padding:16px 18px;font-size:13px;line-height:1.6;color:#546E7A;max-height:170px;overflow-y:auto;margin-bottom:14px}
-.ob-terms a{color:#2896FB;font-weight:600;text-decoration:underline;text-underline-offset:2px}
-.ob-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#37474F;margin-bottom:16px}
-.ob-check input{width:17px;height:17px;margin-top:1px;accent-color:#2896FB}
+.ob-field label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ob-field input{width:100%;padding:11px 13px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--tx);background:#fff}
+.ob-field input:focus{outline:none;border-color:var(--acc)}
+.ob-terms{background:#f9fafb;border:1px solid var(--bd);border-radius:10px;padding:16px 18px;font-size:13px;line-height:1.6;color:#4b5563;max-height:170px;overflow-y:auto;margin-bottom:14px}
+.ob-terms a{color:var(--acc);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.ob-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#374151;margin-bottom:16px}
+.ob-check input{width:17px;height:17px;margin-top:1px;accent-color:var(--acc)}
 .ob-sign{display:grid;grid-template-columns:1fr 140px;gap:14px;margin-bottom:22px}
 .ob-done{text-align:center;padding:30px 10px}
-.ob-done .big{font-size:34px;margin-bottom:10px}
-.ob-card-step{border:1.5px solid #E0E0E0;border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.ob-card-step .cs-icon{width:36px;height:36px;border-radius:8px;background:#E7F3FE;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ob-card-step .cs-txt{flex:1;font-size:13.5px;line-height:1.5;color:#546E7A}
-.ob-card-step .cs-txt b{display:block;color:#07223D;font-size:14px;font-weight:600}
+.ob-done .big{font-size:34px;margin-bottom:10px;color:var(--grnd)}
+.ob-card-step{border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.ob-card-step .cs-icon{width:36px;height:36px;border-radius:8px;background:#e8f4fe;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ob-card-step .cs-txt{flex:1;font-size:13.5px;line-height:1.5;color:#4b5563}
+.ob-card-step .cs-txt b{display:block;color:var(--tx);font-size:14px;font-weight:600}
 .ob-card-step .cs-state{font-size:12px;font-weight:600;white-space:nowrap}
-.ob-card-step.done{border-color:#17D94B;background:rgba(23,217,75,.05)}
-.ob-card-step.done .cs-state{color:#0e9e33}
-.danger-row{margin-top:22px;text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:20px}
-.foot{margin-top:24px;font-size:12.5px;color:#B0BEC5;border-top:1px solid #F5F5F5;padding-top:14px}
-#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#07223D;color:#fff;font-size:13.5px;font-weight:500;border-radius:10px;padding:12px 20px;box-shadow:0 12px 32px rgba(7,34,61,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.hide{display:none !important}
-.spin{width:22px;height:22px;border:3px solid #E7F3FE;border-top-color:#2896FB;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
-@keyframes sp{to{transform:rotate(360deg)}}
-body.billing-close>*:not(#billingCloser){display:none!important}
-body.boot-loading #statusRow, body.boot-loading #stats,
-body.boot-loading #apptSec, body.boot-loading #pastSec,
-body.boot-loading #connectBanner, body.boot-loading #worthNotice,
-body.boot-loading .actions,
-body.boot-loading .danger-row, body.boot-loading #cooldown{display:none!important}
-#bootSpinner{padding:48px 0;text-align:center}
-.notice-card{background:#fff;border:1px solid #ECEFF1;border-left:4px solid #E8A13A;border-radius:12px;padding:16px 20px}
-.notice-card h3{margin:0 0 6px 0}
-.notice-card p{margin:0;font-size:13.5px;color:#546E7A;line-height:1.6}
-#bootSpinner p{font-size:13.5px;color:#90A4AE}
-#billingCloser{margin-top:26px}
-.worth-track{height:8px;border-radius:4px;background:#E3EBF3;overflow:hidden;margin-top:12px}
-.worth-fill{height:100%;border-radius:4px;background:#2896FB;transition:width .6s ease}
-.worth-count{font-size:12.5px;color:#78909C;margin-top:6px}
-.feed{border:1px solid #ECEFF1;border-radius:10px;overflow:hidden}
-.feed div{display:flex;justify-content:space-between;gap:14px;padding:10px 14px;border-bottom:1px solid #F5F5F5;font-size:13.5px}
-.feed div:last-child{border-bottom:none}
-.feed .fw{color:#90A4AE;font-size:12.5px;white-space:nowrap}
-#settingsLink{font-size:13px}
+.ob-card-step.done{border-color:var(--grn);background:rgba(23,217,75,.05)}
+.ob-card-step.done .cs-state{color:var(--grnd)}
 .ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
-.ob-progress span{flex:1;height:4px;border-radius:2px;background:#E3EBF3}
-.ob-progress span.on{background:#2896FB}
+.ob-progress span{flex:1;height:4px;border-radius:2px;background:#e5e7eb}
+.ob-progress span.on{background:var(--acc)}
 .ob-walk{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:18px}
 .ob-walk .spacer{flex:1}
-.ob-setup{margin:14px 0 0 0;padding:0;list-style:none;color:#5B7085}
+.ob-setup{margin:14px 0 0 0;padding:0;list-style:none;color:#4b5563}
 .ob-setup li{margin:7px 0;padding-left:26px;position:relative}
-.ob-setup li:before{content:'';position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:50%;background:#E3EBF3}
-.ob-setup li b{color:#07223D}
-
-@media(max-width:999px){.stats{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:640px){
-.stats{grid-template-columns:repeat(2,1fr)}
-body{padding:20px 14px}
-h1{font-size:20px}
-.stat .num{font-size:26px}
-.btn{padding:10px 16px;font-size:13.5px}
-.danger-row{flex-wrap:wrap;justify-content:flex-start;gap:14px}
-.danger-row .contact{font-size:12.5px}
+.ob-setup li:before{content:'';position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:50%;background:#e5e7eb}
+.ob-setup li b{color:var(--tx)}
+.ret-ad{max-width:520px;text-align:left}
+.ret-ad h3{font-size:22px;margin-bottom:4px}
+.ret-ad .ad-kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.ret-ad ul{list-style:none;margin:18px 0;display:grid;gap:11px}
+.ret-ad li{display:flex;align-items:flex-start;gap:11px;font-size:14.5px;line-height:1.5;color:#374151}
+.ret-ad li svg{flex-shrink:0;margin-top:2px}
+.ret-ad .ad-price{background:#e8f4fe;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:600;color:var(--tx);margin-bottom:16px;text-align:center}
+.ret-ad .ad-check{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#374151;margin-bottom:18px}
+.ret-ad .ad-check input{width:17px;height:17px;margin-top:1px;accent-color:var(--acc)}
+.ret-ad .ad-check a{color:var(--acc);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.foot{margin-top:24px;font-size:12.5px;color:#9ca3af;border-top:1px solid var(--bd);padding-top:14px}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#111827;color:#fff;font-size:13.5px;font-weight:500;border-radius:8px;padding:12px 20px;box-shadow:0 12px 32px rgba(17,24,39,.35);opacity:0;pointer-events:none;transition:all .25s;max-width:86%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hide{display:none !important}
+.spin{width:22px;height:22px;border:3px solid #e8f4fe;border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+body.billing-close>*:not(#billingCloser):not(.bar):not(.wrap){display:none!important}
+body.boot-loading #heroBand, body.boot-loading #spine, body.boot-loading #tabsCard,
+body.boot-loading #actRow, body.boot-loading #connectBanner, body.boot-loading #worthNotice,
+body.boot-loading #schedCard, body.boot-loading #listCheck{display:none!important}
+#bootSpinner{padding:48px 0;text-align:center}
+#bootSpinner p{font-size:13.5px;color:var(--mut)}
+#billingCloser{margin:0 auto;max-width:640px}
+@media(max-width:760px){
+.nums{flex-wrap:wrap;border-left:none;padding-left:0}
+.hnum{flex:1 1 30%}
+.hero .state{min-width:100%}
+.step{font-size:11px}
+body{padding:0}
+.wrap{padding:0 16px}
+.bar{padding:12px 16px}
 }
 </style></head><body>
 
-<div class="lockup">
-  <svg class="mark" viewBox="86 216 226 247"><path fill="#07223D" fill-rule="evenodd" d="M 91.178 226.685 C 91.381 227.739, 93.189 228.800, 96.007 229.519 C 102.422 231.155, 104.735 232.613, 106.740 236.280 C 108.387 239.294, 108.500 245.994, 108.500 341.044 C 108.500 437.233, 108.405 442.733, 106.696 445.342 C 104.359 448.908, 99.854 451.608, 94.926 452.396 C 92.398 452.800, 91 453.554, 91 454.512 C 91 455.801, 95.679 456, 126 456 C 155.476 456, 161 455.777, 161 454.588 C 161 453.714, 159.437 452.912, 156.898 452.483 C 150.864 451.463, 147.202 447.644, 145.995 441.114 C 145.448 438.151, 145 421.435, 145 403.966 L 145 372.205 171.186 352.436 C 185.588 341.563, 197.850 332.685, 198.436 332.707 C 199.021 332.729, 210.750 341.184, 224.500 351.495 C 238.250 361.806, 250.063 370.461, 250.750 370.728 C 252.673 371.475, 252.539 440.775, 250.606 445.401 C 248.894 449.498, 245.686 451.858, 240.750 452.652 C 238.532 453.009, 237 453.816, 237 454.628 C 237 455.764, 242.852 456, 271 456 C 300.361 456, 305 455.798, 305 454.519 C 305 453.705, 303.762 452.764, 302.250 452.429 C 293.343 450.457, 291.118 448.963, 288.949 443.498 C 288.055 441.245, 287.786 415.728, 287.867 340.748 C 287.958 255.964, 288.192 240.475, 289.427 237.520 C 291.098 233.520, 295.839 230.248, 301.250 229.360 C 304.029 228.904, 305 228.260, 305 226.872 C 305 225.078, 303.526 225, 269.500 225 C 234.667 225, 234 225.038, 234 227 C 234 228.510, 234.674 229.005, 236.750 229.022 C 238.262 229.034, 241.432 229.921, 243.793 230.992 C 247.142 232.512, 248.518 233.918, 250.052 237.384 C 251.940 241.652, 252.007 244.026, 251.758 298.024 L 251.500 354.222 234 340.956 C 224.375 333.660, 212.612 324.610, 207.861 320.845 C 203.110 317.080, 198.933 314, 198.580 314 C 198.226 314, 186.364 322.994, 172.219 333.987 C 158.073 344.981, 146.146 353.981, 145.713 353.987 C 145.280 353.994, 145.056 328.688, 145.215 297.750 C 145.471 247.812, 145.690 241.088, 147.168 237.828 C 149.141 233.477, 152.499 231.071, 158.849 229.461 C 161.717 228.734, 163.624 227.652, 163.823 226.641 C 164.118 225.144, 160.937 225, 127.500 225 C 93.676 225, 90.878 225.130, 91.178 226.685 "/><path fill="#2896FB" fill-rule="evenodd" d="M 179 380 L 195 380 L 195 396 L 179 396 Z M 202 380 L 218 380 L 218 396 L 202 396 Z M 179 403 L 195 403 L 195 419 L 179 419 Z M 202 403 L 218 403 L 218 419 L 202 419 Z"/></svg>
+<div class="bar">
+  <svg class="mark" viewBox="86 216 226 247"><path fill="#111827" fill-rule="evenodd" d="M 91.178 226.685 C 91.381 227.739, 93.189 228.800, 96.007 229.519 C 102.422 231.155, 104.735 232.613, 106.740 236.280 C 108.387 239.294, 108.500 245.994, 108.500 341.044 C 108.500 437.233, 108.405 442.733, 106.696 445.342 C 104.359 448.908, 99.854 451.608, 94.926 452.396 C 92.398 452.800, 91 453.554, 91 454.512 C 91 455.801, 95.679 456, 126 456 C 155.476 456, 161 455.777, 161 454.588 C 161 453.714, 159.437 452.912, 156.898 452.483 C 150.864 451.463, 147.202 447.644, 145.995 441.114 C 145.448 438.151, 145 421.435, 145 403.966 L 145 372.205 171.186 352.436 C 185.588 341.563, 197.850 332.685, 198.436 332.707 C 199.021 332.729, 210.750 341.184, 224.500 351.495 C 238.250 361.806, 250.063 370.461, 250.750 370.728 C 252.673 371.475, 252.539 440.775, 250.606 445.401 C 248.894 449.498, 245.686 451.858, 240.750 452.652 C 238.532 453.009, 237 453.816, 237 454.628 C 237 455.764, 242.852 456, 271 456 C 300.361 456, 305 455.798, 305 454.519 C 305 453.705, 303.762 452.764, 302.250 452.429 C 293.343 450.457, 291.118 448.963, 288.949 443.498 C 288.055 441.245, 287.786 415.728, 287.867 340.748 C 287.958 255.964, 288.192 240.475, 289.427 237.520 C 291.098 233.520, 295.839 230.248, 301.250 229.360 C 304.029 228.904, 305 228.260, 305 226.872 C 305 225.078, 303.526 225, 269.500 225 C 234.667 225, 234 225.038, 234 227 C 234 228.510, 234.674 229.005, 236.750 229.022 C 238.262 229.034, 241.432 229.921, 243.793 230.992 C 247.142 232.512, 248.518 233.918, 250.052 237.384 C 251.940 241.652, 252.007 244.026, 251.758 298.024 L 251.500 354.222 234 340.956 C 224.375 333.660, 212.612 324.610, 207.861 320.845 C 203.110 317.080, 198.933 314, 198.580 314 C 198.226 314, 186.364 322.994, 172.219 333.987 C 158.073 344.981, 146.146 353.981, 145.713 353.987 C 145.280 353.994, 145.056 328.688, 145.215 297.750 C 145.471 247.812, 145.690 241.088, 147.168 237.828 C 149.141 233.477, 152.499 231.071, 158.849 229.461 C 161.717 228.734, 163.624 227.652, 163.823 226.641 C 164.118 225.144, 160.937 225, 127.500 225 C 93.676 225, 90.878 225.130, 91.178 226.685 "/><path fill="#188bf6" fill-rule="evenodd" d="M 179 380 L 195 380 L 195 396 L 179 396 Z M 202 380 L 218 380 L 218 396 L 202 396 Z M 179 403 L 195 403 L 195 419 L 179 419 Z M 202 403 L 218 403 L 218 419 L 202 419 Z"/></svg>
   <div class="divider"></div>
   <span class="bname">Hayes Systems &middot; Lead Reactivation</span>
+  <div class="spacer"></div>
+  <span class="barlink" id="settingsLink">Settings</span>
+  <span class="barlink" id="helpLink">Help / FAQ</span>
+  <span class="barlink" id="contactLink">Contact us</span>
 </div>
+
+<div class="wrap">
 
 <div class="ob-card hide" id="billingCloser">
     <h2 id="bcTitle">Payment confirmed</h2>
-    <p id="bcBody" style="font-size:14px;color:#546E7A">Your card is saved.
+    <p id="bcBody" style="font-size:14px;color:#4b5563">Your card is saved.
     Close this tab and return to the Hayes Systems app in your GHL
     dashboard to finish setting up.</p>
   </div>
 
-<h1>Your campaign</h1>
 <div id="bootSpinner" class="hide"><div class="spin"></div><p>Loading</p></div>
 <div id="obGate" class="hide">
   <div class="ob-card" id="obWelcome">
@@ -261,7 +293,7 @@ h1{font-size:20px}
           <input id="obDate" value="Oct 26, 2026" readonly></div>
       </div>
       <div class="ob-card-step" id="obCardStep" style="display:none">
-        <div class="cs-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="1" y="4" width="18" height="12" rx="2.5" fill="none" stroke="#07223D" stroke-width="1.6"/><path d="M1 8h18" stroke="#07223D" stroke-width="1.6"/><rect x="13" y="10.5" width="4" height="2.4" rx="1" fill="#07223D"/></svg></div>
+        <div class="cs-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="1" y="4" width="18" height="12" rx="2.5" fill="none" stroke="#111827" stroke-width="1.6"/><path d="M1 8h18" stroke="#111827" stroke-width="1.6"/><rect x="13" y="10.5" width="4" height="2.4" rx="1" fill="#111827"/></svg></div>
         <div class="cs-txt"><b>Payment card</b>Charged only when appointments land on your calendar.</div>
         <span class="cs-state" id="obCardState"></span>
       </div>
@@ -272,13 +304,13 @@ h1{font-size:20px}
   <div class="ob-card ob-done hide" id="obDone">
     <div class="big">&#10003;</div>
     <h2 style="margin-bottom:8px">You are all set</h2>
-    <div id="noticeEmailRow" class="hide" style="margin-top:16px;padding-top:14px;border-top:1px solid #E3EBF3">
-      <p style="font-size:13px;color:#546E7A;margin:0 0 8px 0">Service notices
+    <div id="noticeEmailRow" class="hide" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+      <p style="font-size:13px;color:#4b5563;margin:0 0 8px 0">Service notices
       (like when your next campaign window opens) go to:</p>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <b id="noticeEmail" style="font-size:13.5px;color:#07223D"></b>
+        <b id="noticeEmail" style="font-size:13.5px;color:var(--tx)"></b>
         <input id="noticeEmailEdit" class="hide" placeholder="new@email.com"
-               style="flex:1;min-width:170px;padding:7px 10px;border:1px solid #C9D6E2;border-radius:7px;font-size:13px">
+               style="flex:1;min-width:170px;padding:7px 10px;border:1px solid var(--bd);border-radius:7px;font-size:13px">
         <button class="btn btn-ghost" id="noticeEmailBtn" style="padding:7px 12px;font-size:12.5px">Change</button>
       </div>
     </div>
@@ -296,91 +328,94 @@ h1{font-size:20px}
   </div>
 
 <div class="sec" id="schedCard" style="display:none;margin-bottom:18px">
-    <div class="notice-card" style="border-left-color:#2896FB">
+    <div class="notice-card" style="border-left-color:#188bf6">
       <h3>Where do appointments live at your business?</h3>
       <p id="schedBody"></p>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" id="schedGhl">Our GoHighLevel calendars</button>
-        <button class="btn" id="schedCal">Calendly</button>
+        <button class="btn btn-primary" id="schedGhl">Our GoHighLevel calendars</button>
+        <button class="btn btn-ghost" id="schedCal">Calendly</button>
       </div>
     </div>
   </div>
 
-<div class="status-row" id="statusRow">
-  <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
-  <div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
-  <span class="muted" id="pillSub">Week 3 of 4 &middot; Ends Oct 30 &middot; Updated Oct 18</span>
-</div>
-
-<div class="actions">
-  <div class="notice-card" id="connectBanner" style="display:none;border-left-color:#2896FB;margin-bottom:14px">
+<div class="notice-card hide" id="connectBanner" style="border-left-color:#188bf6;margin-bottom:18px">
     <h3>Finish setting up your account</h3>
     <p style="margin:0 0 12px 0">One more step: connect your location so we can read your CRM and count your workable leads. Takes one click.</p>
     <button class="btn btn-primary" id="connectLocBtn">Connect your location</button>
   </div>
-  <button class="btn btn-primary" id="reqBtn" disabled>Request a new campaign</button>
-  <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
+
+<div class="hero" id="heroBand">
+  <div class="state" id="statusRow">
+    <div class="pillrow">
+      <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
+      <div class="ret-card off" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer off</span></div>
+    </div>
+    <h1 id="stateH1">Campaign 3</h1>
+    <div class="sub" id="pillSub">Week 3 of 4 &middot; Ends Oct 30 &middot; Updated Oct 18</div>
+  </div>
+  <div class="nums" id="stats">
+    <div class="hnum"><div class="num" id="numW">1,847</div><div class="lbl">Workable</div></div>
+    <div class="hnum"><div class="num" id="numLp">65%</div><div class="lbl">Worked</div></div>
+    <div class="hnum"><div class="num" id="numE">1,204</div><div class="lbl">Emails</div></div>
+    <div class="hnum"><div class="num good" id="numA">23</div><div class="lbl">Appointments</div></div>
+    <div class="hnum"><div class="num" id="numC">$1,380</div><div class="lbl">Cost to date</div></div>
+  </div>
 </div>
 
-<div class="sec" id="listCheck" style="display:none;margin-bottom:18px">
-  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<div class="spine" id="spine">
+  <div class="step done" id="sp1"><span class="d">1</span>List checked<span class="line"></span></div>
+  <div class="step done" id="sp2"><span class="d">2</span>Launched<span class="line"></span></div>
+  <div class="step now" id="sp3"><span class="d">3</span>Outreach underway<span class="line"></span></div>
+  <div class="step" id="sp4"><span class="d">4</span>Campaign completed</div>
+</div>
+
+<div class="listcheck" id="listCheck" style="display:none">
     <div style="flex:1;min-width:220px">
-      <h3 style="margin:0;font-size:15px">Your list</h3>
-      <p id="listCheckBody" style="margin:4px 0 0 0;font-size:13.5px;color:#546E7A"></p>
+      <h3>Your list</h3>
+      <p id="listCheckBody"></p>
     </div>
     <button class="btn btn-ghost" id="listCheckBtn">Check again</button>
   </div>
-</div>
 
-<div class="stats" id="stats">
-  <div class="stat"><div class="num">1,847</div><div class="lbl">Workable leads</div></div>
-  <div class="stat"><div class="num">65%</div><div class="lbl">List worked</div></div>
-  <div class="stat"><div class="num">1,204</div><div class="lbl">Emails sent</div></div>
-  <div class="stat"><div class="num">23</div><div class="lbl">Appointments</div></div>
-  <div class="stat"><div class="num">1.9%</div><div class="lbl">Conversion</div></div>
-  <div class="stat"><div class="num">$1,380</div><div class="lbl">Cost to date</div></div>
-</div>
-<div class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</div>
-<div class="cooldown" id="retainerLine" style="margin-top:6px">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</div>
-
-<div class="sec hide" id="feedSec">
-    <h2>Recent activity</h2>
-    <div class="feed" id="feedBody"></div>
+<div id="tabsCard">
+  <div class="tabs">
+    <button class="tab on" data-pane="apptSec">Appointments <span class="ct" id="apptCt">0</span></button>
+    <button class="tab" data-pane="feedSec">Recent activity</button>
+    <button class="tab" data-pane="pastSec">Past campaigns</button>
   </div>
-
-<div class="sec" id="apptSec">
-  <h2>Appointments</h2>
-  <div class="appt-wrap">
-  <div class="appt-scroll">
-  <table>
-    <thead><tr><th>Lead</th><th>When</th><th style="width:140px">Status</th><th style="width:150px"></th></tr></thead>
-    <tbody id="apptBody"></tbody>
-  </table>
+  <div class="pane on" id="apptSec">
+    <div class="appt-scroll">
+    <table>
+      <thead><tr><th>Lead</th><th>When</th><th style="width:160px">Status</th><th style="width:160px"></th></tr></thead>
+      <tbody id="apptBody"></tbody>
+    </table>
+    </div>
   </div>
+  <div class="pane" id="feedSec">
+    <div id="feedBody"></div>
+  </div>
+  <div class="pane" id="pastSec">
+    <div class="appt-scroll">
+    <table>
+      <thead><tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr></thead>
+      <tbody id="pastBody"></tbody>
+    </table>
+    </div>
   </div>
 </div>
 
-<div class="sec" id="pastSec">
-  <h2>Past campaigns</h2>
-  <div class="appt-wrap">
-  <div class="appt-scroll">
-  <table>
-    <thead><tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr></thead>
-    <tbody id="pastBody"></tbody>
-  </table>
-  </div>
-  </div>
-</div>
-
-<div class="danger-row">
-  <span class="contact" id="settingsLink">Settings</span>
-      <span class="contact" id="helpLink">Help / FAQ</span>
-  <span class="contact" id="contactLink">Contact us</span>
+<div class="actrow" id="actRow">
+  <button class="btn btn-primary" id="reqBtn" disabled>Request a new campaign</button>
+  <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
   <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
   <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
+  <span class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</span>
+  <span class="cooldown" id="retainerLine">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</span>
 </div>
 
 <div class="foot">Hayes Systems &middot; hayessystems.com</div>
+
+</div>
 
 <div class="overlay" id="confirmOverlay">
   <div class="dialog">
@@ -452,20 +487,20 @@ h1{font-size:20px}
   <div class="dialog ret-ad">
     <div class="ad-kicker">Retainer service</div>
     <h3>Work your cold leads, automatically</h3>
-    <p style="font-size:14px;line-height:1.6;color:#546E7A;margin:12px 0 0">
+    <p style="font-size:14px;line-height:1.6;color:#4b5563;margin:12px 0 0">
       Retainer service is designed for operations that regularly produce a
       large volume of leads and would benefit from the continual working
       of leads that go inactive and age into our 90-day threshold. Please
       note that leads are only contacted once every 180 days and retainers
       do not bypass this limit.</p>
     <ul>
-      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Pay only $40 per appointment</li>
-      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         No waiting period between campaigns</li>
-      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Campaigns run continually</li>
-      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17D94B" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17D94B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <li><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         No new setup</li>
     </ul>
     <div class="ad-price">$250 per month + $40 per appointment</div>
@@ -484,11 +519,11 @@ h1{font-size:20px}
   <div class="dialog">
     <h3>Account settings</h3>
     <div class="field"><label>Email for app notices</label>
-      <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+      <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Business name</label>
-      <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+      <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Phone number prospects should call</label>
-      <input id="setPhone" class="set-in" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+      <input id="setPhone" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
@@ -516,38 +551,93 @@ h1{font-size:20px}
   window.__BILLING_DONE = true;
 })();
 
-// State machine. States: running | paused | cancelled | none.
-// ?state= sets the initial state for review; every in-page action runs
-// through the same apply() so what you click is what ships.
+// State machine. States: running | paused | cancelled | none | completed
+// | retainer | onboarding. 'completed' is the post-campaign rest state
+// (the server sends none + past campaigns; applyFromData maps it) - the
+// request path and cooldown line live there. ?state= sets the initial
+// state for review; every in-page action runs through the same apply()
+// so what you click is what ships.
 var S = 'running';
 function $(id){return document.getElementById(id);}
 function pill(cls, txt, sub){
   var p = $('pill'); p.className = 'pill ' + cls; $('pillTxt').textContent = txt; $('pillSub').textContent = sub;
 }
+// Campaign spine (10/29 Mission Control): nowStep 1-3 = that step is
+// current, 4 = all done, 0 = reset. Steps before the current one read
+// done. 'Connected' is deliberately absent - the credential survives
+// between campaigns, so connection is a first-run wizard concern only.
+function setSpine(nowStep){
+  ['sp1','sp2','sp3','sp4'].forEach(function(id, i){
+    var el = $(id); if (!el) return;
+    var n = i + 1;
+    el.className = 'step' + (nowStep === 4 || n < nowStep ? ' done' : n === nowStep ? ' now' : '');
+  });
+}
+function syncTabs(){
+  // a pane's tab hides with the pane; the active tab must point at a
+  // visible pane (fall back to the first visible one)
+  var firstVisible = null;
+  document.querySelectorAll('#tabsCard .tab').forEach(function(tb){
+    var pane = $(tb.getAttribute('data-pane'));
+    var hidden = !pane || pane.classList.contains('hide');
+    tb.classList.toggle('hide', hidden);
+    if (hidden) tb.classList.remove('on');
+    if (!hidden && !firstVisible) firstVisible = tb;
+  });
+  var onTab = document.querySelector('#tabsCard .tab.on');
+  if (!onTab && firstVisible) { firstVisible.classList.add('on'); }
+  var active = document.querySelector('#tabsCard .tab.on');
+  document.querySelectorAll('#tabsCard .pane').forEach(function(pn){
+    pn.classList.toggle('on', !!active && pn === $(active.getAttribute('data-pane')));
+  });
+}
+document.querySelectorAll('#tabsCard .tab').forEach(function(tb){
+  tb.addEventListener('click', function(){
+    document.querySelectorAll('#tabsCard .tab').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('#tabsCard .pane').forEach(function(x){x.classList.remove('on')});
+    tb.classList.add('on');
+    $(tb.getAttribute('data-pane')).classList.add('on');
+  });
+});
 function apply(s, until){
   S = s;
-  var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer');
-  $('stats').classList.remove('hide');
+  var ob = (s === 'onboarding');
+  var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer' || s === 'completed');
+  // hero always visible except onboarding (none shows the pre-campaign
+  // hero: grey pill, lead-reactivation title, zeroed numbers)
+  $('heroBand').classList.toggle('hide', ob);
+  $('spine').classList.toggle('hide', !(s === 'running' || s === 'paused' || s === 'cancelled' || s === 'completed'));
+  $('tabsCard').classList.toggle('hide', ob);
   if (!has) { setStats(0, 0, 0, 0, 0, 0); }
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
-  $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
-  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'retainer');
+  syncTabs();
+  $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
+  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
   $('cancelRetBtn').classList.toggle('hide', s !== 'retainer');
-  $('statusRow').classList.toggle('hide', s === 'none');
+  $('reqBtn').classList.toggle('hide', s === 'retainer');
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
   req.textContent = 'Request a new campaign';
-  req.disabled = (s !== 'none');
-  $('reqBtn').classList.toggle('hide', s === 'retainer');
+  req.disabled = !(s === 'none' || s === 'completed');
   var on = (s === 'retainer');
   $('retCard').className = 'ret-card ' + (on ? 'on' : 'off');
   $('retCardTxt').textContent = on ? 'Retainer on' : 'Retainer off';
-  $('retCard').classList.toggle('hide', s === 'onboarding');
+  $('retCard').classList.toggle('hide', ob);
+  // hero title: campaign numbering follows real history when present
+  var n = (PAGE && PAGE.pastN) || 0;
+  if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = n ? 'Campaign ' + (n + 1) : 'Your campaign'; setSpine(3); }
+  if (s === 'completed') { $('stateH1').textContent = n ? 'Campaign ' + n : 'Campaign'; setSpine(4); }
+  if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
+  if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); }
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Ends Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
+  if (s === 'completed') {
+    var lp = (PAGE && PAGE.lastPast) || null;
+    pill('donepill', 'Completed', lp ? lp.period + ' \u00b7 ' + fmtNum(lp.appointments) + ' appointments' : 'Your campaign has finished');
+  }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected \u00b7 ready when you are'); }
   if (s === 'retainer') { pill('run', 'Active', ''); }
 }
@@ -591,15 +681,16 @@ function fmtWhen(iso){ var d = new Date(iso); if (isNaN(d)) return iso;
   return d.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
     + ' \u00b7 ' + d.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}); }
 function setStats(w, lp, e, a, cv, cost){
-  var nums = document.querySelectorAll('#stats .num');
-  if (nums.length < 6) return;
-  nums[0].textContent = fmtNum(w); nums[1].textContent = (lp || 0) + '%';
-  nums[2].textContent = fmtNum(e); nums[3].textContent = fmtNum(a);
-  nums[4].textContent = (cv || 0) + '%'; nums[5].textContent = fmtMoney(cost);
+  // five hero metrics (conversion folded away 10/29: appointments and
+  // emails carry the story; cv stays in the signature so callers hold)
+  $('numW').textContent = fmtNum(w); $('numLp').textContent = (lp || 0) + '%';
+  $('numE').textContent = fmtNum(e); $('numA').textContent = fmtNum(a);
+  $('numC').textContent = fmtMoney(cost);
 }
 
 // ── Appointments + past campaigns tables (demo rows first, real rows
-// replace them once page-data lands) ───────────────────────────────────
+// replace them once page-data lands). innerHTML is safe here: every
+// interpolated value passes through esc() ─────────────────────────────
 var DEMO_APPTS = [
   {name: 'R. Delgado',   when: 'Fri Oct 24 \u00b7 9:45 AM', status: 'booked',   reportable: false, ref: 'demo1'},
   {name: 'M. Okafor',    when: 'Mon Oct 27 \u00b7 11:15 AM', status: 'booked',  reportable: false, ref: 'demo2'},
@@ -631,6 +722,7 @@ function bindNoshow(){
 }
 function renderAppts(rows){
   var tb = $('apptBody'); if (!tb) return;
+  var ct = $('apptCt'); if (ct) ct.textContent = fmtNum(rows.length);
   if (!rows.length) {
     tb.innerHTML = '<tr><td colspan="4" class="empty">No appointments yet. Booked calls land here.</td></tr>';
     return;
@@ -648,6 +740,8 @@ function renderAppts(rows){
 }
 function renderPast(rows){
   var tb = $('pastBody'); if (!tb) return;
+  PAGE.pastN = rows.length;
+  PAGE.lastPast = rows.length ? rows[rows.length - 1] : null;
   if (!rows.length) {
     tb.innerHTML = '<tr><td colspan="4" class="empty">Your campaign history appears here.</td></tr>';
     return;
@@ -657,6 +751,10 @@ function renderPast(rows){
       + '</td><td>' + fmtNum(p.appointments) + '</td><td>' + fmtMoney(p.cost) + '</td></tr>';
   }).join('');
 }
+// PAGE state lives ABOVE the demo renders: renderPast stamps PAGE.pastN
+// at load, so declaring it lower (as history had it) threw on the
+// hoisted-undefined and killed every binding after it (found live 10/29)
+var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false, needsConnect: false, pastN: 0, lastPast: null};
 renderAppts(DEMO_APPTS);
 renderPast(DEMO_PAST);
 
@@ -752,7 +850,7 @@ $('confirmNoshow').addEventListener('click', function(){
   flip(false);
 });
 
-// Request campaign (enabled only with no active campaign)
+// Request campaign (enabled with no live campaign: none or completed)
 $('connectLocBtn').addEventListener('click', function(){
   this.disabled = true;
   var btn = this;
@@ -854,40 +952,11 @@ $('settingsSave').addEventListener('click', function(){
 $('helpLink').addEventListener('click', function(){ window.open('https://www.hayessystems.com/help.html', '_blank'); });
 $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@hayessystems.com', '_blank'); });
 
-// INSTALL-TIME QUALIFICATION POPUP (Matt 10/25): first-run pass/fail on
-// workable leads. ?install=pass|fail|checking demos each; state=none
-// shows it by default; the live page reads the install_check evidence
-// from page-data (first_run only).
-// RETIRED 10/28 (Matt: the verdict lives on the page, not a popup)
-function _installHTML_retired(mode, workable, total){
-  if (mode === 'checking') return '<div class="spin"></div><h3>Reading your CRM</h3>'
-    + '<p style="margin-bottom:0">Counting your workable leads. This page'
-    + ' updates when the count is ready.</p>';
-  if (mode === 'pass') return '<h3>Your list qualifies</h3>'
-    + '<p>' + fmtNum(workable) + ' workable leads after hygiene, out of ' + fmtNum(total) + ' total.</p>'
-    + '<div class="dialog-actions" style="justify-content:center;margin-bottom:0">'
-    + '<button class="btn btn-primary" onclick="closeInstall()">Request a new campaign</button></div>';
-  return '<h3>Not enough workable leads yet</h3>'
-    + '<p>A campaign needs at least 5,000 workable leads. Your list has '
-    + fmtNum(workable) + ' workable of ' + fmtNum(total) + ' total. Duplicates,'
-    + ' unreachable entries, and opted-out contacts are removed before counting.</p>'
-    + '<div class="dialog-actions" style="justify-content:center;margin-bottom:0">'
-    + '<button class="btn btn-ghost" onclick="closeInstall()">Got it</button></div>';
-}
-function showInstall(mode, workable, total){
-  document.getElementById('installBody').innerHTML = installHTML(mode, workable, total);
-  setTimeout(function(){ open_('installOverlay'); }, 400);
-}
-function closeInstall(){ close_('installOverlay'); }
-(function(){
-  // 10/28: ?install= demos retired with the popup
-})();
-
 // IDENTITY SEAM BOOTSTRAP + REAL DATA BOOT: inside the GHL frame the URL
 // carries the location's id; exchange it once for a signed session token,
 // then pull page-data + appointments and populate every state from real
 // data. Demo mode (no locationId param) skips all of this silently.
-var PAGE = {token: null, name: null, data: null, live: false, worth: null, cooldownClosed: false, needsConnect: false};
+// (PAGE itself is declared above the demo renders - see that note.)
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
   return api('/api/ghl/page-data').then(function(d){
@@ -900,15 +969,16 @@ function loadPageData(){
         return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
                 reportable: !!x.reportable, ref: x.ref};
       }));
-      if ((a.appointments || []).length) $('apptSec').classList.remove('hide');
+      if ((a.appointments || []).length) { $('apptSec').classList.remove('hide'); syncTabs(); }
     });
     return api('/api/ghl/activity').then(function(f){
       if (!f || !f.ok || !(f.activity || []).length) return;
       $('feedBody').innerHTML = f.activity.map(function(e){
-        return '<div><span>' + esc(e.text) + '</span>'
+        return '<div class="feedrow"><span>' + esc(e.text) + '</span>'
           + '<span class="fw">' + esc(fmtDay(e.when)) + '</span></div>';
       }).join('');
       $('feedSec').classList.remove('hide');
+      syncTabs();
     });
   }).catch(function(){});
 }
@@ -969,8 +1039,8 @@ function _schedAnswer(v){
 $('schedGhl').addEventListener('click', function(){ _schedAnswer('ghl'); });
 $('schedCal').addEventListener('click', function(){ _schedAnswer('calendly'); });
 // LIST CHECK (10/29): the client's list count with a manual re-check.
-// Hidden while a campaign runs (the stats card owns workable then -
-// one number, one home).
+// Hidden while a campaign runs (the hero's workable number owns the
+// count then - one number, one home).
 function _renderListCheck(){
   var el = $('listCheck');
   if (!el) return;
@@ -1037,6 +1107,9 @@ function applyFromData(d){
   // a live campaign inside its pause window shows the paused state;
   // the server keeps state 'running' (the campaign stays fully alive)
   if (st === 'running' && c && c.paused) st = 'paused';
+  // none + history = the completed rest state: blue pill, spine done,
+  // request + cooldown live (10/29 Mission Control)
+  if (st === 'none' && (d.past_campaigns || []).length) st = 'completed';
   var _wasOb = (S === 'onboarding');
   apply(st, c && c.paused_until);
   // THE GATE IS DATA-DRIVEN (10/28 live bug): page-data saying
@@ -1059,7 +1132,7 @@ function applyFromData(d){
     (PAGE.needsConnect && S !== 'onboarding') ? '' : 'none';
   if (typeof _updateConnectStep === 'function') { _updateConnectStep(); }
   if (PAGE.needsConnect) { $('reqBtn').disabled = true; }
-  else if (st === 'none') {
+  else if (st === 'none' || st === 'completed') {
     var rq = $('reqBtn');
     if (PAGE.cooldownClosed
         || (PAGE.worth && PAGE.worth.ok !== false
@@ -1097,12 +1170,20 @@ function applyFromData(d){
     $('cooldown').classList.add('hide');
   }
   renderPast(d.past_campaigns || []);
-  // a client with history keeps their past-campaign table (and the
+  // re-run the completed sub-line with the real last campaign now that
+  // renderPast stamped PAGE.lastPast (apply ran before renderPast)
+  if (st === 'completed' && PAGE.lastPast) {
+    $('stateH1').textContent = 'Campaign ' + PAGE.pastN;
+    pill('donepill', 'Completed', PAGE.lastPast.period + ' \u00b7 '
+      + fmtNum(PAGE.lastPast.appointments) + ' appointments');
+  }
+  // a client with history keeps their past-campaign tab (and the
   // retainer offer) visible even with no live campaign - apply('none')
   // hides them for the fresh-install screen, real data brings them back
   if ((d.past_campaigns || []).length) {
     $('pastSec').classList.remove('hide');
     $('retainerLine').classList.remove('hide');
+    syncTabs();
   }
 }
 (function(){
@@ -1142,8 +1223,7 @@ function applyOb(s){
   if (on) {
     $('obWelcome').classList.remove('hide');
     $('obForm').classList.add('hide');
-    ['statusRow','stats','pauseBtn','cooldown','retainerLine',
-     'apptSec','pastSec'].forEach(function(id){
+    ['heroBand','spine','tabsCard','actRow','listCheck'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
     $('cancelBtn').classList.add('hide');
@@ -1173,7 +1253,7 @@ function applyOb(s){
     if (_cardOk) {
       step.classList.add('done');
       state.textContent = 'On file';
-      state.style.color = '#0e9e33';
+      state.style.color = '#15803d';
       return true;
     }
     state.textContent = 'Needed';
@@ -1329,7 +1409,7 @@ function applyOb(s){
   }
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden && PAGE.needsConnect && !_connectDone
-        && S === 'onboarding') { loadPageData().then(function(){
+      && S === 'onboarding') { loadPageData().then(function(){
           if (!PAGE.needsConnect) {
             _connectDone = true; _updateConnectStep();
             toast('Location connected.');
@@ -1387,7 +1467,8 @@ function applyOb(s){
   });
 })();
 
-// Initial state for review: ?state=running|paused|cancelled|none
+// Initial state for review: ?state=running|paused|cancelled|none|
+// completed|onboarding|retainer
 var q = new URLSearchParams(location.search).get('state') || 'running';
 if (!window.__BILLING_DONE) {
 if (window.__LIVE_BOOT) {
@@ -1404,7 +1485,7 @@ if (window.__LIVE_BOOT) {
     }
   }, 7000);
 } else {
-var init = (['running','paused','cancelled','none','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
+var init = (['running','paused','cancelled','none','completed','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
 if (init === 'onboarding' && !location.search.includes('locationId=')) {
   PAGE.needsConnect = true;   // demo the gate's Step 1 for review
 }
