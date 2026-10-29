@@ -749,7 +749,11 @@ $('connectLocBtn').addEventListener('click', function(){
   var btn = this;
   api('/api/ghl/connect-location', {}).then(function(j){
     btn.disabled = false;
-    if (j && j.ok && j.url) { window.open(j.url, '_blank'); }
+    // Navigate the TOP window (the page runs inside GHL's iframe):
+    // GHL runs the picker + consent, our callback exchanges the token,
+    // and the redirect lands back in the app - one tab, no new window
+    // (Matt 10/29). Outside an iframe, top === this window.
+    if (j && j.ok && j.url) { window.top.location.href = j.url; }
     else { toast((j && j.error) || 'Could not start the connection. Try again.'); }
   }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
 });
@@ -1236,7 +1240,9 @@ function applyOb(s){
     }
     api('/api/ghl/connect-location', {}).then(function(j){
       btn.disabled = false;
-      if (j && j.ok && j.url) { window.open(j.url, '_blank'); _startConnectPoll(); }
+      // same-tab top navigation, matching the banner connect button
+      // (Matt 10/29); the poll is harmless when the page navigates
+      if (j && j.ok && j.url) { window.top.location.href = j.url; _startConnectPoll(); }
       else { toast((j && j.error) || 'Could not start the connection.'); }
     }).catch(function(){ btn.disabled = false;
       toast('The connection could not start.'); });
