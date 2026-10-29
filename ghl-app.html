@@ -721,23 +721,25 @@ $('confirmCancel').addEventListener('click', function(){
 // rows outside it simply render without a button).
 $('confirmNoshow').addEventListener('click', function(){
   close_('noshowOverlay');
-  function flip(){
+  function flip(review){
     if (noshowRow) {
       noshowRow.querySelector('.badge').className = 'badge reported';
-      noshowRow.querySelector('.badge').textContent = 'No-show reported';
+      noshowRow.querySelector('.badge').textContent = review ? 'Under review' : 'No-show reported';
       var cell = noshowRow.cells[3]; cell.textContent = '';
     }
-    toast('That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
+    toast(review
+      ? 'Report received. We review high volumes of no-show reports before refunding, and we will be in touch shortly.'
+      : 'That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
   }
   if (PAGE.live && noshowRow) {
     api('/api/ghl/report-no-show',
         {appointment_ref: noshowRow.getAttribute('data-ref') || ''}).then(function(j){
-      if (j.ok) { flip(); }
+      if (j.ok) { flip(j.action === 'review'); }
       else { toast(j.error || 'The report did not go through. Try again in a moment.'); }
     }).catch(function(){ toast('The report did not go through. Try again in a moment.'); });
     return;
   }
-  flip();
+  flip(false);
 });
 
 // Request campaign (enabled only with no active campaign)
@@ -1148,6 +1150,12 @@ function applyOb(s){
         }
         if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
         _maybeComplete();
+      } else if (d && d.ok && d.card_invalid) {
+        // the card exists but failed the charge check: say it plainly
+        // and stop polling - the client re-saves a card, which restarts
+        // the poll through the normal checkout-return flow
+        if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+        toast('That card did not pass the charge check. Save a different card to continue.');
       }
     }).catch(function(){});
   }
