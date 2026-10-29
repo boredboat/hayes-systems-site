@@ -157,6 +157,14 @@ body.boot-loading .danger-row, body.boot-loading #cooldown{display:none!importan
 .notice-card p{margin:0;font-size:13.5px;color:#546E7A;line-height:1.6}
 #bootSpinner p{font-size:13.5px;color:#90A4AE}
 #billingCloser{margin-top:26px}
+.worth-track{height:8px;border-radius:4px;background:#E3EBF3;overflow:hidden;margin-top:12px}
+.worth-fill{height:100%;border-radius:4px;background:#2896FB;transition:width .6s ease}
+.worth-count{font-size:12.5px;color:#78909C;margin-top:6px}
+.feed{border:1px solid #ECEFF1;border-radius:10px;overflow:hidden}
+.feed div{display:flex;justify-content:space-between;gap:14px;padding:10px 14px;border-bottom:1px solid #F5F5F5;font-size:13.5px}
+.feed div:last-child{border-bottom:none}
+.feed .fw{color:#90A4AE;font-size:12.5px;white-space:nowrap}
+#settingsLink{font-size:13px}
 .ob-progress{display:flex;gap:6px;margin:0 0 18px 0}
 .ob-progress span{flex:1;height:4px;border-radius:2px;background:#E3EBF3}
 .ob-progress span.on{background:#2896FB}
@@ -314,6 +322,8 @@ h1{font-size:20px}
     <div class="notice-card">
       <h3>Not enough workable leads yet</h3>
       <p id="worthBody"></p>
+      <div class="worth-track"><div class="worth-fill" id="worthFill" style="width:0%"></div></div>
+      <div class="worth-count" id="worthCount"></div>
     </div>
   </div>
 
@@ -343,6 +353,11 @@ h1{font-size:20px}
 <div class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</div>
 <div class="cooldown" id="retainerLine" style="margin-top:6px">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</div>
 
+<div class="sec hide" id="feedSec">
+    <h2>Recent activity</h2>
+    <div class="feed" id="feedBody"></div>
+  </div>
+
 <div class="sec" id="apptSec">
   <h2>Appointments</h2>
   <div class="appt-wrap">
@@ -368,7 +383,8 @@ h1{font-size:20px}
 </div>
 
 <div class="danger-row">
-  <span class="contact" id="helpLink">Help / FAQ</span>
+  <span class="contact" id="settingsLink">Settings</span>
+      <span class="contact" id="helpLink">Help / FAQ</span>
   <span class="contact" id="contactLink">Contact us</span>
   <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
   <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
@@ -470,6 +486,22 @@ h1{font-size:20px}
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay">Not now</button>
       <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="settingsOverlay">
+  <div class="dialog">
+    <h3>Account settings</h3>
+    <div class="field"><label>Notices email</label>
+      <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="field"><label>Business name</label>
+      <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="field"><label>Phone number prospects should call</label>
+      <input id="setPhone" class="set-in" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
+      <button class="btn btn-primary" id="settingsSave">Save</button>
     </div>
   </div>
 </div>
@@ -792,6 +824,36 @@ $('retainerStart').addEventListener('click', function(){
   toast('Retainer active. Your coverage is now continuous.');
 });
 
+// Settings overlay: notices email + agency details, persisted to the DB
+$('settingsLink').addEventListener('click', function(){
+  var c = (PAGE.data && PAGE.data.client) || {};
+  $('setEmail').value = c.email || '';
+  $('setBusiness').value = c.name || '';
+  $('setPhone').value = c.phone || '';
+  open_('settingsOverlay');
+});
+$('settingsSave').addEventListener('click', function(){
+  var em = $('setEmail').value.trim();
+  if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
+  var btn = this; btn.disabled = true;
+  api('/api/ghl/settings', {
+    email: em, business: $('setBusiness').value.trim(),
+    phone: $('setPhone').value.trim()
+  }).then(function(j){
+    btn.disabled = false;
+    if (j && j.ok) {
+      close_('settingsOverlay');
+      toast('Settings saved.');
+      if (PAGE.data && PAGE.data.client) {
+        PAGE.data.client.email = em;
+        PAGE.data.client.name = $('setBusiness').value.trim();
+        PAGE.data.client.phone = $('setPhone').value.trim();
+      }
+    } else { toast((j && j.error) || 'Could not save. Try again.'); }
+  }).catch(function(){ btn.disabled = false;
+    toast('Could not save. Try again.'); });
+});
+
 // Help / contact open outside the iframe
 $('helpLink').addEventListener('click', function(){ window.open('https://www.hayessystems.com/help.html', '_blank'); });
 $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@hayessystems.com', '_blank'); });
@@ -844,6 +906,14 @@ function loadPageData(){
       }));
       if ((a.appointments || []).length) $('apptSec').classList.remove('hide');
     });
+    return api('/api/ghl/activity').then(function(f){
+      if (!f || !f.ok || !(f.activity || []).length) return;
+      $('feedBody').innerHTML = f.activity.map(function(e){
+        return '<div><span>' + esc(e.text) + '</span>'
+          + '<span class="fw">' + esc(fmtDay(e.when)) + '</span></div>';
+      }).join('');
+      $('feedSec').classList.remove('hide');
+    });
   }).catch(function(){});
 }
 function _renderWorth(){
@@ -857,6 +927,11 @@ function _renderWorth(){
       + fmtNum(w.workable || 0) + ' workable of ' + fmtNum(w.total || 0)
       + ' total. Duplicates, unreachable entries, and opted-out contacts'
       + ' are removed before counting.';
+    var bar = (PAGE.data && PAGE.data.worth_bar) || 5000;
+    var pct = Math.min(100, Math.round((w.workable || 0) / bar * 100));
+    $('worthFill').style.width = Math.max(pct, 2) + '%';
+    $('worthCount').textContent = fmtNum(w.workable || 0) + ' of '
+      + fmtNum(bar) + ' workable leads';
   }
 }
 function applyFromData(d){
