@@ -378,7 +378,7 @@ body{padding:0}
       <h3>Your list</h3>
       <p id="listCheckBody"></p>
     </div>
-    <button class="btn btn-ghost" id="listCheckBtn">Check again</button>
+    <button class="btn btn-ghost" id="listCheckBtn">Update now</button>
   </div>
 
 <div id="tabsCard">
@@ -875,10 +875,18 @@ $('connectLocBtn').addEventListener('click', function(){
   }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
 });
 $('reqBtn').addEventListener('click', function(){
+  var btn = this;
+  function _resetReq(){ btn.disabled = false; btn.textContent = 'Request a new campaign'; }
   if (PAGE.live) {
+    // the server refreshes the list first when the verdict is stale
+    // (Matt 10/29) - show work for the whole wait
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin-sm"></span>Updating your list';
     api('/api/ghl/request-campaign', {}).then(function(j){
+      _resetReq();
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
-    }).catch(function(){ toast('The request did not go through. Try again in a moment.'); });
+    }).catch(function(){ _resetReq();
+      toast('The request did not go through. Try again in a moment.'); });
     return;
   }
   toast('Request received. We will follow up by email.');
@@ -1073,14 +1081,14 @@ $('listCheckBtn').addEventListener('click', function(){
   // working state: grey + spinner + honest label for the whole poll
   // (Matt 10/29: a disabled-but-blue button still looked clickable)
   function _work(){ btn.disabled = true;
-    btn.innerHTML = '<span class="spin-sm"></span>Checking your list'; }
-  function _reset(){ btn.disabled = false; btn.textContent = 'Check again'; }
+    btn.innerHTML = '<span class="spin-sm"></span>Updating your list'; }
+  function _reset(){ btn.disabled = false; btn.textContent = 'Update now'; }
   _work();
   api('/api/ghl/recheck-list', {}).then(function(j){
     if (j && j.ok) {
       toast(j.already
         ? 'A check is already running. Your list updates in a moment.'
-        : 'Checking your list. This takes a minute or two.');
+        : 'Updating your list. This takes a minute or two.');
     } else {
       _reset();
       toast((j && j.error) || 'Could not start the check. Try again.');
