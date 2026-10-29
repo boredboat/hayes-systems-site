@@ -338,7 +338,6 @@ h1{font-size:20px}
     <button class="btn btn-primary" id="connectLocBtn">Connect your location</button>
   </div>
   <button class="btn btn-primary" id="reqBtn" disabled>Request a new campaign</button>
-  <button class="btn btn-ghost" id="resendBtn">Resend latest report</button>
   <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
 </div>
 <div class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</div>
@@ -429,17 +428,6 @@ h1{font-size:20px}
   </div>
 </div>
 
-<div class="overlay" id="resendOverlay">
-  <div class="dialog">
-    <h3>Resend the latest report</h3>
-    <p>The most recent report will be emailed to you again.</p>
-    <div class="dialog-actions">
-      <button class="btn btn-ghost" data-close="resendOverlay">Not now</button>
-      <button class="btn btn-primary" id="confirmResend">Resend report</button>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="cancelRetOverlay">
   <div class="dialog">
     <h3>Cancel your retainer?</h3>
@@ -521,8 +509,6 @@ function apply(s, until){
   if (!has) { setStats(0, 0, 0, 0, 0, 0); }
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
-  $('resendBtn').classList.toggle('hide', false);
-  $('resendBtn').disabled = (s === 'none');
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'retainer');
   $('cancelRetBtn').classList.toggle('hide', s !== 'retainer');
@@ -740,20 +726,6 @@ $('confirmNoshow').addEventListener('click', function(){
     return;
   }
   flip();
-});
-
-// Resend report (confirm first - one misclick should not re-send mail)
-$('resendBtn').addEventListener('click', function(){ open_('resendOverlay'); });
-$('confirmResend').addEventListener('click', function(){
-  close_('resendOverlay');
-  if (PAGE.live) {
-    api('/api/ghl/resend-report', {}).then(function(j){
-      if (j.ok) { toast('The latest report is on its way to your email.'); }
-      else { toast(j.message || j.error || 'No report is available to resend yet.'); }
-    }).catch(function(){ toast('The resend did not go through. Try again in a moment.'); });
-    return;
-  }
-  toast('The latest report is on its way to your email.');
 });
 
 // Request campaign (enabled only with no active campaign)
@@ -999,7 +971,7 @@ function applyOb(s){
   if (on) {
     $('obWelcome').classList.remove('hide');
     $('obForm').classList.add('hide');
-    ['statusRow','stats','resendBtn','pauseBtn','cooldown','retainerLine',
+    ['statusRow','stats','pauseBtn','cooldown','retainerLine',
      'apptSec','pastSec'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
