@@ -302,7 +302,6 @@ h1{font-size:20px}
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn" id="schedGhl">Our GoHighLevel calendars</button>
         <button class="btn" id="schedCal">Calendly</button>
-        <button class="btn" id="schedOther">Something else</button>
       </div>
     </div>
   </div>
@@ -959,7 +958,6 @@ function _schedAnswer(v){
 }
 $('schedGhl').addEventListener('click', function(){ _schedAnswer('ghl'); });
 $('schedCal').addEventListener('click', function(){ _schedAnswer('calendly'); });
-$('schedOther').addEventListener('click', function(){ _schedAnswer('other'); });
 function applyFromData(d){
   if (window.__LIVE_BOOT) {
     window.__LIVE_BOOT = false;
