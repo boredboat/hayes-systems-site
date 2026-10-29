@@ -322,6 +322,16 @@ h1{font-size:20px}
   <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
 </div>
 
+<div class="sec" id="listCheck" style="display:none;margin-bottom:18px">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px">
+      <h3 style="margin:0;font-size:15px">Your list</h3>
+      <p id="listCheckBody" style="margin:4px 0 0 0;font-size:13.5px;color:#546E7A"></p>
+    </div>
+    <button class="btn btn-ghost" id="listCheckBtn">Check again</button>
+  </div>
+</div>
+
 <div class="stats" id="stats">
   <div class="stat"><div class="num">1,847</div><div class="lbl">Workable leads</div></div>
   <div class="stat"><div class="num">65%</div><div class="lbl">List worked</div></div>
@@ -958,6 +968,64 @@ function _schedAnswer(v){
 }
 $('schedGhl').addEventListener('click', function(){ _schedAnswer('ghl'); });
 $('schedCal').addEventListener('click', function(){ _schedAnswer('calendly'); });
+// LIST CHECK (10/29): the client's list count with a manual re-check.
+// Hidden while a campaign runs (the stats card owns workable then -
+// one number, one home).
+function _renderListCheck(){
+  var el = $('listCheck');
+  if (!el) return;
+  var d = PAGE.data || {};
+  var st = (d.client && d.client.state) || 'none';
+  if (st === 'running' || st === 'paused' || st === 'retainer') {
+    el.style.display = 'none';
+    return;
+  }
+  var ic = d.install_check;
+  if (!ic || !ic.ok) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  $('listCheckBody').textContent =
+    fmtNum(ic.workable || 0) + ' workable of '
+    + fmtNum(ic.total || 0) + ' contacts'
+    + (ic.checked_at ? ' · checked ' + fmtDay(ic.checked_at) : '');
+}
+$('listCheckBtn').addEventListener('click', function(){
+  var btn = this;
+  btn.disabled = true;
+  api('/api/ghl/recheck-list', {}).then(function(j){
+    if (j && j.ok) {
+      toast(j.already
+        ? 'A check is already running. Your list updates in a moment.'
+        : 'Checking your list. This takes a minute or two.');
+    } else {
+      btn.disabled = false;
+      toast((j && j.error) || 'Could not start the check. Try again.');
+      return;
+    }
+    // poll page-data until the checked_at stamp advances, max ~6 min
+    var before = ((PAGE.data || {}).install_check || {}).checked_at || '';
+    var tries = 0;
+    var iv = setInterval(function(){
+      tries += 1;
+      api('/api/ghl/page-data').then(function(d){
+        if (!d || !d.ok) return;
+        var at = ((d.install_check || {}).checked_at) || '';
+        if (at && at !== before) {
+          PAGE.data = d;
+          applyFromData(d);
+          clearInterval(iv);
+          btn.disabled = false;
+          toast('Your list is up to date.');
+        }
+      }).catch(function(){});
+      if (tries >= 36) {
+        clearInterval(iv);
+        btn.disabled = false;
+      }
+    }, 10000);
+  }).catch(function(){ btn.disabled = false;
+    toast('Could not start the check. Try again.'); });
+});
+
 function applyFromData(d){
   if (window.__LIVE_BOOT) {
     window.__LIVE_BOOT = false;
@@ -984,6 +1052,7 @@ function applyFromData(d){
   PAGE.needsConnect = !!d.needs_location_connect;
   _renderWorth();
   _renderSched();
+  _renderListCheck();
   // the gate's Step 1 owns the first-run connect; the banner is the
   // fallback for already-onboarded clients (reinstall, revoked token)
   $('connectBanner').style.display =
