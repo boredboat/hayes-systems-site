@@ -345,6 +345,11 @@ body{padding:0}
     </div>
   </div>
 
+<div class="notice-card" id="failCard" style="display:none;margin-bottom:18px">
+    <h3>Your campaign did not start</h3>
+    <p id="failBody"></p>
+  </div>
+
 <div class="notice-card" id="prepCard" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
     <h3>Your campaign is being prepared</h3>
     <p>We are reading your CRM and planning the first emails. This page
@@ -953,6 +958,20 @@ function _renderPrep(){
   if (rq && S === 'none') rq.classList.toggle('hide', prepping);
   if (prepping && PAGE.live) _prepPoll();
 }
+// S2 (logic review 10/30): a failed launch says so - the prep card
+// used to vanish silently and the client was left guessing
+function _renderLaunchFail(){
+  var el = $('failCard'); if (!el) return;
+  var show = !!(PAGE.launchFailed && !PAGE.preparing
+                && S === 'none' && !PAGE.needsConnect);
+  el.style.display = show ? '' : 'none';
+  if (show) {
+    $('failBody').textContent = (PAGE.launchError
+      || 'The campaign could not be prepared.')
+      + ' We have been notified. You can try again, or write'
+      + ' Matt@hayessystems.com and we will sort it out.';
+  }
+}
 function _prepPoll(){
   if (PAGE.prepPoll) return;
   var tries = 0;
@@ -1254,10 +1273,13 @@ function applyFromData(d){
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
   PAGE.preparing = !!d.preparing;
+  PAGE.launchFailed = !!d.launch_failed;
+  PAGE.launchError = d.launch_error || '';
   _renderWorth();
   _renderSched();
   _renderListCheck();
   _renderPrep();
+  _renderLaunchFail();
   // the gate's Step 1 owns the first-run connect; the banner is the
   // fallback for already-onboarded clients (reinstall, revoked token)
   $('connectBanner').style.display =
