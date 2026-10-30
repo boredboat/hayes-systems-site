@@ -1080,7 +1080,10 @@ function _schedGhlPick(){
     var b = document.createElement('button');
     b.className = 'btn btn-ghost';
     b.style.padding = '9px 14px';
-    b.textContent = c.name || c.id;
+    // tag round-robin calendars: that is the "book across the whole
+    // team" choice (GHL distributes natively once we write to it)
+    var rr = /round/i.test(c.type || '');
+    b.textContent = (c.name || c.id) + (rr ? ' \u00b7 whole team' : '');
     b.addEventListener('click', function(){
       _schedAnswer('ghl', c.id, c.name);
     });
