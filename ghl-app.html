@@ -419,7 +419,7 @@ body{padding:0}
 </div>
 
 <div class="actrow" id="actRow">
-  <button class="btn btn-primary" id="reqBtn" disabled>Request a new campaign</button>
+  <button class="btn btn-primary" id="reqBtn" disabled>Start a new campaign</button>
   <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
   <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
   <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
@@ -655,7 +655,7 @@ function apply(s, until){
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
-  req.textContent = 'Request a new campaign';
+  req.textContent = 'Start a new campaign';
   req.disabled = !(s === 'none' || s === 'completed');
   // retainer badge is an ACTIVE-ONLY green card (Matt 10/29: the old
   // always-on red "Retainer off" read like an error)
@@ -910,7 +910,7 @@ $('reqBtn').addEventListener('click', function(){ open_('reqOverlay'); });
 $('confirmReq').addEventListener('click', function(){
   close_('reqOverlay');
   var btn = $('reqBtn');
-  function _resetReq(){ btn.disabled = false; btn.textContent = 'Request a new campaign'; }
+  function _resetReq(){ btn.disabled = false; btn.textContent = 'Start a new campaign'; }
   if (PAGE.live) {
     // the server refreshes the list first when the verdict is stale
     // (Matt 10/29) - show work for the whole wait
