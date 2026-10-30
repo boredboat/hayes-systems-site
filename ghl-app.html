@@ -545,7 +545,7 @@ body{padding:0}
 
 <div class="overlay" id="reqOverlay">
   <div class="dialog">
-    <h3>Request your campaign</h3>
+    <h3>Start your campaign</h3>
     <p>Here is what happens next:</p>
     <ul style="font-size:14px;color:#4b5563;line-height:1.65;margin:0 0 18px 0;padding-left:20px">
       <li>We read your CRM now to confirm your workable lead count (a minute or two)</li>
@@ -554,9 +554,11 @@ body{padding:0}
       <li>Interested leads get a call from our AI booking assistant and book straight onto your calendar</li>
       <li>You pay only for appointments that land, per the <a href="https://www.hayessystems.com/terms.html" target="_blank" style="color:var(--acc)">terms you agreed to</a></li>
     </ul>
+    <label class="ob-check" style="margin-bottom:16px"><input type="checkbox" id="csAgree">
+      <span>I agree to the <a href="https://www.hayessystems.com/terms.html" target="_blank" style="color:var(--acc);font-weight:600">Campaign Terms</a> and understand that Start campaign begins a paid service.</span></label>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
-      <button class="btn btn-primary" id="confirmReq">Request campaign</button>
+      <button class="btn btn-primary" id="confirmReq" disabled>Start campaign</button>
     </div>
   </div>
 </div>
@@ -905,8 +907,18 @@ $('connectLocBtn').addEventListener('click', function(){
   }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
 });
 // REQUEST (Matt 10/30): a what-happens dialog first - the request is
-// the page's one commit action and it used to fire with no info at all
-$('reqBtn').addEventListener('click', function(){ open_('reqOverlay'); });
+// the page's one commit action and it used to fire with no info at all.
+// Terms checkbox (Matt 10/30): explicit agreement + paid-service
+// acknowledgment before the button unlocks; the ack rides the request
+// into the approval trail and the checkbox resets after each send
+$('reqBtn').addEventListener('click', function(){
+  $('csAgree').checked = false;
+  $('confirmReq').disabled = true;
+  open_('reqOverlay');
+});
+$('csAgree').addEventListener('change', function(){
+  $('confirmReq').disabled = !this.checked;
+});
 $('confirmReq').addEventListener('click', function(){
   close_('reqOverlay');
   var btn = $('reqBtn');
@@ -916,7 +928,7 @@ $('confirmReq').addEventListener('click', function(){
     // (Matt 10/29) - show work for the whole wait
     btn.disabled = true;
     btn.innerHTML = '<span class="spin-sm"></span>Updating your list';
-    api('/api/ghl/request-campaign', {}).then(function(j){
+    api('/api/ghl/request-campaign', {agreed: true}).then(function(j){
       _resetReq();
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
       if (j && j.ok && !j.duplicate) {
