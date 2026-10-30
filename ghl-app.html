@@ -260,13 +260,10 @@ body{padding:0}
 
     <div class="ob-step" data-ob="3">
       <h3>Agency details</h3>
-      <p>Please provide your business name and phone number you would like
-      leads to see in our outreach.</p>
-      <div class="ob-fields">
+      <p>Please provide the business name leads will see in our outreach.</p>
+      <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
-        <div class="ob-field"><label for="obPhone">Phone number prospects should call</label>
-          <input id="obPhone" value="+1 (413) 555-0142"></div>
       </div>
     </div>
 
@@ -530,8 +527,6 @@ body{padding:0}
       <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Business name</label>
       <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
-    <div class="field"><label>Phone number prospects should call</label>
-      <input id="setPhone" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
@@ -949,7 +944,6 @@ $('settingsLink').addEventListener('click', function(){
   var c = (PAGE.data && PAGE.data.client) || {};
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
-  $('setPhone').value = c.phone || '';
   open_('settingsOverlay');
 });
 $('settingsSave').addEventListener('click', function(){
@@ -957,8 +951,7 @@ $('settingsSave').addEventListener('click', function(){
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
   var btn = this; btn.disabled = true;
   api('/api/ghl/settings', {
-    email: em, business: $('setBusiness').value.trim(),
-    phone: $('setPhone').value.trim()
+    email: em, business: $('setBusiness').value.trim()
   }).then(function(j){
     btn.disabled = false;
     if (j && j.ok) {
@@ -967,7 +960,6 @@ $('settingsSave').addEventListener('click', function(){
       if (PAGE.data && PAGE.data.client) {
         PAGE.data.client.email = em;
         PAGE.data.client.name = $('setBusiness').value.trim();
-        PAGE.data.client.phone = $('setPhone').value.trim();
       }
     } else { toast((j && j.error) || 'Could not save. Try again.'); }
   }).catch(function(){ btn.disabled = false;
@@ -1501,8 +1493,7 @@ function applyOb(s){
       if (PAGE.token) {
         api('/api/ghl/agreement', {
           signed_by: $('obSign').value.trim(),
-          business: $('obBusiness').value.trim(),
-          phone: $('obPhone').value.trim()
+          business: $('obBusiness').value.trim()
         }).catch(function(){});
       }
       fetch(API + '/api/ghl/stripe-setup', {
