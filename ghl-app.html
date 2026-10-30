@@ -345,6 +345,13 @@ body{padding:0}
     </div>
   </div>
 
+<div class="notice-card" id="prepCard" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
+    <h3>Your campaign is being prepared</h3>
+    <p>We are reading your CRM and planning the first emails. This page
+    updates on its own when your campaign starts - nothing more for you
+    to do.</p>
+  </div>
+
 <div class="notice-card" id="connectBanner" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
     <h3>Finish setting up your account</h3>
     <p style="margin:0 0 12px 0">One more step: connect your location so we can read your CRM and count your workable leads.</p>
@@ -532,6 +539,24 @@ body{padding:0}
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="reqOverlay">
+  <div class="dialog">
+    <h3>Request your campaign</h3>
+    <p>Here is what happens next:</p>
+    <ul style="font-size:14px;color:#4b5563;line-height:1.65;margin:0 0 18px 0;padding-left:20px">
+      <li>We read your CRM now to confirm your workable lead count (a minute or two)</li>
+      <li>Your campaign is planned and starts automatically - no further action from you</li>
+      <li>Leads receive 6 personalized emails over about a month</li>
+      <li>Interested leads get a call from our AI booking assistant and book straight onto your calendar</li>
+      <li>You pay only for appointments that land, per the <a href="https://www.hayessystems.com/terms.html" target="_blank" style="color:var(--acc)">terms you agreed to</a></li>
+    </ul>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
+      <button class="btn btn-primary" id="confirmReq">Request campaign</button>
     </div>
   </div>
 </div>
@@ -879,8 +904,12 @@ $('connectLocBtn').addEventListener('click', function(){
     else { toast((j && j.error) || 'Could not start the connection. Try again.'); }
   }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
 });
-$('reqBtn').addEventListener('click', function(){
-  var btn = this;
+// REQUEST (Matt 10/30): a what-happens dialog first - the request is
+// the page's one commit action and it used to fire with no info at all
+$('reqBtn').addEventListener('click', function(){ open_('reqOverlay'); });
+$('confirmReq').addEventListener('click', function(){
+  close_('reqOverlay');
+  var btn = $('reqBtn');
   function _resetReq(){ btn.disabled = false; btn.textContent = 'Request a new campaign'; }
   if (PAGE.live) {
     // the server refreshes the list first when the verdict is stale
@@ -890,12 +919,45 @@ $('reqBtn').addEventListener('click', function(){
     api('/api/ghl/request-campaign', {}).then(function(j){
       _resetReq();
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
+      if (j && j.ok && !j.duplicate) {
+        // into the preparing state NOW - the card shows and the poller
+        // runs until the campaign actually goes live
+        PAGE.preparing = true;
+        _renderPrep();
+      }
     }).catch(function(){ _resetReq();
       toast('The request did not go through. Try again in a moment.'); });
     return;
   }
   toast('Request received. We will follow up by email.');
 });
+// PREPARING STATE: persistent card + live poller until launch (the
+// toast used to promise "this page updates on its own" - now it does)
+function _renderPrep(){
+  var el = $('prepCard'); if (!el) return;
+  var prepping = !!(PAGE.preparing && S === 'none' && !PAGE.needsConnect);
+  el.style.display = prepping ? '' : 'none';
+  var rq = $('reqBtn');
+  if (rq && S === 'none') rq.classList.toggle('hide', prepping);
+  if (prepping && PAGE.live) _prepPoll();
+}
+function _prepPoll(){
+  if (PAGE.prepPoll) return;
+  var tries = 0;
+  PAGE.prepPoll = setInterval(function(){
+    tries += 1;
+    api('/api/ghl/page-data').then(function(d){
+      if (!d || !d.ok) return;
+      PAGE.data = d;
+      applyFromData(d);
+      if (S !== 'none' && S !== 'onboarding') {
+        clearInterval(PAGE.prepPoll); PAGE.prepPoll = null;
+        toast('Your campaign is live.');
+      }
+    }).catch(function(){});
+    if (tries >= 40) { clearInterval(PAGE.prepPoll); PAGE.prepPoll = null; }
+  }, 15000);
+}
 
 // Retainer
 $('retainerLink').addEventListener('click', function(){ open_('retainerOverlay'); });
@@ -1179,9 +1241,11 @@ function applyFromData(d){
   PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
+  PAGE.preparing = !!d.preparing;
   _renderWorth();
   _renderSched();
   _renderListCheck();
+  _renderPrep();
   // the gate's Step 1 owns the first-run connect; the banner is the
   // fallback for already-onboarded clients (reinstall, revoked token)
   $('connectBanner').style.display =
