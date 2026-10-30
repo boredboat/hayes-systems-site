@@ -343,7 +343,7 @@ body{padding:0}
     </div>
   </div>
 
-<div class="notice-card hide" id="connectBanner" style="border-left-color:#188bf6;margin-bottom:18px">
+<div class="notice-card" id="connectBanner" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
     <h3>Finish setting up your account</h3>
     <p style="margin:0 0 12px 0">One more step: connect your location so we can read your CRM and count your workable leads. Takes one click.</p>
     <button class="btn btn-primary" id="connectLocBtn">Connect your location</button>
@@ -1093,7 +1093,8 @@ function _renderListCheck(){
   if (!el) return;
   var d = PAGE.data || {};
   var st = (d.client && d.client.state) || 'none';
-  if (st === 'running' || st === 'paused' || st === 'retainer') {
+  if (st === 'running' || st === 'paused' || st === 'retainer'
+      || PAGE.needsConnect) {
     el.style.display = 'none';
     return;
   }
