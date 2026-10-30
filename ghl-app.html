@@ -640,13 +640,17 @@ function apply(s, until){
   if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = n ? 'Campaign ' + (n + 1) : 'Your campaign'; setSpine(3); }
   if (s === 'completed') { $('stateH1').textContent = n ? 'Campaign ' + n : 'Campaign'; setSpine(4); }
   if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
-  if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); }
+  if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); setStats(0, 0, 0, 0, 0, 0); }
   if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Ends Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
   if (s === 'completed') {
     var lp = (PAGE && PAGE.lastPast) || null;
     pill('donepill', 'Completed', lp ? lp.period + ' \u00b7 ' + fmtNum(lp.appointments) + ' appointments' : 'Your campaign has finished');
+    if (lp) {
+      setStats(lp.leads_worked, 100, 0, lp.appointments, 0, lp.cost);
+      $('numE').textContent = '\u2013';
+    }
   }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected'); }
   if (s === 'retainer') { pill('run', 'Active', ''); }
@@ -1183,6 +1187,7 @@ function applyFromData(d){
                c.conversion_pct, c.cost_to_date);
     } else {
       pill('run', 'Active', 'Continual coverage \u00b7 the next chapter starts automatically');
+      setStats(0, 0, 0, 0, 0, 0);
     }
   }
   var cd = d.cooldown;
@@ -1200,6 +1205,9 @@ function applyFromData(d){
     $('stateH1').textContent = 'Campaign ' + PAGE.pastN;
     pill('donepill', 'Completed', PAGE.lastPast.period + ' \u00b7 '
       + fmtNum(PAGE.lastPast.appointments) + ' appointments');
+    setStats(PAGE.lastPast.leads_worked, 100, 0, PAGE.lastPast.appointments,
+             0, PAGE.lastPast.cost);
+    $('numE').textContent = '\u2013';
   }
   // a client with history keeps their past-campaign tab (and the
   // retainer offer) visible even with no live campaign - apply('none')
