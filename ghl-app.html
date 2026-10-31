@@ -352,9 +352,16 @@ body{padding:0}
 
 <div class="notice-card" id="prepCard" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
     <h3>Your campaign is being prepared</h3>
-    <p>We are reading your CRM and planning the first emails. This page
-    updates on its own when your campaign starts - nothing more for you
-    to do.</p>
+    <div style="margin:14px 0 10px 0">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+        <span id="prepPhase" style="font-size:13.5px;font-weight:600;color:#4b5563">Reading your CRM</span>
+        <span id="prepPct" style="font-size:15px;font-weight:700;color:#188bf6">0%</span>
+      </div>
+      <div style="height:10px;border-radius:5px;background:#e5e7eb;overflow:hidden">
+        <div id="prepBar" style="height:100%;width:0%;border-radius:5px;background:#188bf6;transition:width 1.2s ease"></div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:#6b7280">This page updates on its own when your campaign starts.</p>
   </div>
 
 <div class="notice-card" id="connectBanner" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
@@ -937,8 +944,9 @@ $('confirmReq').addEventListener('click', function(){
       _resetReq();
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
       if (j && j.ok && !j.duplicate) {
-        // into the preparing state NOW - the card shows and the poller
-        // runs until the campaign actually goes live
+        // into the preparing state NOW - the bar starts, the card
+        // shows, and the poller runs until the campaign goes live
+        _prepStart = Date.now();
         PAGE.preparing = true;
         _renderPrep();
       }
@@ -948,15 +956,64 @@ $('confirmReq').addEventListener('click', function(){
   }
   toast('Request received. We will follow up by email.');
 });
-// PREPARING STATE: persistent card + live poller until launch (the
-// toast used to promise "this page updates on its own" - now it does)
+// PREPARING STATE: persistent card + progress bar + live poller
+// (Matt 10/31: a loading bar showing what's happening and % remaining)
+// The bar is time-based against an estimated ~3-minute cycle: the CRM
+// pull dominates (0-60%), staging+planning (60-85%), dispatcher tick
+// (85-95%). It approaches 95% asymptotically and only hits 100% when
+// the poller sees the campaign actually live - never a fake finish.
+var _prepStart = 0;
+var _prepTimer = null;
+var _PREP_EST_MS = 180000;  // 3 min estimate for a typical list
+function _prepPhaseLabel(elapsed) {
+  if (elapsed < _PREP_EST_MS * 0.55) return 'Reading your CRM';
+  if (elapsed < _PREP_EST_MS * 0.80) return 'Planning your campaign';
+  if (elapsed < _PREP_EST_MS * 0.95) return 'Almost there';
+  return 'Finishing up';
+}
+function _prepPct(elapsed) {
+  // ease toward 95% over the estimate, then sit there until live
+  if (elapsed >= _PREP_EST_MS) return 95;
+  var t = elapsed / _PREP_EST_MS;
+  // smooth ease-out: fast start, gentle approach
+  return Math.min(95, Math.round(95 * (1 - Math.pow(1 - t, 1.6))));
+}
+function _tickPrepBar() {
+  if (!_prepStart) return;
+  var elapsed = Date.now() - _prepStart;
+  var pct = _prepPct(elapsed);
+  var bar = $('prepBar'), pctEl = $('prepPct'), phEl = $('prepPhase');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (phEl) phEl.textContent = _prepPhaseLabel(elapsed);
+}
+function _startPrepBar() {
+  if (_prepTimer) return;
+  _prepStart = _prepStart || Date.now();
+  _tickPrepBar();
+  _prepTimer = setInterval(_tickPrepBar, 2000);
+}
+function _finishPrepBar() {
+  if (_prepTimer) { clearInterval(_prepTimer); _prepTimer = null; }
+  var bar = $('prepBar'), pctEl = $('prepPct'), phEl = $('prepPhase');
+  if (bar) bar.style.width = '100%';
+  if (pctEl) pctEl.textContent = '100%';
+  if (phEl) phEl.textContent = 'Campaign is live';
+  _prepStart = 0;
+  setTimeout(function(){ if (!_prepStart) _prepStart = 0; }, 1500);
+}
 function _renderPrep(){
   var el = $('prepCard'); if (!el) return;
   var prepping = !!(PAGE.preparing && S === 'none' && !PAGE.needsConnect);
   el.style.display = prepping ? '' : 'none';
   var rq = $('reqBtn');
   if (rq && S === 'none') rq.classList.toggle('hide', prepping);
-  if (prepping && PAGE.live) _prepPoll();
+  if (prepping) {
+    _startPrepBar();
+    if (PAGE.live) _prepPoll();
+  } else if (_prepStart) {
+    _finishPrepBar();
+  }
 }
 // S2 (logic review 10/30): a failed launch says so - the prep card
 // used to vanish silently and the client was left guessing
@@ -983,6 +1040,7 @@ function _prepPoll(){
       applyFromData(d);
       if (S !== 'none' && S !== 'onboarding') {
         clearInterval(PAGE.prepPoll); PAGE.prepPoll = null;
+        _finishPrepBar();
         toast('Your campaign is live.');
       }
     }).catch(function(){});
