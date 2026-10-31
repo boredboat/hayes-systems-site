@@ -229,9 +229,9 @@ body{padding:0}
 
     <div class="ob-step" id="obConnectStep" style="display:none">
       <h3>Connect your location</h3>
-      <p>One click connects us to this location in read-only mode, so we
-      can count your workable leads and plan your campaign. We never
-      write to your account.</p>
+      <p>One click connects us to this location. We read your contacts to
+      count your workable leads and plan your campaign. We write
+      appointments to your calendar and never write to your CRM.</p>
       <button class="btn btn-primary" id="obConnectBtn">Connect your location</button>
       <span class="cs-state" id="obConnectState" style="margin-left:10px"></span>
     </div>
@@ -274,10 +274,11 @@ body{padding:0}
       <div class="ob-terms">
         <b>Data Agreement and Campaign Terms.</b> You authorize Hayes
         Systems to contact the leads you provide on your behalf by email
-        and by consented AI-assisted phone call. We read your contacts in
-        read-only mode, we never write to your account, and every access
-        token is deleted at the end of the engagement. Working copies of
-        your list are deleted once your campaign is planned. You may stop
+        and by consented AI-assisted phone call. We read your contacts,
+        we write appointments to your calendar, we never write to your
+        CRM, and every access token is deleted at the end of the
+        engagement. Your list is
+        deleted at campaign closeout. You may stop
         all outreach at any time.
         <span id="obTermsFull" class="hide"> The full agreement text
         appears here at launch, loaded from the same source the website
@@ -498,10 +499,11 @@ body{padding:0}
 <div class="overlay" id="cancelRetOverlay">
   <div class="dialog">
     <h3>Cancel your retainer?</h3>
-    <p>Cancelling retainer service will end any active campaign outreach
-    and revert your account to regular terms. You are responsible for any
-    appointment fees that result from already completed outreach. Monthly
-    fees are non-refundable and there are no cancellation fees.</p>
+    <p>Cancelling retainer service stops the monthly fee. Your current
+    campaign chapter runs to its finish and appointments that land during
+    it are billed at the retainer rate. After that, your account reverts
+    to regular campaign terms. Monthly fees are non-refundable and there
+    are no cancellation fees.</p>
     <div class="dialog-actions">
       <button class="btn btn-primary" data-close="cancelRetOverlay">Keep retainer</button>
       <button class="btn btn-danger" id="confirmCancelRet">Yes, cancel retainer</button>
