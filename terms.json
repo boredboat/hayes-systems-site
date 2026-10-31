@@ -4,7 +4,7 @@
   "clauses": [
    {
     "h": "1. What the Client provides",
-    "b": "The Client will provide a read-only connection to their CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form."
+    "b": "The Client will provide a read-only connection to their CRM, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. Calendars are accessed with read and write permissions to facilitate the serving of appointments. Access tokens are deleted at the end of the engagement. The Client will also provide the booking connection described in the intake form."
    },
    {
     "h": "2. The Client representations",
@@ -41,7 +41,7 @@
    },
    {
     "h": "3. Client responsibilities",
-    "b": "The Client will provide a read-only connection to their CRM for the purpose of retrieving the past-inquiry leads named in the engagement, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. The Client will also provide the booking connection described in the intake form (Follow Up Boss, Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
+    "b": "The Client will provide a read-only connection to their CRM, revocable by them at any time, or, where no CRM connection is available, a CSV export of those leads. Calendars are accessed with read and write permissions to facilitate the serving of appointments. Access tokens are deleted at the end of the engagement. The Client will also provide the booking connection described in the intake form (Follow Up Boss, Cal.com, Calendly, or GoHighLevel). The lead list is used solely to provide the services under this agreement."
    },
    {
     "h": "4. Client representations",
@@ -57,7 +57,7 @@
    },
    {
     "h": "7. Reporting",
-    "b": "Hayes Systems will deliver a weekly report during the campaign and a closeout report by email at the end of it. The Client may use either report for their own purposes, provided the Hayes Systems branding within it is left unmodified."
+    "b": "Campaigns run through our website include a weekly email report. Campaigns run through the GoHighLevel app are followed in the app instead, where the numbers are always current. Every campaign ends with a closeout report by email. The Client may use either report for their own purposes, provided the Hayes Systems branding within it is left unmodified."
    }
   ]
  }
