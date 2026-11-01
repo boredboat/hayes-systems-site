@@ -18,6 +18,23 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .barlink{font-size:13px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:none;margin-left:18px}
 .barlink:hover{color:var(--acch);text-decoration:underline;text-underline-offset:3px}
 
+/* CALENDAR SETTINGS CHECK (11/1): the pre-campaign gate */
+.cfgcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:26px 30px;max-width:640px;margin:0 auto 26px;box-shadow:0 10px 30px rgba(17,24,39,.06)}
+.cfg-find{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.cfg-item{display:flex;gap:12px;padding:14px 16px;background:var(--bg);border:1px solid var(--bd);border-radius:10px}
+.cfg-box{flex:0 0 auto;width:18px;height:18px;border:1.5px solid #d1d5db;border-radius:5px;margin-top:1px;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:center}
+.cfg-box:hover{border-color:var(--acc)}
+.cfg-box svg{display:none}
+.cfg-box.done{background:var(--grn);border-color:var(--grn)}
+.cfg-box.done svg{display:block}
+.cfg-det{font-size:12px;font-weight:600;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;display:inline-block;margin-top:4px}
+.cfg-t{font-size:13.5px;font-weight:600;color:var(--tx)}
+.cfg-d{font-size:12.5px;color:var(--mut);line-height:1.5;margin-top:2px}
+.cfg-path{font-size:12px;color:var(--acc);font-weight:500;margin-top:4px}
+.cfg-passed{font-size:12.5px;color:var(--grnd);font-weight:600;margin-top:14px;display:flex;align-items:center;gap:7px}
+.cfg-passed .n{background:var(--grnb);border-radius:5px;padding:1px 7px}
+
+
 /* HOW IT WORKS dropdown (mock 11/1) */
 .hiw{position:relative;margin-left:18px}
 .hiw-panel{position:absolute;top:calc(100% + 10px);right:0;width:400px;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 18px 50px rgba(17,24,39,.16);padding:6px;display:none;z-index:60}
@@ -246,6 +263,18 @@ body{padding:0}
 </div></div>
 
 <div class="wrap">
+
+<div class="cfgcard hide" id="cfgCard">
+  <h2 style="font-size:18px">Calendar settings check</h2>
+  <p class="muted" style="margin-top:4px" id="cfgSub">We check your calendar settings every time you request a campaign.</p>
+  <div class="cfg-find" id="cfgFind"></div>
+  <div class="cfg-passed hide" id="cfgPassed"></div>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button class="btn btn-primary" id="cfgContinue">Continue to campaign</button>
+    <button class="btn btn-ghost" id="cfgRecheck">Check again</button>
+  </div>
+</div>
+
 
 <div class="ob-card hide" id="billingCloser">
     <h2 id="bcTitle">Payment confirmed</h2>
@@ -986,10 +1015,92 @@ $('connectLocBtn').addEventListener('click', function(){
 // Terms checkbox (Matt 10/30): explicit agreement + paid-service
 // acknowledgment before the button unlocks; the ack rides the request
 // into the approval trail and the checkbox resets after each send
-$('reqBtn').addEventListener('click', function(){
+function _openReqDialog(){
   $('csAgree').checked = false;
   $('confirmReq').disabled = true;
   open_('reqOverlay');
+}
+function _renderCfgCheck(d){
+  var card = $('cfgCard'), find = $('cfgFind'), pass = $('cfgPassed');
+  var items = (d && d.findings) || [];
+  find.innerHTML = '';
+  items.forEach(function(f){
+    var row = document.createElement('div');
+    row.className = 'cfg-item';
+    var box = '';
+    if (f.suggestion) {
+      box = '<div class="cfg-box" data-key="' + f.key + '" title="Dismiss suggestion">'
+            + '{CHK}</div>'.replace('{CHK}', '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6.2 L4.8 9 L10 3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    }
+    row.innerHTML = box +
+      '<div><div class="cfg-t">' + f.title +
+      (f.suggestion ? ' <span style="font-weight:500;color:var(--mut);font-size:12px">&middot; suggestion</span>' : '') +
+      '</div><div class="cfg-det">Detected: ' + f.detected + '</div>' +
+      '<div class="cfg-d">' + f.detail + '</div>' +
+      '<div class="cfg-path">' + f.path + '</div></div>';
+    find.appendChild(row);
+  });
+  find.querySelectorAll('.cfg-box').forEach(function(b){
+    b.addEventListener('click', function(){
+      var key = this.getAttribute('data-key');
+      var self = this;
+      api('/api/ghl/calendar-check', {dismiss: key}).then(function(j){
+        if (j && j.ok) {
+          self.classList.add('done');
+          var item = self.closest('.cfg-item');
+          item.style.transition = 'opacity .25s';
+          item.style.opacity = '0';
+          setTimeout(function(){ item.remove(); _cfgCount(); }, 260);
+        } else { toast('Could not save that. Try again.'); }
+      }).catch(function(){ toast('Could not save that. Try again.'); });
+    });
+  });
+  var passed = (d && d.passed) || [];
+  if (passed.length) {
+    pass.classList.remove('hide');
+    pass.innerHTML = '<svg width="13" height="13" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.2" fill="#e8f9ee"/><path d="M4 7.2 L6.2 9.4 L10 4.6" fill="none" stroke="#15803d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="n">' + passed.length + '</span> checks passed: ' + passed.join(' &middot; ');
+  } else { pass.classList.add('hide'); }
+  _cfgCount();
+  card.classList.remove('hide');
+  window.scrollTo(0, 0);
+}
+function _cfgCount(){
+  var n = document.querySelectorAll('#cfgFind .cfg-item').length;
+  var sub = $('cfgSub');
+  if (n === 0) sub.textContent = 'We check your calendar settings every time you request a campaign. Everything looks good.';
+  else sub.textContent = 'We check your calendar settings every time you request a campaign. ' +
+    (n === 1 ? 'One thing needs' : n + ' things need') + ' your attention before we start.';
+}
+function _runCfgCheck(then){
+  if (!PAGE.live) { then(); return; }   // demo: straight through
+  api('/api/ghl/calendar-check').then(function(j){
+    if (j && j.ok && j.findings && j.findings.length) {
+      _renderCfgCheck(j);
+    } else {
+      $('cfgCard').classList.add('hide');
+      if (j && j.ok && j.passed && j.passed.length) {
+        toast('Calendar settings look good.');
+      }
+      then();
+    }
+  }).catch(function(){ then(); });   // check unavailable: never block the request
+}
+$('cfgContinue').addEventListener('click', function(){
+  $('cfgCard').classList.add('hide');
+  _openReqDialog();
+});
+$('cfgRecheck').addEventListener('click', function(){
+  var btn = this; btn.disabled = true;
+  api('/api/ghl/calendar-check').then(function(j){
+    btn.disabled = false;
+    if (j && j.ok) {
+      if (j.findings && j.findings.length) _renderCfgCheck(j);
+      else { $('cfgCard').classList.add('hide'); _openReqDialog(); }
+    } else toast((j && j.error) || 'Check unavailable.');
+  }).catch(function(){ btn.disabled = false; toast('Check unavailable.'); });
+});
+$('reqBtn').addEventListener('click', function(){
+  _runCfgCheck(_openReqDialog);
 });
 $('csAgree').addEventListener('change', function(){
   $('confirmReq').disabled = !this.checked;
