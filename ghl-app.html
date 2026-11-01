@@ -17,6 +17,20 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .bar .spacer{flex:1}
 .barlink{font-size:13px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:none;margin-left:18px}
 .barlink:hover{color:var(--acch);text-decoration:underline;text-underline-offset:3px}
+
+/* HOW IT WORKS dropdown (mock 11/1) */
+.hiw{position:relative;margin-left:18px}
+.hiw-panel{position:absolute;top:calc(100% + 10px);right:0;width:400px;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 18px 50px rgba(17,24,39,.16);padding:6px;display:none;z-index:60}
+.hiw.open .hiw-panel{display:block}
+.hiw-head{padding:14px 16px 8px;font-size:13px;font-weight:700;color:var(--tx)}
+.hiw-item{padding:10px 16px;border-radius:8px}
+.hiw-item:hover{background:var(--bg)}
+.hiw-q{font-size:13px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:8px}
+.hiw-a{font-size:12.5px;color:var(--mut);line-height:1.5;margin-top:3px;display:none;padding-left:26px}
+.hiw-item.open .hiw-a{display:block}
+.hiw-item.open .hiw-chev{transform:rotate(90deg)}
+.hiw-chev{transition:transform .15s;flex:0 0 auto;color:#9ca3af}
+
 .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
 h1{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--tx)}
 .muted{font-size:13px;color:var(--mut)}
@@ -193,8 +207,40 @@ body{padding:0}
   <div class="divider"></div>
   <span class="bname">Hayes Systems &middot; Lead Reactivation</span>
   <div class="spacer"></div>
+  <div class="hiw" id="hiw">
+    <span class="barlink" id="hiwLink">How it works</span>
+    <div class="hiw-panel" id="hiwPanel">
+      <div class="hiw-head">How lead reactivation works</div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>The connection</div>
+        <div class="hiw-a">CRM data is accessed in read-only mode. Calendars are accessed with read and write permissions to facilitate the serving of appointments.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>The campaign</div>
+        <div class="hiw-a">We email the quiet leads already in your list, paced across the day. Consent-backed calls follow up on the leads who engage.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Appointments</div>
+        <div class="hiw-a">Booked calls land straight on your calendar. You see every appointment and its outcome in this app.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Your control</div>
+        <div class="hiw-a">Request, pause, or stop a campaign from this app. Outreach stops the same day you stop it.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Billing</div>
+        <div class="hiw-a">You are billed per appointment booked, invoiced weekly. No-shows are refunded when the lead is at fault.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Opt-outs</div>
+        <div class="hiw-a">A lead who says stop is stopped on every channel, permanently. Their wish outranks every campaign.</div>
+      </div>
+      <div class="hiw-item">
+        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Your data</div>
+        <div class="hiw-a">Your list is deleted at campaign closeout. Access tokens are deleted at the end of the engagement.</div>
+      </div>    </div>
+  </div>
   <span class="barlink" id="settingsLink">Settings</span>
-  <span class="barlink" id="helpLink">Help / FAQ</span>
   <span class="barlink" id="contactLink">Contact us</span>
 </div></div>
 
@@ -1117,7 +1163,26 @@ $('settingsSave').addEventListener('click', function(){
 });
 
 // Help / contact open outside the iframe
-$('helpLink').addEventListener('click', function(){ window.open('https://www.hayessystems.com/help.html', '_blank'); });
+
+(function(){
+  var hiw = document.getElementById('hiw');
+  if (!hiw) return;
+  document.getElementById('hiwLink').addEventListener('click', function(e){
+    e.stopPropagation();
+    hiw.classList.toggle('open');
+  });
+  hiw.querySelectorAll('.hiw-item').forEach(function(it){
+    it.querySelector('.hiw-q').addEventListener('click', function(e){
+      e.stopPropagation();
+      var was = it.classList.contains('open');
+      hiw.querySelectorAll('.hiw-item').forEach(function(o){ o.classList.remove('open'); });
+      if (!was) it.classList.add('open');
+    });
+  });
+  document.addEventListener('click', function(){ hiw.classList.remove('open'); });
+  hiw.querySelector('.hiw-panel').addEventListener('click', function(e){ e.stopPropagation(); });
+})();
+
 $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@hayessystems.com', '_blank'); });
 
 // IDENTITY SEAM BOOTSTRAP + REAL DATA BOOT: inside the GHL frame the URL
