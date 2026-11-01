@@ -631,6 +631,10 @@ body{padding:0}
       <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Business name</label>
       <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="field"><label>Calendar for appointments</label>
+      <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+      <p id="setCalLock" class="hide" style="margin:6px 0 0;font-size:12px;color:var(--mut)">Locked while a campaign is active. Appointments already booked stay on the old calendar.</p>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Appointments need a whole team calendar: a round-robin with every agent who should take calls.</p></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
@@ -1277,19 +1281,54 @@ $('retainerStart').addEventListener('click', function(){
 });
 
 // Settings overlay: notices email + agency details, persisted to the DB
+var _calOptions = [], _calCurrent = '';
+function _loadCalPicker(){
+  var sel = $('setCalendar');
+  var locked = (S === 'running' || S === 'paused');
+  sel.disabled = locked;
+  $('setCalLock').classList.toggle('hide', !locked);
+  sel.innerHTML = '<option>Loading calendars...</option>';
+  if (!PAGE.live) {
+    sel.innerHTML = '<option>Whole team calendar</option>';
+    return;
+  }
+  api('/api/ghl/calendars').then(function(j){
+    if (!(j && j.ok)) { sel.innerHTML = '<option>' + ((j && j.error) || 'Unavailable') + '</option>'; return; }
+    _calOptions = j.calendars || [];
+    _calCurrent = j.current || '';
+    sel.innerHTML = '';
+    if (!_calOptions.length) { sel.innerHTML = '<option>No calendars found</option>'; return; }
+    _calOptions.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = c.name + (c.rr ? ' \u00b7 whole team' : '');
+      if (c.id === _calCurrent) o.selected = true;
+      sel.appendChild(o);
+    });
+  }).catch(function(){ sel.innerHTML = '<option>Unavailable</option>'; });
+}
 $('settingsLink').addEventListener('click', function(){
   var c = (PAGE.data && PAGE.data.client) || {};
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
+  _loadCalPicker();
   open_('settingsOverlay');
 });
 $('settingsSave').addEventListener('click', function(){
   var em = $('setEmail').value.trim();
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
   var btn = this; btn.disabled = true;
-  api('/api/ghl/settings', {
-    email: em, business: $('setBusiness').value.trim()
-  }).then(function(j){
+  var body = { email: em, business: $('setBusiness').value.trim() };
+  var sel = $('setCalendar');
+  if (!sel.disabled && sel.value && sel.value !== _calCurrent
+      && sel.selectedIndex >= 0) {
+    var opt = _calOptions[sel.selectedIndex];
+    if (opt && opt.id === sel.value) {
+      body.calendarId = opt.id;
+      body.calendarName = opt.name;
+    }
+  }
+  api('/api/ghl/settings', body).then(function(j){
     btn.disabled = false;
     if (j && j.ok) {
       close_('settingsOverlay');
