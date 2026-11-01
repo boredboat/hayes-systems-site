@@ -321,7 +321,7 @@ body{padding:0}
         and by consented AI-assisted phone call. CRM data is accessed in read-only mode. Calendars are accessed with read and write permissions to facilitate the serving of appointments. Access tokens are deleted at the end of the engagement. Your list is
         deleted at campaign closeout. You may stop
         all outreach at any time.
-        <span id="obTermsFull" class="hide"> The full agreement text
+        <span id="obTermsFull"> The full agreement text
         appears here at launch, loaded from the same source the website
         signs against, so what you sign is exactly what every client
         signs. <a href="https://www.hayessystems.com/privacy.html" target="_blank">Privacy
@@ -1515,7 +1515,9 @@ function applyOb(s){
 }
 (function(){
   $('obAgree').addEventListener('change', function(){
-    $('obTermsFull').classList.toggle('hide', !this.checked);
+    // FIX 11/1: the full terms used to appear ONLY after checking the
+    // agree box - backwards. They are always visible now; the checkbox
+    // only gates the submit button.
     updateObBtn();
   });
   function updateObBtn(){
