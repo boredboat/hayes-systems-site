@@ -258,6 +258,20 @@ body{padding:0}
         <div class="hiw-a">Stop any time from this app. Campaign cancellation stops outreach and sends an invoice to cover existing uncharged appointments. Cancellation ends appointment booking; leads who respond will not receive a response. Retainer cancellation stops the monthly fee and your current campaign finishes at the retainer rate. Campaigns run and charge the standard rate after retainer cancellation. There are no cancellation fees.</div>
       </div>    </div>
   </div>
+
+  <div class="hiw" id="tips">
+    <span class="barlink" id="tipsLink">Tips</span>
+    <div class="hiw-panel" id="tipsPanel">
+      <div class="hiw-head">Getting the most from your campaigns</div>
+      <ul class="tips-list">
+        <li>Appointments are phone calls; 15 to 30 minute slots are the sweet spot.</li>
+        <li>Add every agent who should take calls to your whole team calendar.</li>
+        <li>Keep each agent's availability up to date; stale hours mean booked calls at bad times.</li>
+        <li>GHL's in-app booking notifications are on by default; agents see new appointments as they land.</li>
+        <li>Reminders before each call are yours to set per calendar if your team wants them.</li>
+      </ul>
+    </div>
+  </div>
   <span class="barlink" id="settingsLink">Settings</span>
   <span class="barlink" id="contactLink">Contact us</span>
 </div></div>
@@ -1349,6 +1363,8 @@ $('settingsSave').addEventListener('click', function(){
   if (!hiw) return;
   document.getElementById('hiwLink').addEventListener('click', function(e){
     e.stopPropagation();
+    var t = document.getElementById('tips');
+    if (t) t.classList.remove('open');
     hiw.classList.toggle('open');
   });
   hiw.querySelectorAll('.hiw-item').forEach(function(it){
@@ -1359,7 +1375,11 @@ $('settingsSave').addEventListener('click', function(){
       if (!was) it.classList.add('open');
     });
   });
-  document.addEventListener('click', function(){ hiw.classList.remove('open'); });
+  document.addEventListener('click', function(){
+    hiw.classList.remove('open');
+    var t = document.getElementById('tips');
+    if (t) t.classList.remove('open');
+  });
   hiw.querySelector('.hiw-panel').addEventListener('click', function(e){ e.stopPropagation(); });
 })();
 
@@ -1959,4 +1979,16 @@ applyOb(init);
 }
 </script>
 
-</body></html>
+<script>
+(function(){
+  var tips = document.getElementById('tips');
+  if (!tips) return;
+  document.getElementById('tipsLink').addEventListener('click', function(e){
+    e.stopPropagation();
+    var hiw = document.getElementById('hiw');
+    if (hiw) hiw.classList.remove('open');
+    tips.classList.toggle('open');
+  });
+  tips.querySelector('.hiw-panel').addEventListener('click', function(e){ e.stopPropagation(); });
+})();
+</script></body></html>
