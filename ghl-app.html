@@ -322,6 +322,11 @@ body{padding:0}
       time during the campaign to book an appointment. We do not qualify
       leads as to not interfere in your own qualification process.</p>
 
+      <p>Appointments are booked to your <b>whole team calendar</b> in
+      GoHighLevel: a round-robin with every agent who should take calls
+      added to it. You will pick it when you verify your calendar in the
+      app.</p>
+
       <h3 style="margin-top:22px">What you pay</h3>
       <p>Hayes Systems' lead reactivation service charges $60 per
       appointment we book to your calendar. Billing is on a weekly cycle
@@ -411,7 +416,12 @@ body{padding:0}
         <button class="btn btn-ghost" id="schedCal">Calendly</button>
       </div>
       <div id="schedCals" class="hide" style="margin-top:12px">
-        <p style="margin:0 0 8px 0;font-size:13px;color:#4b5563">Which calendar should appointments land on?</p>
+        <p style="margin:0 0 8px 0;font-size:13px;color:#4b5563"><b>Which calendar should appointments land on?</b><br>
+        Appointments need a <b>whole team calendar</b>: a round-robin in
+        GoHighLevel with every agent who should take calls added to it.
+        If you don't have one yet, create it in GoHighLevel under
+        Calendars (choose Round Robin, add your agents), then check again.
+        <span id="schedNoRR" class="hide" style="display:block;margin-top:8px;color:#b45309;font-weight:600;font-size:12.5px">None of your calendars are round-robin yet. Create one in GoHighLevel with your agents on it, then check again below.</span></p>
         <div id="schedCalBtns" style="display:flex;gap:8px;flex-direction:column;align-items:flex-start"></div>
       </div>
     </div>
@@ -1421,12 +1431,16 @@ function _schedGhlPick(){
     // tag round-robin calendars: that is the "book across the whole
     // team" choice (GHL distributes natively once we write to it)
     var rr = /round/i.test(c.type || '');
-    b.textContent = (c.name || c.id) + (rr ? ' \u00b7 whole team' : '');
+    b.textContent = (c.name || c.id)
+      + (rr ? ' \u00b7 whole team' : ' \u00b7 not whole team');
     b.addEventListener('click', function(){
       _schedAnswer('ghl', c.id, c.name);
     });
     holder.appendChild(b);
   });
+  var anyRR = cals.some(function(c){ return /round/i.test(c.type || ''); });
+  var warn = $('schedNoRR');
+  if (warn) warn.classList.toggle('hide', anyRR);
   box.classList.remove('hide');
 }
 $('schedGhl').addEventListener('click', _schedGhlPick);
