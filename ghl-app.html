@@ -13,9 +13,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .bar .bin{display:flex;align-items:center;gap:12px;max-width:1000px;margin:0 auto;width:100%;padding:13px 28px}
 .mark{width:28px;height:31px;flex-shrink:0}
 .divider{width:1px;height:24px;background:var(--bd)}
-.bname{font-weight:700;font-size:11px;letter-spacing:.14em;color:var(--tx);text-transform:uppercase}
-.bar .spacer{flex:1}
-.barlink{font-size:13px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:none;margin-left:18px}
+.bname{font-weight:700;font-size:11px;letter-spacing:.14em;color:var(--tx);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+.bar .spacer{flex:1 0 12px;min-width:12px}
+.barlink{font-size:13px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:none;margin-left:18px;white-space:nowrap;flex:0 0 auto}
 .barlink:hover{color:var(--acch);text-decoration:underline;text-underline-offset:3px}
 
 /* CALENDAR SETTINGS CHECK (11/1): the pre-campaign gate */
