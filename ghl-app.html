@@ -185,6 +185,7 @@ td .when{color:var(--mut);font-size:13px}
 .spin{width:22px;height:22px;border:3px solid #e8f4fe;border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 body.billing-close>*:not(#billingCloser):not(.bar):not(.wrap){display:none!important}
+body.billing-close .wrap>*:not(#billingCloser){display:none!important}
 body.boot-loading #heroBand, body.boot-loading #spine, body.boot-loading #tabsCard,
 body.boot-loading #actRow, body.boot-loading #connectBanner, body.boot-loading #worthNotice,
 body.boot-loading #schedCard, body.boot-loading #listCheck{display:none!important}
@@ -249,8 +250,8 @@ body{padding:0}
 <div class="ob-card hide" id="billingCloser">
     <h2 id="bcTitle">Payment confirmed</h2>
     <p id="bcBody" style="font-size:14px;color:#4b5563">Your card is saved.
-    Close this tab and return to the Hayes Systems app in your GHL
-    dashboard to finish setting up.</p>
+    Return to the Hayes Systems app in your GHL dashboard to finish
+    setting up.</p>
   </div>
 
 <div id="bootSpinner" class="hide"><div class="spin"></div><p>Loading</p></div>
@@ -627,13 +628,32 @@ body{padding:0}
 (function(){
   var _bp = new URLSearchParams(location.search).get('billing');
   if (_bp !== 'success' && _bp !== 'cancelled') return;
+  var _inFrame = false;
+  try { _inFrame = window.self !== window.top; } catch (e) { _inFrame = true; }
+  if (_inFrame) {
+    // FIX 11/1: inside the GHL iframe the checkout return lands IN-PAGE:
+    // the closer card used to take over and sit above the campaign card,
+    // and the copy said 'close this tab' about a page that is not a tab.
+    // In-page: boot the app normally (campaign card stays top), confirm
+    // with a toast, and nudge the wizard's card poll.
+    window.__CARD_JUST_SAVED = (_bp === 'success');
+    setTimeout(function(){
+      try {
+        toast(_bp === 'success' ? 'Your card is saved.'
+                                : 'Card setup was cancelled.');
+        if (typeof _pollCard === 'function' && !_cardOk) _pollCard();
+      } catch (e) {}
+    }, 1400);
+    return;   // normal boot proceeds
+  }
+  // a genuine top-level checkout tab: isolated closer, no tab language
   document.body.classList.add('billing-close');
   document.getElementById('billingCloser').classList.remove('hide');
   if (_bp === 'cancelled') {
     document.getElementById('bcTitle').textContent = 'Card setup cancelled';
     document.getElementById('bcBody').textContent = 'No card was saved.'
-      + ' Close this tab and return to the Hayes Systems app in your GHL'
-      + ' dashboard to try again.';
+      + ' Return to the Hayes Systems app in your GHL dashboard to'
+      + ' try again.';
   }
   window.__BILLING_DONE = true;
 })();
