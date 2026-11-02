@@ -110,6 +110,13 @@ td .when{color:var(--mut);font-size:13px}
 .appt-scroll::-webkit-scrollbar-thumb:hover{background:#9ca3af}
 .rns{white-space:nowrap;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:var(--acc);background:none;border:none;cursor:pointer;padding:0}
 .rns:hover{text-decoration:underline;color:var(--acch)}
+.rowmenu{position:relative;display:inline-block}
+.kebab{background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:6px;color:var(--mut);font-size:16px;line-height:1;vertical-align:middle}
+.kebab:hover{background:var(--bg);color:var(--tx)}
+.rowmenu-panel{display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--bd);border-radius:8px;box-shadow:0 10px 30px rgba(17,24,39,.14);padding:5px;z-index:40;min-width:150px}
+.rowmenu.open .rowmenu-panel{display:block}
+.rowmenu-panel button{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;color:var(--tx);padding:8px 10px;border-radius:6px}
+.rowmenu-panel button:hover{background:var(--bg)}
 .empty{padding:28px 16px;text-align:center;color:var(--mut);font-size:14px}
 .feedrow{display:flex;justify-content:space-between;gap:14px;padding:11px 22px;border-top:1px solid #f3f4f6;font-size:14px}
 .feedrow:first-child{border-top:none}
@@ -889,6 +896,15 @@ var DEMO_PAST = [
 ];
 var noshowRow = null;
 function bindNoshow(){
+  document.querySelectorAll('tr[data-ref] .kebab').forEach(function(k){
+    k.addEventListener('click', function(e){
+      e.stopPropagation();
+      var m = k.closest('.rowmenu');
+      document.querySelectorAll('.rowmenu.open').forEach(function(o){
+        if (o !== m) o.classList.remove('open'); });
+      m.classList.toggle('open');
+    });
+  });
   document.querySelectorAll('tr[data-ref] .rns').forEach(function(b){
     var tr = b.closest('tr');
     b.addEventListener('click', function(){
@@ -911,7 +927,10 @@ function renderAppts(rows){
     var badge = a.status === 'booked' ? '<span class="badge booked">Booked</span>'
       : a.status === 'reported' ? '<span class="badge reported">No-show reported</span>'
       : '<span class="badge held">Held</span>';
-    var btn = a.reportable ? '<button class="rns">Report no-show</button>' : '';
+    var btn = a.reportable
+      ? '<div class="rowmenu"><button class="kebab" aria-label="Row actions">\u22ee</button>'
+        + '<div class="rowmenu-panel"><button class="rns">Report no-show</button></div></div>'
+      : '';
     return '<tr data-ref="' + esc(a.ref) + '"><td><span class="who">' + esc(a.name)
       + '</span></td><td class="when">' + esc(a.when) + '</td><td>' + badge
       + '</td><td>' + btn + '</td></tr>';
@@ -1392,6 +1411,8 @@ $('settingsSave').addEventListener('click', function(){
     hiw.classList.remove('open');
     var t = document.getElementById('tips');
     if (t) t.classList.remove('open');
+    document.querySelectorAll('.rowmenu.open').forEach(function(m){
+      m.classList.remove('open'); });
   });
   hiw.querySelector('.hiw-panel').addEventListener('click', function(e){ e.stopPropagation(); });
 })();
