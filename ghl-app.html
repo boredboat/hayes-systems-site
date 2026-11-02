@@ -117,6 +117,7 @@ td .when{color:var(--mut);font-size:13px}
 .rowmenu.open .rowmenu-panel{display:block}
 .rowmenu-panel button{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;color:var(--tx);padding:8px 10px;border-radius:6px}
 .rowmenu-panel button:hover{background:var(--bg)}
+.badge.marked-cal{background:#fef3c7;color:#b45309;border:1px solid #fde68a;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}
 .empty{padding:28px 16px;text-align:center;color:var(--mut);font-size:14px}
 .feedrow{display:flex;justify-content:space-between;gap:14px;padding:11px 22px;border-top:1px solid #f3f4f6;font-size:14px}
 .feedrow:first-child{border-top:none}
@@ -927,6 +928,9 @@ function renderAppts(rows){
     var badge = a.status === 'booked' ? '<span class="badge booked">Booked</span>'
       : a.status === 'reported' ? '<span class="badge reported">No-show reported</span>'
       : '<span class="badge held">Held</span>';
+    if (a.calendar_marked && a.status !== 'reported') {
+      badge += ' <span class="badge marked-cal" title="You marked this no-show in your calendar. Report it here to claim the refund.">Marked in calendar</span>';
+    }
     var btn = a.reportable
       ? '<div class="rowmenu"><button class="kebab" aria-label="Row actions">\u22ee</button>'
         + '<div class="rowmenu-panel"><button class="rns">Report no-show</button></div></div>'
