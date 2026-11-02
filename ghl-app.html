@@ -1017,7 +1017,7 @@ $('confirmNoshow').addEventListener('click', function(){
     }
     toast(review
       ? 'Report received. We review high volumes of no-show reports before refunding, and we will be in touch shortly.'
-      : 'That appointment is refunded. You never pay for an appointment that didn\u2019t happen.');
+      : 'That appointment is refunded. You never pay for a no-show.');
   }
   if (PAGE.live && noshowRow) {
     api('/api/ghl/report-no-show',
