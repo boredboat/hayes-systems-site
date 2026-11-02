@@ -1438,7 +1438,8 @@ function loadPageData(){
       if (!a || !a.ok) return;
       renderAppts((a.appointments || []).map(function(x){
         return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
-                reportable: !!x.reportable, ref: x.ref};
+                reportable: !!x.reportable, ref: x.ref,
+                calendar_marked: !!x.calendar_marked};   // B-2 (t_547cc848)
       }));
       if ((a.appointments || []).length) { $('apptSec').classList.remove('hide'); syncTabs(); }
     });
