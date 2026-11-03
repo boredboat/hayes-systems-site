@@ -143,6 +143,21 @@ td .when{color:var(--mut);font-size:13px}
 .overlay.show{display:flex}
 .dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(17,24,39,.3)}
 .dialog h3{font-weight:700;font-size:18px;color:var(--tx);margin-bottom:10px}
+.noshow-dlg{padding:0;overflow:hidden}
+.noshow-head{background:#fef2f2;border-bottom:1px solid #fecaca;padding:18px 20px 14px;display:flex;gap:12px;align-items:center}
+.noshow-head h3{margin:0;color:#b91c1c}
+.noshow-warn{width:34px;height:34px;border-radius:50%;border:2px solid #dc2626;color:#dc2626;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.noshow-dlg .appt-chip{margin:16px 20px 0;background:var(--surface,#f6f6f6);border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:10px 12px;font-size:13.5px}
+.noshow-facts{list-style:none;margin:14px 20px;padding:0}
+.noshow-facts li{font-size:13px;padding:5px 0 5px 20px;position:relative;line-height:1.45}
+.noshow-facts li::before{content:"";position:absolute;left:4px;top:10px;width:8px;height:8px;border-radius:50%;background:#dc2626}
+.noshow-confirm{display:flex;gap:10px;align-items:flex-start;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin:0 20px 4px}
+.noshow-confirm input{width:18px;height:18px;margin-top:1px;accent-color:#dc2626;cursor:pointer;flex:none}
+.noshow-confirm label{font-size:13px;font-weight:600;cursor:pointer;line-height:1.45}
+.noshow-dlg .dialog-actions{padding:14px 20px 18px}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover:not(:disabled){background:#b91c1c}
+.btn-danger:disabled{background:#f3b4b4;cursor:not-allowed;color:#fff}
 .dialog p{font-size:14px;color:#4b5563;margin-bottom:22px}
 .dialog-actions{display:flex;gap:12px;justify-content:flex-end}
 
@@ -611,12 +626,24 @@ body{padding:0}
 </div>
 
 <div class="overlay" id="noshowOverlay">
-  <div class="dialog">
-    <h3>Report a no-show</h3>
-    <p id="noshowBody">Mark the appointment as a no-show in your calendar first, then report it here. This refunds the appointment. Report it only if the lead did not show.</p>
+  <div class="dialog noshow-dlg">
+    <div class="noshow-head">
+      <div class="noshow-warn">!</div>
+      <h3>Report a no-show</h3>
+    </div>
+    <div class="appt-chip" id="noshowBody"><b>R. Delgado</b> &middot; <span class="when">Mon, Nov 2, 10:00 AM</span></div>
+    <ul class="noshow-facts">
+      <li>Mark the appointment as a no-show in your calendar first.</li>
+      <li>The appointment charge is refunded after you report it.</li>
+      <li>Reporting is tracked. False reports can end the service.</li>
+    </ul>
+    <div class="noshow-confirm">
+      <input type="checkbox" id="noshowCheck">
+      <label for="noshowCheck">I confirm this lead did not show up for the scheduled call, and the calendar shows it marked as a no-show.</label>
+    </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="noshowOverlay">Not a no-show</button>
-      <button class="btn btn-primary" id="confirmNoshow">Report no-show</button>
+      <button class="btn btn-danger" id="confirmNoshow" disabled>Report no-show</button>
     </div>
   </div>
 </div>
@@ -928,7 +955,12 @@ function bindNoshow(){
       noshowRow = tr;
       var who = tr.querySelector('.who').textContent;
       var when = tr.querySelector('.when').textContent;
-      $('noshowBody').textContent = who + ', ' + when + '. Mark it as a no-show in your calendar first, then report it here. This refunds the appointment. Report it only if the lead did not show.';
+      var chip = $('noshowBody');
+      chip.innerHTML = '<b></b> &middot; <span class="when"></span>';
+      chip.querySelector('b').textContent = who;
+      chip.querySelector('.when').textContent = when;
+      $('noshowCheck').checked = false;
+      $('confirmNoshow').disabled = true;
       open_('noshowOverlay');
     });
   });
@@ -1045,6 +1077,13 @@ $('confirmCancel').addEventListener('click', function(){
   }
   apply('cancelled');
   toast('Campaign cancelled. Appointments already on your calendar are unaffected.');
+});
+
+// The checkbox gate: the report button stays locked until the box is
+// checked (Matt 11/3: friction against wanton refund use, not only the
+// server-side limiter).
+$('noshowCheck').addEventListener('change', function(){
+  $('confirmNoshow').disabled = !$('noshowCheck').checked;
 });
 
 // No-show report: confirm, then the row flips and the button never returns
