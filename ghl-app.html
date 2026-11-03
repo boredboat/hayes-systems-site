@@ -719,8 +719,7 @@ body{padding:0}
       <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Calendar for appointments</label>
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
-      <p id="setCalLock" class="hide" style="margin:6px 0 0;font-size:12px;color:var(--mut)">Locked while a campaign is active. Appointments already booked stay on the old calendar.</p>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Appointments need a whole team calendar: a round-robin with every agent who should take calls.</p></div>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
         <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Card on file</span>
@@ -1490,7 +1489,6 @@ function _loadCalPicker(){
   var sel = $('setCalendar');
   var locked = (S === 'running' || S === 'paused');
   sel.disabled = locked;
-  $('setCalLock').classList.toggle('hide', !locked);
   sel.innerHTML = '<option>Loading calendars...</option>';
   if (!PAGE.live) {
     sel.innerHTML = '<option>Whole team calendar</option>';
