@@ -425,6 +425,9 @@ body{padding:0}
       <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
+        <div class="ob-field"><label for="obNotice">Service notice email</label>
+          <input id="obNotice" placeholder="you@brokerage.com">
+          <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
       </div>
     </div>
 
@@ -466,7 +469,7 @@ body{padding:0}
     <h2 style="margin-bottom:8px">You are all set</h2>
     <div id="noticeEmailRow" class="hide" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
       <p style="font-size:13px;color:#4b5563;margin:0 0 8px 0">Service notices
-      (like when your next campaign window opens) go to:</p>
+      (like when your next campaign window opens) will go to:</p>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <b id="noticeEmail" style="font-size:13.5px;color:var(--tx)"></b>
         <input id="noticeEmailEdit" class="hide" placeholder="new@email.com"
@@ -1670,6 +1673,10 @@ function audPreview(){
 }
 function audInit(){
   if (!PAGE.token) return;
+  var _nb = $('obNotice');
+  if (_nb && !_nb.value) {
+    _nb.value = ((PAGE.data && PAGE.data.client) || {}).email || '';
+  }
   audFromData();
   if (AUD_TAGS === null) {
     AUD_TAGS = [];
@@ -2323,6 +2330,11 @@ function applyOb(s){
           signed_by: $('obSign').value.trim(),
           business: $('obBusiness').value.trim()
         }).catch(function(){});
+        var _obEm = $('obNotice') ? $('obNotice').value.trim() : '';
+        if (_obEm && _obEm.indexOf('@') > 1) {
+          api('/api/ghl/settings', {email: _obEm}).catch(function(){});
+          if (PAGE.data && PAGE.data.client) PAGE.data.client.email = _obEm;
+        }
       }
       fetch(API + '/api/ghl/stripe-setup', {
         method: 'POST',
