@@ -154,6 +154,7 @@ td .when{color:var(--mut);font-size:13px}
 .noshow-confirm{display:flex;gap:10px;align-items:flex-start;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin:0 20px 4px}
 .noshow-confirm input{width:18px;height:18px;margin-top:1px;accent-color:#dc2626;cursor:pointer;flex:none}
 .noshow-confirm label{font-size:13px;font-weight:600;cursor:pointer;line-height:1.45}
+.noshow-error{margin:10px 20px 0;color:#b91c1c;font-size:13px;font-weight:600;line-height:1.45}
 .noshow-dlg .dialog-actions{padding:14px 20px 18px}
 .btn-danger{background:#dc2626;color:#fff}
 .btn-danger:hover:not(:disabled){background:#b91c1c}
@@ -641,6 +642,7 @@ body{padding:0}
       <input type="checkbox" id="noshowCheck">
       <label for="noshowCheck">I confirm this lead did not show up for the scheduled call, and the calendar shows it marked as a no-show.</label>
     </div>
+    <p class="noshow-error" id="noshowError" hidden></p>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="noshowOverlay">Not a no-show</button>
       <button class="btn btn-danger" id="confirmNoshow" disabled>Report no-show</button>
@@ -961,6 +963,8 @@ function bindNoshow(){
       chip.querySelector('.when').textContent = when;
       $('noshowCheck').checked = false;
       $('confirmNoshow').disabled = true;
+      var errEl0 = $('noshowError');
+      if (errEl0) { errEl0.hidden = true; errEl0.textContent = ''; }
       open_('noshowOverlay');
     });
   });
@@ -1090,8 +1094,14 @@ $('noshowCheck').addEventListener('change', function(){
 // for that appointment (the 14-day window is decided server-side now;
 // rows outside it simply render without a button).
 $('confirmNoshow').addEventListener('click', function(){
-  close_('noshowOverlay');
+  var errEl = $('noshowError');
+  errEl.hidden = true; errEl.textContent = '';
+  function fail(msg){
+    errEl.textContent = msg || 'The report did not go through. Try again in a moment.';
+    errEl.hidden = false;
+  }
   function flip(review){
+    close_('noshowOverlay');
     if (noshowRow) {
       noshowRow.querySelector('.badge').className = 'badge reported';
       noshowRow.querySelector('.badge').textContent = review ? 'Under review' : 'No-show reported';
@@ -1105,8 +1115,8 @@ $('confirmNoshow').addEventListener('click', function(){
     api('/api/ghl/report-no-show',
         {appointment_ref: noshowRow.getAttribute('data-ref') || ''}).then(function(j){
       if (j.ok) { flip(j.action === 'review'); }
-      else { toast(j.error || 'The report did not go through. Try again in a moment.'); }
-    }).catch(function(){ toast('The report did not go through. Try again in a moment.'); });
+      else { fail(j.message || j.error); }
+    }).catch(function(){ fail(); });
     return;
   }
   flip(false);
