@@ -260,7 +260,7 @@ body.billing-close>*:not(#billingCloser):not(.bar):not(.wrap){display:none!impor
 body.billing-close .wrap>*:not(#billingCloser){display:none!important}
 body.boot-loading #heroBand, body.boot-loading #spine, body.boot-loading #tabsCard,
 body.boot-loading #actRow, body.boot-loading #connectBanner, body.boot-loading #worthNotice,
-body.boot-loading #schedCard, body.boot-loading #listCheck{display:none!important}
+body.boot-loading #schedCard{display:none!important}
 #bootSpinner{padding:48px 0;text-align:center}
 #bootSpinner p{font-size:13.5px;color:var(--mut)}
 #billingCloser{margin:0 auto;max-width:640px}
@@ -559,14 +559,6 @@ body{padding:0}
   <div class="step now" id="sp3"><span class="d">3</span>Outreach underway<span class="line"></span></div>
   <div class="step" id="sp4"><span class="d">4</span>Campaign completed</div>
 </div>
-
-<div class="listcheck" id="listCheck" style="display:none">
-    <div style="flex:1;min-width:220px">
-      <h3>Your list</h3>
-      <p id="listCheckBody"></p>
-    </div>
-    <button class="btn btn-ghost" id="listCheckBtn">Update now</button>
-  </div>
 
 <div class="actionbar hide" id="actionBar"></div>
 
@@ -1880,71 +1872,6 @@ function _schedGhlPick(){
 }
 $('schedGhl').addEventListener('click', _schedGhlPick);
 $('schedCal').addEventListener('click', function(){ _schedAnswer('calendly'); });
-// LIST CHECK (10/29): the client's list count with a manual re-check.
-// Hidden while a campaign runs (the hero's workable number owns the
-// count then - one number, one home).
-function _renderListCheck(){
-  var el = $('listCheck');
-  if (!el) return;
-  var d = PAGE.data || {};
-  var st = (d.client && d.client.state) || 'none';
-  if (st === 'running' || st === 'paused' || st === 'retainer'
-      || PAGE.needsConnect) {
-    el.style.display = 'none';
-    return;
-  }
-  var ic = d.install_check;
-  if (!ic || !ic.ok) { el.style.display = 'none'; return; }
-  el.style.display = '';
-  $('listCheckBody').textContent =
-    fmtNum(ic.workable || 0) + ' workable of '
-    + fmtNum(ic.total || 0) + ' contacts'
-    + (ic.checked_at ? ' · checked ' + fmtDay(ic.checked_at) : '');
-}
-$('listCheckBtn').addEventListener('click', function(){
-  var btn = this;
-  // working state: grey + spinner + honest label for the whole poll
-  // (Matt 10/29: a disabled-but-blue button still looked clickable)
-  function _work(){ btn.disabled = true;
-    btn.innerHTML = '<span class="spin-sm"></span>Updating your list'; }
-  function _reset(){ btn.disabled = false; btn.textContent = 'Update now'; }
-  _work();
-  api('/api/ghl/recheck-list', {}).then(function(j){
-    if (j && j.ok) {
-      toast(j.already
-        ? 'A check is already running. Your list updates in a moment.'
-        : 'Updating your list. This takes a minute or two.');
-    } else {
-      _reset();
-      toast((j && j.error) || 'Could not start the check. Try again.');
-      return;
-    }
-    // poll page-data until the checked_at stamp advances, max ~6 min
-    var before = ((PAGE.data || {}).install_check || {}).checked_at || '';
-    var tries = 0;
-    var iv = setInterval(function(){
-      tries += 1;
-      api('/api/ghl/page-data').then(function(d){
-        if (!d || !d.ok) return;
-        var at = ((d.install_check || {}).checked_at) || '';
-        if (at && at !== before) {
-          PAGE.data = d;
-          applyFromData(d);
-          clearInterval(iv);
-          _reset();
-          toast('Your list is up to date.');
-        }
-      }).catch(function(){});
-      if (tries >= 36) {
-        clearInterval(iv);
-        _reset();
-        toast('Still checking. Give it another minute and refresh.');
-      }
-    }, 10000);
-  }).catch(function(){ _reset();
-    toast('Could not start the check. Try again.'); });
-});
-
 function applyFromData(d){
   if (window.__LIVE_BOOT) {
     window.__LIVE_BOOT = false;
@@ -1984,7 +1911,6 @@ function applyFromData(d){
   PAGE.launchError = d.launch_error || '';
   _renderWorth();
   _renderSched();
-  _renderListCheck();
   _renderPrep();
   _renderLaunchFail();
   // the gate's Step 1 owns the first-run connect; the banner is the
@@ -2099,7 +2025,7 @@ function applyOb(s){
       $('obWelcome').classList.remove('hide');
       $('obForm').classList.add('hide');
     }
-    ['heroBand','spine','tabsCard','actRow','listCheck'].forEach(function(id){
+    ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
     $('cancelBtn').classList.add('hide');
