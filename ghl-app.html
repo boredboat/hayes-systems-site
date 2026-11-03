@@ -893,6 +893,12 @@ function apply(s, until){
   $('heroBand').classList.toggle('hide', ob);
   $('spine').classList.toggle('hide', !(s === 'running' || s === 'paused' || s === 'cancelled' || s === 'completed'));
   $('tabsCard').classList.toggle('hide', ob);
+  // apply() OWNS the action bar's visibility (Matt 11/3, live-caught:
+  // applyOb hides it for onboarding but nothing un-hid it on the in-page
+  // 'Go to your campaign' transition - the buttons vanished until a full
+  // reload). Hidden only for onboarding; the buttons inside are
+  // state-managed below.
+  $('actRow').classList.toggle('hide', ob);
   if (!has) { setStats(0, 0, 0, 0, 0, 0); }
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
