@@ -1450,16 +1450,20 @@ function loadPageData(){
     if (!d || !d.ok) return;
     PAGE.data = d;
     applyFromData(d);
+    // FIX (Matt 11/2: "no recent activity"): the activity fetch was
+    // UNREACHABLE - the appointments return above exited the callback
+    // before this line ever ran. Chained properly now.
     return api('/api/ghl/appointments').then(function(a){
-      if (!a || !a.ok) return;
-      renderAppts((a.appointments || []).map(function(x){
-        return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
-                reportable: !!x.reportable, ref: x.ref,
-                calendar_marked: !!x.calendar_marked};   // B-2 (t_547cc848)
-      }));
-      if ((a.appointments || []).length) { $('apptSec').classList.remove('hide'); syncTabs(); }
-    });
-    return api('/api/ghl/activity').then(function(f){
+      if (a && a.ok) {
+        renderAppts((a.appointments || []).map(function(x){
+          return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
+                  reportable: !!x.reportable, ref: x.ref,
+                  calendar_marked: !!x.calendar_marked};   // B-2 (t_547cc848)
+        }));
+        if ((a.appointments || []).length) { $('apptSec').classList.remove('hide'); syncTabs(); }
+      }
+      return api('/api/ghl/activity');
+    }).then(function(f){
       if (!f || !f.ok || !(f.activity || []).length) return;
       $('feedBody').innerHTML = f.activity.map(function(e){
         return '<div class="feedrow"><span>' + esc(e.text) + '</span>'
