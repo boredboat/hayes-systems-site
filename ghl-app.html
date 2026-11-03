@@ -543,7 +543,7 @@ body{padding:0}
   <div class="pane" id="pastSec">
     <div class="appt-scroll">
     <table>
-      <thead><tr><th>Campaign</th><th style="width:130px">Leads worked</th><th style="width:130px">Appointments</th><th style="width:110px">Cost</th></tr></thead>
+      <thead><tr><th style="width:110px">Campaign</th><th>Period</th><th style="width:120px">Leads worked</th><th style="width:120px">Appointments</th><th style="width:100px">Cost</th></tr></thead>
       <tbody id="pastBody"></tbody>
     </table>
     </div>
@@ -965,8 +965,10 @@ function renderPast(rows){
     tb.innerHTML = '<tr><td colspan="4" class="empty">Your campaign history appears here.</td></tr>';
     return;
   }
-  tb.innerHTML = rows.map(function(p){
-    return '<tr><td class="when">' + esc(p.period) + '</td><td>' + fmtNum(p.leads_worked)
+  tb.innerHTML = rows.map(function(p, i){
+    var n = p.campaign_id || (i + 1);
+    return '<tr><td>Campaign ' + esc(n) + '</td><td class="when">' + esc(p.period)
+      + '</td><td>' + fmtNum(p.leads_worked)
       + '</td><td>' + fmtNum(p.appointments) + '</td><td>' + fmtMoney(p.cost) + '</td></tr>';
   }).join('');
 }
