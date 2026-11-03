@@ -515,7 +515,7 @@ body{padding:0}
       <div class="ret-card on hide" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer</span></div>
     </div>
     <h1 id="stateH1">Campaign 3</h1>
-    <div class="sub" id="pillSub">Week 3 of 4 &middot; Projected end ~Oct 30 &middot; Updated Oct 18</div>
+    <div class="sub" id="pillSub">Week 3 &middot; Projected end ~Oct 30 &middot; Updated Oct 18</div>
   </div>
   <div class="nums" id="stats">
     <div class="hnum"><div class="num" id="numW">1,847</div><div class="lbl">Leads</div></div>
@@ -878,7 +878,7 @@ function apply(s, until){
   if (s === 'completed') { $('stateH1').textContent = n ? 'Campaign ' + n : 'Campaign'; setSpine(4); }
   if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
   if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); setStats(0, 0, 0, 0, 0, 0); }
-  if (s === 'running') { pill('run', 'Running', 'Week 3 of 4 \u00b7 Projected end ~Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
+  if (s === 'running') { pill('run', 'Running', 'Week 3 \u00b7 Projected end ~Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
   if (s === 'completed') {
@@ -1836,7 +1836,7 @@ function applyFromData(d){
   if (st === 'running' && c) {
     var sub = c.stopping
       ? 'Ending this week \u00b7 appointments on your calendar are unaffected'
-      : 'Week ' + c.week + ' of 4'
+      : 'Week ' + c.week
         + (c.projected_ends ? ' \u00b7 Projected end ~' + fmtDay(c.projected_ends) : '')
         + (c.updated ? ' \u00b7 Updated ' + fmtDay(c.updated) : '');
     pill(c.stopping ? 'stoppill' : 'run', c.stopping ? 'Ending' : 'Running', sub);
