@@ -613,7 +613,7 @@ body{padding:0}
 <div class="overlay" id="noshowOverlay">
   <div class="dialog">
     <h3>Report a no-show</h3>
-    <p id="noshowBody">This refunds the appointment. Report it only if the lead did not show.</p>
+    <p id="noshowBody">Mark the appointment as a no-show in your calendar first, then report it here. This refunds the appointment. Report it only if the lead did not show.</p>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="noshowOverlay">Not a no-show</button>
       <button class="btn btn-primary" id="confirmNoshow">Report no-show</button>
@@ -928,7 +928,7 @@ function bindNoshow(){
       noshowRow = tr;
       var who = tr.querySelector('.who').textContent;
       var when = tr.querySelector('.when').textContent;
-      $('noshowBody').textContent = who + ', ' + when + '. This refunds the appointment. Report it only if the lead did not show.';
+      $('noshowBody').textContent = who + ', ' + when + '. Mark it as a no-show in your calendar first, then report it here. This refunds the appointment. Report it only if the lead did not show.';
       open_('noshowOverlay');
     });
   });
