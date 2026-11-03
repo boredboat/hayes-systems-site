@@ -816,6 +816,15 @@ body{padding:0}
       + ' try again.';
   }
   window.__BILLING_DONE = true;
+  // Matt 11/3: this tab was opened by the app page, so on SUCCESS it may
+  // close itself - the client lands back in the GHL app, where the card
+  // poll (3s) has already picked the saved card up and the wizard
+  // advances. The closer stays as fallback copy for browsers that
+  // refuse scripted close; cancelled stays manual (the retry copy
+  // deserves reading time).
+  if (_bp === 'success') {
+    setTimeout(function(){ try { window.close(); } catch (e) {} }, 1200);
+  }
 })();
 
 // State machine. States: running | paused | cancelled | none | completed
