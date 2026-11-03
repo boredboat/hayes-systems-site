@@ -1018,8 +1018,15 @@ function renderInvoices(rows){
     return;
   }
   tb.innerHTML = rows.map(function(v){
+    // Matt 11/3: billing is weekly invoices, the retainer monthly fee,
+    // and refunds - never a special close-out invoice. Fee and refund
+    // rows carry no appointment count; refunds render as credits.
+    var n = (v.appointments === null || v.appointments === undefined)
+      ? '' : fmtNum(v.appointments);
+    var amt = (v.kind === 'Refund')
+      ? '-$' + fmtNum(v.total) : fmtMoney(v.total);
     return '<tr><td class="when">' + esc(v.date) + '</td><td>' + esc(v.kind)
-      + '</td><td>' + fmtNum(v.appointments) + '</td><td>' + fmtMoney(v.total) + '</td></tr>';
+      + '</td><td>' + n + '</td><td>' + amt + '</td></tr>';
   }).join('');
 }
 function renderPast(rows){
