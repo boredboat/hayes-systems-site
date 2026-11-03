@@ -2054,31 +2054,19 @@ function applyFromData(d){
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
 // are told what it is and sign). state=onboarding shows ONLY the gate.
-var _obResumed = false;
+var _obResumed = false, _obResumeHook = null;
 function _obResume(){
-  // mid-walk refresh returns to the saved step, not the welcome card
-  if (_obResumed) return;
-  var started = false, step = 0;
-  try {
-    started = localStorage.getItem(
-      'ghlob:' + (new URLSearchParams(location.search)
-                  .get('locationId') || 'x') + ':started') === '1';
-    step = parseInt(localStorage.getItem(
-      'ghlob:' + (new URLSearchParams(location.search)
-                  .get('locationId') || 'x') + ':step') || '0', 10) || 0;
-  } catch(e) {}
-  if (!started) return;
-  _obResumed = true;
-  $('obWelcome').classList.add('hide');
-  $('obForm').classList.remove('hide');
-  _obInit();
-  _obGo(Math.min(step, _obSteps.length - 1));
+  // mid-walk refresh returns to the saved step, not the welcome card.
+  // The wizard internals live in their own closure - the IIFE installs
+  // the real resume as _obResumeHook once it has defined them.
+  if (_obResumed || !_obResumeHook) return;
+  _obResumeHook();
 }
 function applyOb(s){
   var on = (s === 'onboarding');
   $('obGate').classList.toggle('hide', !on);
   if (on) {
-    _obResume();
+    try { _obResume(); } catch(e) {}
     if (!_obResumed) {
       $('obWelcome').classList.remove('hide');
       $('obForm').classList.add('hide');
@@ -2223,6 +2211,20 @@ function applyOb(s){
     var nc = $('obNextConnect');
     if (nc) { nc.disabled = !_connectOk(); }
   }
+  _obResumeHook = function(){
+    var started = false, step = 0;
+    try {
+      var k = _obKey();
+      started = localStorage.getItem(k + ':started') === '1';
+      step = parseInt(localStorage.getItem(k + ':step') || '0', 10) || 0;
+    } catch(e) {}
+    if (!started) return;
+    _obResumed = true;
+    $('obWelcome').classList.add('hide');
+    $('obForm').classList.remove('hide');
+    _obInit();
+    _obGo(Math.min(step, _obSteps.length - 1));
+  };
   $('obStart').addEventListener('click', function(){
     try { localStorage.setItem(_obKey() + ':started', '1'); } catch(e) {}
     $('obWelcome').classList.add('hide');
