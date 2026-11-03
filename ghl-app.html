@@ -757,19 +757,13 @@ body{padding:0}
 <div class="overlay" id="reqOverlay">
   <div class="dialog">
     <h3>Start your campaign</h3>
-    <p>Here is what happens next:</p>
-    <ul style="font-size:14px;color:#4b5563;line-height:1.65;margin:0 0 18px 0;padding-left:20px;display:grid;gap:12px">
-      <li>We read your CRM now to confirm your workable lead count (a minute or two)</li>
-      <li>Your campaign is planned and starts automatically - no further action from you</li>
-      <li>Leads receive 6 personalized emails over about a month</li>
-      <li>Interested leads get a call from our AI booking assistant and book straight onto your calendar</li>
-      <li>You pay only for appointments that land, per the terms you agreed to</li>
-    </ul>
-    <label class="ob-check" style="margin-bottom:16px"><input type="checkbox" id="csAgree">
-      <span>I agree to the <a href="https://www.hayessystems.com/terms.html" target="_blank" style="color:var(--acc);font-weight:600">Campaign Terms</a> and understand that Start campaign begins a paid service.</span></label>
+    <p>Your campaign is set up and ready. Starting begins the paid
+    service per the terms you agreed to: we read your list now (a minute
+    or two), then your audience receives their emails and interested
+    leads book straight onto your calendar.</p>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
-      <button class="btn btn-primary" id="confirmReq" disabled>Start campaign</button>
+      <button class="btn btn-primary" id="confirmReq">Start campaign</button>
     </div>
   </div>
 </div>
@@ -902,7 +896,8 @@ function apply(s, until){
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
-  req.textContent = 'Start a new campaign';
+  req.textContent = ((PAGE && PAGE.pastN) ? 'Start a new campaign'
+                                        : 'Start campaign';
   req.disabled = !(s === 'none' || s === 'completed');
   // retainer badge is an ACTIVE-ONLY green card (Matt 10/29: the old
   // always-on red "Retainer off" read like an error)
@@ -1365,9 +1360,7 @@ $('cfgRecheck').addEventListener('click', function(){
 $('reqBtn').addEventListener('click', function(){
   _runCfgCheck(_openReqDialog);
 });
-$('csAgree').addEventListener('change', function(){
-  $('confirmReq').disabled = !this.checked;
-});
+
 $('confirmReq').addEventListener('click', function(){
   close_('reqOverlay');
   var btn = $('reqBtn');
