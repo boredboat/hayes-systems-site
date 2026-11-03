@@ -721,7 +721,8 @@ body{padding:0}
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
     <div class="field"><label>Contact tag (optional)</label>
-      <input id="setTag" class="set-in" placeholder="Leave blank to work your whole contact list" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px">
+      <input id="setTag" class="set-in" list="tagOptions" placeholder="Leave blank to work your whole contact list" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px">
+      <datalist id="tagOptions"></datalist>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Only contacts carrying this tag in GoHighLevel are worked. Leave blank and we work your whole contact list. Applies from your next campaign onward.</p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
@@ -1540,9 +1541,24 @@ $('settingsLink').addEventListener('click', function(){
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
   $('setTag').value = (PAGE.data && PAGE.data.contact_tag) || '';
+  _loadTagOptions();
   _loadCalPicker();
   open_('settingsOverlay');
 });
+// Tag picker inventory (11/3): the location's live tag list powers a
+// datalist under the free-text input. Free text stays legal - a read
+// failure or a stale list must never block saving a tag by name.
+function _loadTagOptions(){
+  var dl = $('tagOptions');
+  if (!dl || !PAGE.token || dl.dataset.loaded) return;
+  dl.dataset.loaded = '1';
+  api('/api/ghl/tags').then(function(j){
+    if (!(j && j.ok) || !(dl = $('tagOptions'))) return;
+    dl.innerHTML = (j.tags || []).map(function(t){
+      return '<option value="' + esc(t) + '">';
+    }).join('');
+  }).catch(function(){});
+}
 $('settingsSave').addEventListener('click', function(){
   var em = $('setEmail').value.trim();
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
