@@ -196,11 +196,11 @@ td .when{color:var(--mut);font-size:13px}
 .chip:hover{border-color:var(--acc)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .aud-rows{margin:0 0 14px}
-.aud-row{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
+.aud-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
 .aud-row:hover{border-color:var(--acc)}
 .aud-row + .aud-row{margin-top:8px}
-.aud-prev{margin-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.aud-n{font-size:32px;font-weight:700;color:var(--tx);letter-spacing:-.5px;line-height:1}
+.aud-prev{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;text-align:center}
+.aud-n{font-size:34px;font-weight:700;color:#15803d;letter-spacing:-.5px;line-height:1}
 .aud-cap{font-size:13px;color:var(--mut)}
 
 /* onboarding wizard */
@@ -414,11 +414,9 @@ body{padding:0}
       <p>The default audience is <b>everyone except open opportunities</b>
       - the leads your team is not actively working a deal with right
       now. You know your list best, so shape it with your own tags if
-      you want it tighter or wider.</p>
+      you want it tighter or wider. Duplicates, opted-out contacts, and
+      contacts with no email address are filtered on our end.</p>
       <div id="audWizard"></div>
-      <p style="font-size:12.5px;color:var(--mut)">Duplicates, opted-out
-      contacts, and contacts with no email address are always removed
-      before anything sends.</p>
     </div>
 
     <div class="ob-step" data-ob="3">
