@@ -1055,8 +1055,8 @@ function renderActionBar(st){
     }
     var h = st.health || {};
     if (h.connection_ok === false) {
-      items.push(['The connection to your GoHighLevel account needs attention. Contact us and we will restore it.',
-                  'Contact us', 'openContact']);
+      items.push(['The connection to your GoHighLevel account needs attention.',
+                  'Reconnect', 'openReconnect']);
     }
   }
   if (!items.length) { bar.classList.add('hide'); bar.innerHTML = ''; return; }
@@ -1068,6 +1068,7 @@ function renderActionBar(st){
     btn.addEventListener('click', function(){
       var it = items[parseInt(btn.getAttribute('data-ab'), 10)];
       if (it[2] === 'openCardUpdate') openCardUpdate();
+      else if (it[2] === 'openReconnect') openReconnect();
       else if (it[2] === 'openContact') {
         var cl = $('contactLink');
         if (cl) cl.click(); else location.href = 'mailto:support@hayessystems.com';
@@ -1075,6 +1076,16 @@ function renderActionBar(st){
     });
   });
   bar.classList.remove('hide');
+}
+function openReconnect(){
+  if (!PAGE.token) { toast('Reconnect is unavailable in preview mode.'); return; }
+  toast('Opening GoHighLevel to reconnect...');
+  fetch(API + '/api/ghl/reconnect-url', {
+    headers: {'X-Hayes-Token': PAGE.token}
+  }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+    if (d && d.ok && d.url) window.open(d.url, '_blank');
+    else toast('Reconnect is unavailable right now. Contact us and we will restore it.');
+  }).catch(function(){ toast('Reconnect is unavailable right now.'); });
 }
 function openCardUpdate(){
   if (!PAGE.token) { toast('Card setup is unavailable in preview mode.'); return; }
