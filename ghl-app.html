@@ -1635,12 +1635,16 @@ function audPreview(){
   clearTimeout(AUD_PREV_T);
   AUD_PREV_T = setTimeout(function(){
     if (!PAGE.token) return;
-    api('/api/ghl/audience-preview', {include_tags: AUD.include_tags}).then(function(j){
+    api('/api/ghl/audience-preview', {include_tags: AUD.include_tags,
+                                      exclude_tags: AUD.exclude_tags}).then(function(j){
       if (!j || !j.ok) return;
+      var counts = j.tag_counts || {};
       var base = AUD.include_tags.length
         ? AUD.include_tags.reduce(function(n, t){
-            return n + ((j.tag_counts && j.tag_counts[t]) || 0); }, 0)
+            return n + (counts[t] || 0); }, 0)
         : (j.whole || 0);
+      base -= AUD.exclude_tags.reduce(function(n, t){
+        return n + (counts[t] || 0); }, 0);
       var skip = AUD.skip_open_opp ? (j.open_opp || 0) : 0;
       var n = Math.max(0, base - skip);
       var cap = 'contacts in this audience';
