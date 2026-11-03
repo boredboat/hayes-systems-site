@@ -1940,7 +1940,14 @@ function applyFromData(d){
   // boot default stayed rendered: demo running stats), and leaving
   // onboarding must close the gate
   if (st === 'onboarding') { applyOb('onboarding'); }
-  else if (_wasOb) { $('obGate').classList.add('hide'); }
+  else if (_wasOb) { $('obGate').classList.add('hide');
+    try { localStorage.removeItem(
+      'ghlob:' + (new URLSearchParams(location.search)
+                   .get('locationId') || 'x') + ':started');
+      localStorage.removeItem(
+      'ghlob:' + (new URLSearchParams(location.search)
+                   .get('locationId') || 'x') + ':step'); } catch(e) {}
+  }
   PAGE.worth = d.install_check || null;
   PAGE.sched = d.sched_scan || null;
   PAGE.schedVerified = d.scheduling_surface || '';
@@ -2049,12 +2056,35 @@ function applyFromData(d){
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
 // are told what it is and sign). state=onboarding shows ONLY the gate.
+var _obResumed = false;
+function _obResume(){
+  // mid-walk refresh returns to the saved step, not the welcome card
+  if (_obResumed) return;
+  var started = false, step = 0;
+  try {
+    started = localStorage.getItem(
+      'ghlob:' + (new URLSearchParams(location.search)
+                  .get('locationId') || 'x') + ':started') === '1';
+    step = parseInt(localStorage.getItem(
+      'ghlob:' + (new URLSearchParams(location.search)
+                  .get('locationId') || 'x') + ':step') || '0', 10) || 0;
+  } catch(e) {}
+  if (!started) return;
+  _obResumed = true;
+  $('obWelcome').classList.add('hide');
+  $('obForm').classList.remove('hide');
+  _obInit();
+  _obGo(Math.min(step, _obSteps.length - 1));
+}
 function applyOb(s){
   var on = (s === 'onboarding');
   $('obGate').classList.toggle('hide', !on);
   if (on) {
-    $('obWelcome').classList.remove('hide');
-    $('obForm').classList.add('hide');
+    _obResume();
+    if (!_obResumed) {
+      $('obWelcome').classList.remove('hide');
+      $('obForm').classList.add('hide');
+    }
     ['heroBand','spine','tabsCard','actRow','listCheck'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
@@ -2180,9 +2210,14 @@ function applyOb(s){
       el.appendChild(row);
     });
   }
+  function _obKey(){
+    return 'ghlob:' + (new URLSearchParams(location.search)
+                       .get('locationId') || 'x');
+  }
   function _obGo(i) {
     if (i < 0 || i >= _obSteps.length) return;
     _obCur = i;
+    try { localStorage.setItem(_obKey() + ':step', i); } catch(e) {}
     _obSteps.forEach(function(el, j){ el.style.display = (j === i) ? '' : 'none'; });
     Array.prototype.slice.call($('obProgress').children).forEach(function(s, j){
       s.classList.toggle('on', j <= i);
@@ -2191,6 +2226,7 @@ function applyOb(s){
     if (nc) { nc.disabled = !_connectOk(); }
   }
   $('obStart').addEventListener('click', function(){
+    try { localStorage.setItem(_obKey() + ':started', '1'); } catch(e) {}
     $('obWelcome').classList.add('hide');
     $('obForm').classList.remove('hide');
     _obInit(); _obGo(0);
