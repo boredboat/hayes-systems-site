@@ -195,6 +195,10 @@ td .when{color:var(--mut);font-size:13px}
 .chip{border:1px solid #d1d5db;border-radius:999px;background:#fff;padding:5px 12px;font-size:12.5px;font-family:'Inter',sans-serif;color:var(--tx);cursor:pointer}
 .chip:hover{border-color:var(--acc)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.aud-rows{margin:0 0 14px}
+.aud-row{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
+.aud-row:hover{border-color:var(--acc)}
+.aud-row + .aud-row{margin-top:8px}
 .aud-prev{margin-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .aud-n{font-size:32px;font-weight:700;color:var(--tx);letter-spacing:-.5px;line-height:1}
 .aud-cap{font-size:13px;color:var(--mut)}
@@ -1605,8 +1609,10 @@ function audRender(){
   ['audWizard', 'audSettings'].forEach(function(id){
     var box = $(id); if (!box) return;
     box.innerHTML =
-      '<label class="ad-check" style="margin:0 0 10px;display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="' + id + '_open"><span>Skip contacts with an open opportunity</span></label>' +
-      '<label class="ad-check" style="margin:0 0 14px;display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="' + id + '_lost"><span>Include lost opportunities</span></label>' +
+      '<div class="aud-rows">' +
+      '<label class="ad-check aud-row"><input type="checkbox" id="' + id + '_open"><span>Skip contacts with an open opportunity</span></label>' +
+      '<label class="ad-check aud-row"><input type="checkbox" id="' + id + '_lost"><span>Include lost opportunities</span></label>' +
+      '</div>' +
       '<div class="aud-lab">Only these tags (optional)</div><div class="aud-chips" id="' + id + '_inc"></div>' +
       '<div class="aud-lab" style="margin-top:12px">Never these tags (optional)</div><div class="aud-chips" id="' + id + '_exc"></div>' +
       '<div class="aud-prev" id="' + id + '_prev"><span class="aud-cap">Counting your contacts...</span></div>';
