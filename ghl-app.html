@@ -195,7 +195,9 @@ td .when{color:var(--mut);font-size:13px}
 .chip{border:1px solid #d1d5db;border-radius:999px;background:#fff;padding:5px 12px;font-size:12.5px;font-family:'Inter',sans-serif;color:var(--tx);cursor:pointer}
 .chip:hover{border-color:var(--acc)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.aud-prev{margin-top:12px;font-size:12.5px;color:var(--mut)}
+.aud-prev{margin-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.aud-n{font-size:32px;font-weight:700;color:var(--tx);letter-spacing:-.5px;line-height:1}
+.aud-cap{font-size:13px;color:var(--mut)}
 
 /* onboarding wizard */
 .ob-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(17,24,39,.06)}
@@ -1607,7 +1609,7 @@ function audRender(){
       '<label class="ad-check" style="margin:0 0 14px;display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="' + id + '_lost"><span>Include lost opportunities</span></label>' +
       '<div class="aud-lab">Only these tags (optional)</div><div class="aud-chips" id="' + id + '_inc"></div>' +
       '<div class="aud-lab" style="margin-top:12px">Never these tags (optional)</div><div class="aud-chips" id="' + id + '_exc"></div>' +
-      '<div class="aud-prev" id="' + id + '_prev"></div>';
+      '<div class="aud-prev" id="' + id + '_prev"><span class="aud-cap">Counting your contacts...</span></div>';
     var o = $(id + '_open'), l = $(id + '_lost');
     o.checked = AUD.skip_open_opp; l.checked = AUD.include_lost_opp;
     o.addEventListener('change', function(){ AUD.skip_open_opp = o.checked; audRender(); audChanged(); });
@@ -1636,10 +1638,13 @@ function audPreview(){
             return n + ((j.tag_counts && j.tag_counts[t]) || 0); }, 0)
         : (j.whole || 0);
       var skip = AUD.skip_open_opp ? (j.open_opp || 0) : 0;
-      var line = 'About ' + fmtNum(Math.max(0, base - skip)) + ' contacts';
-      if (skip) line += ' (' + fmtNum(skip) + ' open deals skipped)';
+      var n = Math.max(0, base - skip);
+      var cap = 'contacts in this audience';
+      if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       ['audWizard_prev', 'audSettings_prev'].forEach(function(id){
-        var el = $(id); if (el) el.textContent = line;
+        var el = $(id);
+        if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
+          + '</span><span class="aud-cap">' + cap + '</span>';
       });
     }).catch(function(){});
   }, 250);
