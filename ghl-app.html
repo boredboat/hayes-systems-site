@@ -1087,7 +1087,9 @@ function renderActionBar(st){
   var items = [];
   if (st) {
     var b = st.billing || {};
-    if (b.card_invalid) {
+    if (b.card_invalid && st.client && st.client.state !== 'onboarding') {
+      // onboarding owns card messaging in its own wizard step - the
+      // amber billing banner is for ACTIVE clients (Matt 11/3)
       items.push(['Your card on file could not be charged. Update your card so invoices keep working.',
                   'Update card', 'openCardUpdate']);
     } else if (!b.card_on_file && st.client && st.client.state !== 'none'
