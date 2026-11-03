@@ -145,6 +145,16 @@ td .when{color:var(--mut);font-size:13px}
 .dialog h3{font-weight:700;font-size:18px;color:var(--tx);margin-bottom:10px}
 .dialog p{font-size:14px;color:#4b5563;margin-bottom:22px}
 .dialog-actions{display:flex;gap:12px;justify-content:flex-end}
+
+/* CANCEL DIALOG v2 (Matt 11/2): red-x consequences + help line */
+.cx-list{margin:16px 0 4px;padding:0;list-style:none}
+.cx-list li{display:flex;gap:11px;padding:11px 2px;border-bottom:1px solid var(--bg);font-size:13.5px;line-height:1.5;color:var(--tx)}
+.cx-list li:last-child{border-bottom:none}
+.cx-x{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:#fde8e8;border:1px solid #f5b5b5;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cx-x svg{display:block}
+.cx-help{font-size:12.5px;color:var(--mut);margin:16px 0 18px;padding-top:12px;border-top:1px solid var(--bg)}
+.cx-help a{color:var(--acc);font-weight:500}
+
 .field{margin-bottom:16px}
 .field label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
 .field input[type=date]{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--tx);background:#fff}
@@ -556,7 +566,13 @@ body{padding:0}
 <div class="overlay" id="confirmOverlay">
   <div class="dialog">
     <h3>Cancel this campaign?</h3>
-    <p>Remaining leads will not be contacted and the campaign will end on the current invoice week. Appointments already on your calendar are unaffected.</p>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:2px">Here is what ends when the campaign stops:</p>
+    <ul class="cx-list" id="cxList">
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span><b>{pending} leads</b> still waiting for their first email will never be contacted</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Leads partway through the sequence <b>stop receiving emails</b> - and anyone who replies after cancellation gets no response</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>A <b>3-month cooldown</b> starts - your next campaign can't open until {cooldown}</span></li>
+    </ul>
+    <p class="cx-help">Need help? Something not working as expected? <a href="mailto:team@hayessystems.com">team@hayessystems.com</a></p>
     <div class="dialog-actions">
       <button class="btn btn-danger" id="confirmCancel">Yes, cancel campaign</button>
       <button class="btn btn-primary" data-close="confirmOverlay">Keep campaign running</button>
@@ -2029,5 +2045,27 @@ applyOb(init);
     tips.classList.toggle('open');
   });
   tips.querySelector('.hiw-panel').addEventListener('click', function(e){ e.stopPropagation(); });
+})();
+</script><script>
+// CANCEL DIALOG v2: fill the consequence numbers from page data
+(function(){
+  var btn = document.getElementById('cancelBtn');
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    try {
+      var d = PAGE.data || {};
+      var c = d.campaign || {};
+      var leads = (c.leads || 0) - (c.emails || 0);
+      if (leads < 0) leads = 0;
+      var cd = d.cooldown && d.cooldown.next_open ? d.cooldown.next_open : 'the cooldown ends';
+      var lis = document.querySelectorAll('#cxList li');
+      if (lis.length === 3) {
+        lis[0].querySelector('span:last-child').innerHTML =
+          '<b>' + leads + ' leads</b> still waiting for their first email will never be contacted';
+        lis[2].querySelector('span:last-child').innerHTML =
+          'A <b>3-month cooldown</b> starts - your next campaign can\'t open until ' + cd;
+      }
+    } catch (e) {}
+  });
 })();
 </script></body></html>
