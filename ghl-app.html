@@ -189,6 +189,14 @@ td .when{color:var(--mut);font-size:13px}
 .listcheck{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .listcheck h3{margin:0;font-size:15px;color:var(--tx)}
 .listcheck p{margin:4px 0 0 0;font-size:13.5px;color:#4b5563}
+/* audience picker (11/3) */
+.aud-lab{font-size:12px;font-weight:600;color:var(--tx);margin:0 0 6px}
+.aud-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #d1d5db;border-radius:999px;background:#fff;padding:5px 12px;font-size:12.5px;font-family:'Inter',sans-serif;color:var(--tx);cursor:pointer}
+.chip:hover{border-color:var(--acc)}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.aud-prev{margin-top:12px;font-size:12.5px;color:var(--mut)}
+
 /* onboarding wizard */
 .ob-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:34px 36px;max-width:640px;margin:0 auto;box-shadow:0 10px 30px rgba(17,24,39,.06)}
 .ob-card h2{font-weight:700;font-size:21px;color:var(--tx);margin-bottom:6px}
@@ -368,10 +376,10 @@ body{padding:0}
 
     <div class="ob-step" data-ob="2">
       <h3>What we do</h3>
-      <p>We run hands-free lead reactivation campaigns on all leads older
-      than 90-days, utilizing personalized and professional email outreach
-      combined with a Retell AI powered booking agent who assists leads in
-      choosing a free slot on your calendar.</p>
+      <p>We run hands-free lead reactivation campaigns on the audience
+      you pick in the next step, utilizing personalized and professional
+      email outreach combined with a Retell AI powered booking agent who
+      assists leads in choosing a free slot on your calendar.</p>
 
       <p>Campaigns typically run 1-3 months depending on list size. Leads
       receive 6 emails over the course of a month and may respond at any
@@ -393,6 +401,18 @@ body{padding:0}
       <h3 style="margin-top:22px">Your data</h3>
       <p>Sensitive data is removed from our system at closeout. For full
       details please review our <a href="https://www.hayessystems.com/terms.html" target="_blank">data agreement</a>.</p>
+    </div>
+
+    <div class="ob-step" id="obAudienceStep">
+      <h3>Who we contact</h3>
+      <p>The default audience is <b>everyone except open opportunities</b>
+      - the leads your team is not actively working a deal with right
+      now. You know your list best, so shape it with your own tags if
+      you want it tighter or wider.</p>
+      <div id="audWizard"></div>
+      <p style="font-size:12.5px;color:var(--mut)">Duplicates, opted-out
+      contacts, and contacts with no email address are always removed
+      before anything sends.</p>
     </div>
 
     <div class="ob-step" data-ob="3">
@@ -720,10 +740,9 @@ body{padding:0}
     <div class="field"><label>Calendar for appointments</label>
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
-    <div class="field"><label>Contact tag (optional)</label>
-      <input id="setTag" class="set-in" list="tagOptions" placeholder="Leave blank to work your whole contact list" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px">
-      <datalist id="tagOptions"></datalist>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Only contacts carrying this tag in GoHighLevel are worked. Leave blank and we work your whole contact list. Applies from your next campaign onward.</p></div>
+    <div class="field"><label>Audience</label>
+      <div id="audSettings"></div>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Applies from your next campaign onward. Duplicates, opted-out contacts, and contacts with no email are always removed.</p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
         <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Card on file</span>
@@ -1540,31 +1559,107 @@ $('settingsLink').addEventListener('click', function(){
   var c = (PAGE.data && PAGE.data.client) || {};
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
-  $('setTag').value = (PAGE.data && PAGE.data.contact_tag) || '';
-  _loadTagOptions();
+  audInit();
   _loadCalPicker();
   open_('settingsOverlay');
 });
-// Tag picker inventory (11/3): the location's live tag list powers a
-// datalist under the free-text input. Free text stays legal - a read
-// failure or a stale list must never block saving a tag by name.
-function _loadTagOptions(){
-  var dl = $('tagOptions');
-  if (!dl || !PAGE.token || dl.dataset.loaded) return;
-  dl.dataset.loaded = '1';
-  api('/api/ghl/tags').then(function(j){
-    if (!(j && j.ok) || !(dl = $('tagOptions'))) return;
-    dl.innerHTML = (j.tags || []).map(function(t){
-      return '<option value="' + esc(t) + '">';
-    }).join('');
-  }).catch(function(){});
+// AUDIENCE (Matt 11/3): the client's own inactive decision. Default:
+// everyone except open opportunities; tags and the lost/won toggles
+// shape it. One shared state serves the onboarding step and Settings;
+// every change persists (debounced) and refreshes the count preview.
+var AUD = {skip_open_opp: true, include_lost_opp: true,
+           include_tags: [], exclude_tags: []};
+var AUD_TAGS = null, AUD_SAVE_T = null, AUD_PREV_T = null;
+
+function audFromData(){
+  var a = (PAGE.data && PAGE.data.audience) || {};
+  AUD.skip_open_opp = a.skip_open_opp !== false;
+  AUD.include_lost_opp = a.include_lost_opp !== false;
+  AUD.include_tags = (a.include_tags || []).slice();
+  AUD.exclude_tags = (a.exclude_tags || []).slice();
+}
+function audChips(el, key){
+  if (!el) return;
+  el.innerHTML = '';
+  if (!(AUD_TAGS || []).length) {
+    el.innerHTML = '<span style="font-size:12.5px;color:var(--mut)">No tags in this location yet</span>';
+    return;
+  }
+  AUD_TAGS.forEach(function(t){
+    var c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'chip' + (AUD[key].indexOf(t) >= 0 ? ' on' : '');
+    c.textContent = t;
+    c.addEventListener('click', function(ev){
+      ev.preventDefault();
+      var i = AUD[key].indexOf(t);
+      if (i >= 0) AUD[key].splice(i, 1); else AUD[key].push(t);
+      audRender(); audChanged();
+    });
+    el.appendChild(c);
+  });
+}
+function audRender(){
+  ['audWizard', 'audSettings'].forEach(function(id){
+    var box = $(id); if (!box) return;
+    box.innerHTML =
+      '<label class="ad-check" style="margin:0 0 10px;display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="' + id + '_open"><span>Skip contacts with an open opportunity</span></label>' +
+      '<label class="ad-check" style="margin:0 0 14px;display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="' + id + '_lost"><span>Include lost opportunities</span></label>' +
+      '<div class="aud-lab">Only these tags (optional)</div><div class="aud-chips" id="' + id + '_inc"></div>' +
+      '<div class="aud-lab" style="margin-top:12px">Never these tags (optional)</div><div class="aud-chips" id="' + id + '_exc"></div>' +
+      '<div class="aud-prev" id="' + id + '_prev"></div>';
+    var o = $(id + '_open'), l = $(id + '_lost');
+    o.checked = AUD.skip_open_opp; l.checked = AUD.include_lost_opp;
+    o.addEventListener('change', function(){ AUD.skip_open_opp = o.checked; audRender(); audChanged(); });
+    l.addEventListener('change', function(){ AUD.include_lost_opp = l.checked; audChanged(); });
+    audChips($(id + '_inc'), 'include_tags');
+    audChips($(id + '_exc'), 'exclude_tags');
+  });
+  audPreview();
+}
+function audChanged(){
+  clearTimeout(AUD_SAVE_T);
+  AUD_SAVE_T = setTimeout(function(){
+    api('/api/ghl/settings', {audience: AUD}).then(function(j){
+      if (j && j.ok && PAGE.data) PAGE.data.audience = JSON.parse(JSON.stringify(AUD));
+    }).catch(function(){});
+  }, 700);
+}
+function audPreview(){
+  clearTimeout(AUD_PREV_T);
+  AUD_PREV_T = setTimeout(function(){
+    if (!PAGE.token) return;
+    api('/api/ghl/audience-preview', {include_tags: AUD.include_tags}).then(function(j){
+      if (!j || !j.ok) return;
+      var base = AUD.include_tags.length
+        ? AUD.include_tags.reduce(function(n, t){
+            return n + ((j.tag_counts && j.tag_counts[t]) || 0); }, 0)
+        : (j.whole || 0);
+      var skip = AUD.skip_open_opp ? (j.open_opp || 0) : 0;
+      var line = 'About ' + fmtNum(Math.max(0, base - skip)) + ' contacts';
+      if (skip) line += ' (' + fmtNum(skip) + ' open deals skipped)';
+      ['audWizard_prev', 'audSettings_prev'].forEach(function(id){
+        var el = $(id); if (el) el.textContent = line;
+      });
+    }).catch(function(){});
+  }, 250);
+}
+function audInit(){
+  if (!PAGE.token) return;
+  audFromData();
+  if (AUD_TAGS === null) {
+    AUD_TAGS = [];
+    api('/api/ghl/tags').then(function(j){
+      if (j && j.ok) { AUD_TAGS = j.tags || []; audRender(); }
+    }).catch(function(){});
+  }
+  audRender();
 }
 $('settingsSave').addEventListener('click', function(){
   var em = $('setEmail').value.trim();
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
   var btn = this; btn.disabled = true;
-  var body = { email: em, business: $('setBusiness').value.trim(),
-               tag: $('setTag').value.trim() };
+  var body = { email: em, business: $('setBusiness').value.trim() };
   var sel = $('setCalendar');
   if (!sel.disabled && sel.value && sel.value !== _calCurrent
       && sel.selectedIndex >= 0) {
@@ -1583,7 +1678,6 @@ $('settingsSave').addEventListener('click', function(){
         PAGE.data.client.email = em;
         PAGE.data.client.name = $('setBusiness').value.trim();
       }
-      if (PAGE.data) PAGE.data.contact_tag = $('setTag').value.trim();
     } else { toast((j && j.error) || 'Could not save. Try again.'); }
   }).catch(function(){ btn.disabled = false;
     toast('Could not save. Try again.'); });
@@ -1632,6 +1726,7 @@ function loadPageData(){
     PAGE.data = d;
     applyFromData(d);
     renderActionBar(d);
+    audInit();   // audience picker state (wizard step + Settings)
     // FIX (Matt 11/2: "no recent activity"): the activity fetch was
     // UNREACHABLE - the appointments return above exited the callback
     // before this line ever ran. Chained properly now.
