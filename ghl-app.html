@@ -53,6 +53,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .hiw-item.open .hiw-chev{transform:rotate(90deg)}
 .hiw-chev{transition:transform .15s;flex:0 0 auto;color:#9ca3af}
 
+.actionbar{background:#fff7e0;border:1px solid #f3d68a;border-left:4px solid #E8A13A;border-radius:10px;padding:13px 18px;margin:0 0 18px;font-size:13.5px;color:#7a5a0d;line-height:1.5;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.actionbar button{flex:0 0 auto}
 .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
 h1{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--tx)}
 .muted{font-size:13px;color:var(--mut)}
@@ -539,16 +541,19 @@ body{padding:0}
     <button class="btn btn-ghost" id="listCheckBtn">Update now</button>
   </div>
 
+<div class="actionbar hide" id="actionBar"></div>
+
 <div id="tabsCard">
   <div class="tabs">
     <button class="tab on" data-pane="apptSec">Appointments <span class="ct" id="apptCt">0</span></button>
     <button class="tab" data-pane="feedSec">Recent activity</button>
     <button class="tab" data-pane="pastSec">Past campaigns</button>
+    <button class="tab" data-pane="invSec">Billing</button>
   </div>
   <div class="pane on" id="apptSec">
     <div class="appt-scroll">
     <table>
-      <thead><tr><th>Lead</th><th>When</th><th style="width:160px">Status</th><th style="width:160px"></th></tr></thead>
+      <thead><tr><th>Lead</th><th>When</th><th style="width:130px">Agent</th><th style="width:160px">Status</th><th style="width:160px"></th></tr></thead>
       <tbody id="apptBody"></tbody>
     </table>
     </div>
@@ -561,6 +566,14 @@ body{padding:0}
     <table>
       <thead><tr><th style="width:110px">Campaign</th><th>Period</th><th style="width:120px">Leads worked</th><th style="width:120px">Appointments</th><th style="width:100px">Cost</th></tr></thead>
       <tbody id="pastBody"></tbody>
+    </table>
+    </div>
+  </div>
+  <div class="pane" id="invSec">
+    <div class="appt-scroll">
+    <table>
+      <thead><tr><th style="width:110px">Date</th><th>Type</th><th style="width:130px">Appointments</th><th style="width:110px">Total</th></tr></thead>
+      <tbody id="invBody"></tbody>
     </table>
     </div>
   </div>
@@ -708,6 +721,11 @@ body{padding:0}
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
       <p id="setCalLock" class="hide" style="margin:6px 0 0;font-size:12px;color:var(--mut)">Locked while a campaign is active. Appointments already booked stay on the old calendar.</p>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Appointments need a whole team calendar: a round-robin with every agent who should take calls.</p></div>
+    <div class="field"><label>Payment method</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Card on file</span>
+        <button class="btn btn-ghost" id="setCardUpdate" style="padding:8px 14px">Update card</button>
+      </div></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
@@ -973,7 +991,7 @@ function renderAppts(rows){
   var tb = $('apptBody'); if (!tb) return;
   var ct = $('apptCt'); if (ct) ct.textContent = fmtNum(rows.length);
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="4" class="empty">No appointments yet. Booked calls land here.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="5" class="empty">No appointments yet. Booked calls land here.</td></tr>';
     return;
   }
   tb.innerHTML = rows.map(function(a){
@@ -988,10 +1006,22 @@ function renderAppts(rows){
         + '<div class="rowmenu-panel"><button class="rns">Report no-show</button></div></div>'
       : '';
     return '<tr data-ref="' + esc(a.ref) + '"><td><span class="who">' + esc(a.name)
-      + '</span></td><td class="when">' + esc(a.when) + '</td><td>' + badge
+      + '</span></td><td class="when">' + esc(a.when) + '</td><td>'
+      + esc(a.agent || '') + '</td><td>' + badge
       + '</td><td>' + btn + '</td></tr>';
   }).join('');
   bindNoshow();
+}
+function renderInvoices(rows){
+  var tb = $('invBody'); if (!tb) return;
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="empty">Invoices appear here as appointments land.</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(function(v){
+    return '<tr><td class="when">' + esc(v.date) + '</td><td>' + esc(v.kind)
+      + '</td><td>' + fmtNum(v.appointments) + '</td><td>' + fmtMoney(v.total) + '</td></tr>';
+  }).join('');
 }
 function renderPast(rows){
   var tb = $('pastBody'); if (!tb) return;
@@ -1010,6 +1040,57 @@ function renderPast(rows){
       + '</td><td>' + fmtNum(p.appointments) + '</td><td>' + fmtMoney(p.cost) + '</td></tr>';
   }).join('');
 }
+function renderActionBar(st){
+  var bar = $('actionBar'); if (!bar) return;
+  var items = [];
+  if (st) {
+    var b = st.billing || {};
+    if (b.card_invalid) {
+      items.push(['Your card on file could not be charged. Update your card so invoices keep working.',
+                  'Update card', 'openCardUpdate']);
+    } else if (!b.card_on_file && st.client && st.client.state !== 'none'
+               && st.client.state !== 'onboarding') {
+      items.push(['No working card on file. Add one so appointments can be invoiced.',
+                  'Add card', 'openCardUpdate']);
+    }
+    var h = st.health || {};
+    if (h.connection_ok === false) {
+      items.push(['The connection to your GoHighLevel account needs attention. Contact us and we will restore it.',
+                  'Contact us', 'openContact']);
+    }
+  }
+  if (!items.length) { bar.classList.add('hide'); bar.innerHTML = ''; return; }
+  bar.innerHTML = items.map(function(it, i){
+    return '<span>' + esc(it[0]) + '</span>'
+      + '<button class="btn btn-primary" data-ab="' + i + '">' + esc(it[1]) + '</button>';
+  }).join('');
+  bar.querySelectorAll('button[data-ab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var it = items[parseInt(btn.getAttribute('data-ab'), 10)];
+      if (it[2] === 'openCardUpdate') openCardUpdate();
+      else if (it[2] === 'openContact') {
+        var cl = $('contactLink');
+        if (cl) cl.click(); else location.href = 'mailto:support@hayessystems.com';
+      }
+    });
+  });
+  bar.classList.remove('hide');
+}
+function openCardUpdate(){
+  if (!PAGE.token) { toast('Card setup is unavailable in preview mode.'); return; }
+  toast('Opening secure card update...');
+  fetch(API + '/api/ghl/stripe-setup', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json',
+              'X-Hayes-Token': PAGE.token},
+    body: JSON.stringify({locationId:
+      new URLSearchParams(location.search).get('locationId') || ''})
+  }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+    if (d && d.checkout_url) window.open(d.checkout_url, '_blank');
+    else toast('Card update is unavailable right now. We will reach out.');
+  }).catch(function(){ toast('Card update is unavailable right now.'); });
+}
+
 // PAGE state lives ABOVE the demo renders: renderPast stamps PAGE.pastN
 // at load, so declaring it lower (as history had it) threw on the
 // hoisted-undefined and killed every binding after it (found live 10/29)
@@ -1426,7 +1507,16 @@ function _loadCalPicker(){
     });
   }).catch(function(){ sel.innerHTML = '<option>Unavailable</option>'; });
 }
+$('setCardUpdate').addEventListener('click', openCardUpdate);
 $('settingsLink').addEventListener('click', function(){
+  var _b = (PAGE.data && PAGE.data.billing) || {};
+  var _cs = $('setCardState');
+  if (_cs) {
+    _cs.textContent = _b.card_invalid ? 'Card needs attention'
+      : (_b.card_on_file ? 'Card on file' : 'No card on file');
+    _cs.style.color = _b.card_invalid ? '#b45309'
+      : (_b.card_on_file ? 'var(--mut)' : '#b91c1c');
+  }
   var c = (PAGE.data && PAGE.data.client) || {};
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
@@ -1503,6 +1593,7 @@ function loadPageData(){
     if (!d || !d.ok) return;
     PAGE.data = d;
     applyFromData(d);
+    renderActionBar(d);
     // FIX (Matt 11/2: "no recent activity"): the activity fetch was
     // UNREACHABLE - the appointments return above exited the callback
     // before this line ever ran. Chained properly now.
@@ -1510,12 +1601,15 @@ function loadPageData(){
       if (a && a.ok) {
         renderAppts((a.appointments || []).map(function(x){
           return {name: x.lead_name, when: fmtWhen(x.when), status: x.status,
-                  reportable: !!x.reportable, ref: x.ref,
+                  reportable: !!x.reportable, ref: x.ref, agent: x.agent || '',
                   calendar_marked: !!x.calendar_marked};   // B-2 (t_547cc848)
         }));
         if ((a.appointments || []).length) { $('apptSec').classList.remove('hide'); syncTabs(); }
       }
-      return api('/api/ghl/activity');
+      return api('/api/ghl/invoices').then(function(v){
+        if (v && v.ok) renderInvoices(v.invoices || []);
+        return api('/api/ghl/activity');
+      });
     }).then(function(f){
       if (!f || !f.ok || !(f.activity || []).length) return;
       $('feedBody').innerHTML = f.activity.map(function(e){
