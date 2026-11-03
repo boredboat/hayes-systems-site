@@ -966,8 +966,10 @@ function renderPast(rows){
     return;
   }
   tb.innerHTML = rows.map(function(p, i){
-    var n = p.campaign_id || (i + 1);
-    return '<tr><td>Campaign ' + esc(n) + '</td><td class="when">' + esc(p.period)
+    // sequential campaign numbers matching the heading's naming
+    // (raw DB ids are internal - "Campaign 1, 2, 3..." reads right)
+    var n = i + 1;
+    return '<tr><td>Campaign ' + n + '</td><td class="when">' + esc(p.period)
       + '</td><td>' + fmtNum(p.leads_worked)
       + '</td><td>' + fmtNum(p.appointments) + '</td><td>' + fmtMoney(p.cost) + '</td></tr>';
   }).join('');
