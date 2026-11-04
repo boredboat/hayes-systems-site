@@ -1842,16 +1842,18 @@ function audPreview(){
 // starts directly - the terms were signed in onboarding, the card IS
 // the confirmation surface.
 function _audSummary(){
+  // explicit selections (Matt 11/3: the value LISTS the checkbox states
+  // and tags so each choice is confirmable at a glance)
   var bits = [];
+  bits.push(AUD.skip_open_opp ? 'Except open opportunities'
+                              : 'Open opportunities included');
+  bits.push(AUD.include_lost_opp ? 'Lost opportunities included'
+                                 : 'Lost opportunities skipped');
   if (AUD.include_tags.length)
-    bits.push('only: ' + AUD.include_tags.join(', '));
+    bits.push('Only: ' + AUD.include_tags.join(', '));
   if (AUD.exclude_tags.length)
-    bits.push('never: ' + AUD.exclude_tags.join(', '));
-  var base = AUD.skip_open_opp
-    ? 'Everyone except open opportunities'
-    : 'Everyone';
-  if (!AUD.include_lost_opp) base += ', lost opportunities skipped';
-  return base + (bits.length ? ' \u00b7 ' + bits.join(' \u00b7 ') : '');
+    bits.push('Never: ' + AUD.exclude_tags.join(', '));
+  return bits.join(' \u00b7 ');
 }
 function _renderPending(){
   var card = $('pendingCard'); if (!card) return;
@@ -1886,7 +1888,8 @@ function _renderPending(){
      [((PAGE.data.client || {}).name || '')]],
     ['Audience', 'editAudience', audParts],
     ['Agreement', 'editAgreement',
-     [(ag.by ? 'Signed by ' + ag.by : 'Signed')].concat(ag.at ? [ag.at] : [])],
+     [(ag.by ? 'Signed by ' + ag.by : 'Signed')]
+       .concat(ag.at ? [fmtLongDate(ag.at)] : [])],
     ['Card on file', 'editCard',
      [(b.card_summary || (b.card_invalid ? 'Card needs attention'
                                          : 'Saved during setup'))]]
@@ -1904,12 +1907,10 @@ function _renderPending(){
     v.className = 'v';
     s[2].forEach(function(part, i){
       if (i > 0) v.appendChild(document.createTextNode(' \u00b7 '));
-      if (i === 0) { v.appendChild(document.createTextNode(part)); }
-      else {
-        var sm = document.createElement('small');
-        sm.textContent = part;
-        v.appendChild(sm);
-      }
+      var seg = document.createElement(i === 0 ? 'b' : 'span');
+      if (i > 0) seg.style.fontWeight = '500';
+      seg.textContent = part;
+      v.appendChild(seg);
     });
     kv.appendChild(k); kv.appendChild(v);
     row.appendChild(ck); row.appendChild(kv);
