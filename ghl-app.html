@@ -1865,8 +1865,13 @@ function _renderPending(){
   // titles only (Matt 11/3: the second detail lines were pointless -
   // the audience count lives in the big number) and every step is
   // EDITABLE so mistakes get fixed before starting
+  // Location is INFORMATIONAL (Matt 11/3, live-caught: 'editing' it
+  // replays the marketplace install flow, which reads as something
+  // being broken - there is no sensible in-app edit for which location
+  // is connected). The health banner's Reconnect owns the dead-
+  // connection case; everything the client can genuinely fix keeps Edit.
   var steps = [
-    ['Location connected', 'editLocation'],
+    ['Location connected', null],
     ['Audience', 'editAudience'],
     ['Agreement signed', 'editAgreement'],
     ['Card on file', 'editCard']
@@ -1879,13 +1884,16 @@ function _renderPending(){
     var t = document.createElement('div');
     t.className = 'pc-t'; t.textContent = s[0];
     t.style.flex = '1';
-    var e = document.createElement('span');
-    e.className = 'pc-edit'; e.textContent = 'Edit';
-    e.setAttribute('data-act', s[1]);
     row.appendChild(n);
     var wrap = document.createElement('div');
     wrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:10px';
-    wrap.appendChild(t); wrap.appendChild(e);
+    wrap.appendChild(t);
+    if (s[1]) {
+      var e = document.createElement('span');
+      e.className = 'pc-edit'; e.textContent = 'Edit';
+      e.setAttribute('data-act', s[1]);
+      wrap.appendChild(e);
+    }
     row.appendChild(wrap);
     flow.appendChild(row);
   });
