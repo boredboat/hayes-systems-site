@@ -2961,8 +2961,16 @@ function applyOb(s){
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
-    // live mode: skip the demo none-state and boot from real data instead
-    if (PAGE.live) loadPageData();
+    // live mode: skip the demo none-state and boot from real data
+    // instead - and clear the checklist dismissal so the pending
+    // campaign card (the start surface) shows, not the bare main page
+    // (Matt 11/3: 'go to your campaign' means the campaign, not the
+    // empty shell)
+    if (PAGE.live) {
+      try { localStorage.removeItem(_pcKey() + ':cancelled'); } catch(e) {}
+      PAGE.pcDismissed = false;
+      loadPageData();
+    }
   });
 })();
 
