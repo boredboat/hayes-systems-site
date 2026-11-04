@@ -1486,6 +1486,16 @@ $('cfgRecheck').addEventListener('click', function(){
   }).catch(function(){ btn.disabled = false; toast('Check unavailable.'); });
 });
 $('reqBtn').addEventListener('click', function(){
+  // FIRST campaign: the workflow card IS the start surface (Matt 11/3,
+  // live-caught: after Cancel, Start must bring the checklist back, not
+  // the legacy dialog). The dialog serves later campaigns only.
+  var d = PAGE.data || {};
+  if (S === 'none' && !(d.past_campaigns || []).length
+      && (d.billing || {}).card_on_file && !PAGE.preparing) {
+    PAGE.pcDismissed = false;
+    _renderPending();
+    return;
+  }
   _runCfgCheck(_openReqDialog);
 });
 
