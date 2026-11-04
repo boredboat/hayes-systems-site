@@ -479,8 +479,7 @@ body{padding:0}
 
     <div class="ob-step" data-ob="3">
       <h3>Agency details</h3>
-      <p>Please provide the business name leads will see in our outreach.
-      The first email your leads receive updates live as you type.</p>
+      <p>Please provide the business name leads will see in our outreach.</p>
       <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
@@ -488,11 +487,6 @@ body{padding:0}
           <input id="obNotice" placeholder="you@brokerage.com">
           <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
       </div>
-      <div class="mailprev" id="mailPrev"></div>
-      <p style="margin:10px 0 0;font-size:12.5px;color:var(--mut)">This is
-      the first of the emails your leads receive - the exact copy that
-      will be sent, with a sample lead. Leads who reply get a call from
-      our AI booking assistant.</p>
     </div>
 
     <div class="ob-step" data-ob="4">
@@ -834,7 +828,8 @@ body{padding:0}
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
     <div class="field"><label>Audience</label>
       <div id="audSettings"></div>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Applies from your next campaign onward. Duplicates, opted-out contacts, and contacts with no email are always removed.</p></div>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Applies from your next campaign onward. Duplicates, opted-out contacts, and contacts with no email are always removed.
+      <br><a id="setMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
         <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Payment method on file</span>
@@ -843,6 +838,20 @@ body{padding:0}
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="mailOverlay">
+  <div class="dialog">
+    <h3>A sample email your leads receive</h3>
+    <div class="mailprev" id="mailPrev"></div>
+    <p style="margin:12px 0 0;font-size:12.5px;color:var(--mut)">Shown with
+    a sample lead. Our emails are tested and go out under your name; the
+    wording is tuned for deliverability and can't be edited per account.
+    Leads who reply get a call from our AI booking assistant.</p>
+    <div class="dialog-actions" style="margin-top:18px">
+      <button class="btn btn-primary" data-close="mailOverlay">Done</button>
     </div>
   </div>
 </div>
@@ -1824,6 +1833,8 @@ $('settingsLink').addEventListener('click', function(){
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
   audInit();
+  var sml = $('setMailLink');
+  if (sml) sml.onclick = function(ev){ ev.preventDefault(); _openMailPreview(); };
   _loadCalPicker();
   open_('settingsOverlay');
 });
@@ -2042,13 +2053,17 @@ function _renderPending(){
   var nums = $('pcNums');
   nums.innerHTML = '<div class="pc-total"><div class="n">'
     + fmtNum(PAGE.audCount || 0)
-    + '</div><div class="l">Total leads in this campaign</div></div>';
+    + '</div><div class="l">Total leads in this campaign</div></div>'
+    + '<div style="text-align:center;margin-top:8px;font-size:12.5px">'
+    + '<a id="pcMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></div>';
   // worth gate (Matt 11/3, live-caught): a failing list disables Start
   // the moment the verdict lands - never a request that will refuse
   var worthOk = !(PAGE.worth && PAGE.worth.ok !== false
                   && PAGE.worth.pass === false);
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   if (!worthOk) $('pcStart').disabled = true;
+  var ml = $('pcMailLink');
+  if (ml) ml.onclick = function(ev){ ev.preventDefault(); _openMailPreview(); };
 }
 var _calOvCals = [], _calOvCur = '';
 function _loadCalOverlay(){
@@ -2247,17 +2262,20 @@ function _loadObCals(){
   if (relink) relink.addEventListener('click', _loadObCals);
 })();
 var MAIL_TPL = null;   // {subject, from_line, body} with {agency} intact
-function _loadMailPreview(){
-  if (!PAGE.token || MAIL_TPL) return;
-  api('/api/ghl/email-preview').then(function(j){
-    if (!(j && j.ok)) return;
-    MAIL_TPL = j;
-    _fillMailPreview();
-  }).catch(function(){});
+function _openMailPreview(){
+  // lazy: fetch the real template once, then fill from the account name
+  if (!MAIL_TPL && PAGE.token) {
+    api('/api/ghl/email-preview').then(function(j){
+      if (j && j.ok) { MAIL_TPL = j; _fillMailPreview(); }
+    }).catch(function(){});
+  }
+  _fillMailPreview();
+  open_('mailOverlay');
 }
 function _fillMailPreview(){
   var box = $('mailPrev'); if (!box || !MAIL_TPL) return;
-  var agency = ($('obBusiness') && $('obBusiness').value.trim())
+  var agency = (((PAGE.data || {}).client || {}).name || '').trim()
+               || ($('obBusiness') && $('obBusiness').value.trim())
                || 'Your business';
   var body = String(MAIL_TPL.body || '')
     .split('\n\n- The {agency} follow-up team').join('')
@@ -2279,15 +2297,8 @@ function _fillMailPreview(){
   box.querySelectorAll('.mh .r span')[1].textContent = MAIL_TPL.subject || '';
   box.querySelector('.mb').textContent = body;
 }
-(function(){
-  var b = $('obBusiness');
-  if (b) b.addEventListener('input', function(){
-    if (MAIL_TPL) _fillMailPreview();
-  });
-})();
 function audInit(){
   if (!PAGE.token) return;
-  _loadMailPreview();
   _loadObCals();
   var _nb = $('obNotice');
   if (_nb && !_nb.value) {
