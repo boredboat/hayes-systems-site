@@ -412,8 +412,7 @@ body{padding:0}
 
       <p>Appointments are booked to your <b>whole team calendar</b> in
       GoHighLevel: a round-robin with every agent who should take calls
-      added to it. You will pick it when you verify your calendar in the
-      app.</p>
+      added to it. You will pick yours on the next step.</p>
 
       <h3 style="margin-top:22px">What you pay</h3>
       <p>Hayes Systems' lead reactivation service charges $60 per
@@ -435,6 +434,18 @@ body{padding:0}
       you want it tighter or wider. Duplicates, opted-out contacts, and
       contacts with no email address are filtered on our end.</p>
       <div id="audWizard"></div>
+    </div>
+
+    <div class="ob-step" id="obCalStep">
+      <h3>Appointments</h3>
+      <p>Appointments book onto a <b>whole team calendar</b> in
+      GoHighLevel: a round-robin with every agent who should take calls
+      added to it. Pick the calendar your appointments should land on.</p>
+      <div class="ob-fields" style="grid-template-columns:1fr">
+        <div class="ob-field"><label for="obCal">Calendar for appointments</label>
+          <select id="obCal" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+          <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Don't have one yet? Create it in GoHighLevel under Calendars (choose Round Robin, add your agents), then <span id="obCalRelink" style="color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px">refresh the list</span>.</p></div>
+      </div>
     </div>
 
     <div class="ob-step" data-ob="3">
@@ -531,6 +542,13 @@ body{padding:0}
 <div class="notice-card" id="failCard" style="display:none;margin-bottom:18px">
     <h3>Your campaign did not start</h3>
     <p id="failBody"></p>
+    <div id="failFix" class="hide" style="margin-top:14px">
+      <p style="margin:0 0 10px;font-size:13.5px;color:#4b5563"><b>Pick the calendar appointments should land on</b> (a round-robin in GoHighLevel with every agent who takes calls). Don't have one yet? Create it in GoHighLevel under Calendars, choose Round Robin, add your agents, then come back and refresh.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="failCal" style="flex:1;min-width:220px;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+        <button class="btn btn-primary" id="failRetry" style="padding:9px 18px">Save and start campaign</button>
+      </div>
+    </div>
   </div>
 
 <div class="notice-card" id="prepCard" style="display:none;border-left-color:#188bf6;margin-bottom:18px">
@@ -1483,13 +1501,75 @@ function _renderLaunchFail(){
   var show = !!(PAGE.launchFailed && !PAGE.preparing
                 && S === 'none' && !PAGE.needsConnect);
   el.style.display = show ? '' : 'none';
+  var fix = $('failFix');
+  if (fix) fix.classList.toggle('hide', !(show && PAGE.launchFix === 'calendar'));
   if (show) {
-    $('failBody').textContent = (PAGE.launchError
-      || 'The campaign could not be prepared.')
+    $('failBody').textContent = PAGE.launchFix === 'calendar'
+      ? 'Your campaign needs a calendar for appointments before it can start.'
+      : ((PAGE.launchError || 'The campaign could not be prepared.')
       + ' We have been notified. You can try again, or write'
-      + ' Matt@hayessystems.com and we will sort it out.';
+      + ' Matt@hayessystems.com and we will sort it out.');
   }
 }
+// FIX-IN-PLACE (Matt 11/3): the blocked card offers the calendar pick
+// right where the campaign stopped, then retries the launch blockers.
+var _failCals = [], _failCur = '';
+function _loadFailCals(){
+  var sel = $('failCal'); if (!sel || !PAGE.token) return;
+  sel.innerHTML = '<option>Loading calendars...</option>';
+  api('/api/ghl/calendars').then(function(j){
+    if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable - use Settings</option>'; return; }
+    _failCals = (j.calendars || []).filter(function(c){ return c.rr; });
+    _failCur = j.current || '';
+    sel.innerHTML = '';
+    if (!_failCals.length) {
+      sel.innerHTML = '<option>No round-robin calendars yet</option>';
+      return;
+    }
+    _failCals.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      if (c.id === _failCur) o.selected = true;
+      sel.appendChild(o);
+    });
+  }).catch(function(){ sel.innerHTML = '<option>Unavailable - use Settings</option>'; });
+}
+(function(){
+  var el = $('failCard');
+  if (el) {
+    var obs = new MutationObserver(function(){
+      if (el.style.display !== 'none' && !$('failFix').classList.contains('hide')
+          && !$('failCal').options.length) _loadFailCals();
+    });
+    obs.observe(el, {attributes: true, attributeFilter: ['style']});
+  }
+  $('failRetry').addEventListener('click', function(){
+    var btn = this; btn.disabled = true;
+    btn.innerHTML = '<span class="spin-sm"></span>Starting';
+    var c = _failCals[$('failCal').selectedIndex];
+    var p = Promise.resolve({ok: true});
+    if (c && c.id && c.id !== _failCur) {
+      p = api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name});
+    }
+    p.then(function(){
+      return api('/api/ghl/retry-start', {});
+    }).then(function(j){
+      btn.disabled = false; btn.textContent = 'Save and start campaign';
+      if (j && j.started) {
+        toast('Campaign starting. This page updates on its own.');
+        PAGE.launchFailed = false; PAGE.preparing = true;
+        _renderLaunchFail(); _renderPending(); _renderPrep();
+      } else if (j && j.blocked) {
+        toast('Still blocked: ' + ((j.blockers || [])[0] || 'unknown')
+              .slice(0, 90));
+      } else if (j && j.nothing) {
+        toast('Nothing to retry - request a campaign again.');
+      }
+    }).catch(function(){ btn.disabled = false;
+      btn.textContent = 'Save and start campaign';
+      toast('Could not reach the server. Try again.'); });
+  });
+})();
 function _prepPoll(){
   if (PAGE.prepPoll) return;
   var tries = 0;
@@ -1791,8 +1871,41 @@ function _fileCampaignRequest(){
 $('pcStart').addEventListener('click', function(){
   _runCfgCheck(_fileCampaignRequest);
 });
+// ONBOARDING CALENDAR STEP (Matt 11/3: the pick lost its home when the
+// GHL-or-Calendly card retired - now it is a wizard step, saved on
+// selection like the audience block)
+var _obCals = [], _obCalCur = '';
+function _loadObCals(){
+  var sel = $('obCal'); if (!sel || !PAGE.token) return;
+  sel.innerHTML = '<option>Loading calendars...</option>';
+  api('/api/ghl/calendars').then(function(j){
+    if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
+    _obCals = (j.calendars || []).filter(function(c){ return c.rr; });
+    _obCalCur = j.current || '';
+    sel.innerHTML = '';
+    if (!_obCals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
+    _obCals.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      if (c.id === _obCalCur) o.selected = true;
+      sel.appendChild(o);
+    });
+  }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
+}
+(function(){
+  var sel = $('obCal'), relink = $('obCalRelink');
+  if (sel) sel.addEventListener('change', function(){
+    var c = _obCals[sel.selectedIndex];
+    if (!c || !c.id) return;
+    api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
+      .then(function(j){ if (j && j.ok) { _obCalCur = c.id; toast('Calendar saved: ' + c.name); } })
+      .catch(function(){});
+  });
+  if (relink) relink.addEventListener('click', _loadObCals);
+})();
 function audInit(){
   if (!PAGE.token) return;
+  _loadObCals();
   var _nb = $('obNotice');
   if (_nb && !_nb.value) {
     _nb.value = ((PAGE.data && PAGE.data.client) || {}).email || '';
@@ -2032,6 +2145,7 @@ function applyFromData(d){
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
+  PAGE.launchFix = d.launch_fix || '';
   _renderWorth();
   _renderSched();
   _renderPrep();
