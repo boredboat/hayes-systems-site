@@ -1806,8 +1806,32 @@ function audChanged(){
   AUD_SAVE_T = setTimeout(function(){
     api('/api/ghl/settings', {audience: AUD}).then(function(j){
       if (j && j.ok && PAGE.data) PAGE.data.audience = JSON.parse(JSON.stringify(AUD));
+      _worthRepoll();   // the verdict re-derives server-side; the page must follow (Matt 11/3)
     }).catch(function(){});
   }, 700);
+}
+// the worth check respawns on every audience change; poll page-data
+// until its checked_at advances so the not-enough-leads warning (and
+// the Start gating) land LIVE, not on the next refresh
+var _WR_T = null;
+function _worthRepoll(){
+  if (!PAGE.token) return;
+  var before = ((PAGE.data || {}).install_check || {}).checked_at || '';
+  var tries = 0;
+  if (_WR_T) clearInterval(_WR_T);
+  _WR_T = setInterval(function(){
+    tries += 1;
+    api('/api/ghl/page-data').then(function(d){
+      if (!d || !d.ok) return;
+      var at = ((d.install_check || {}).checked_at) || '';
+      if ((at && at !== before) || tries >= 12) {
+        clearInterval(_WR_T); _WR_T = null;
+        PAGE.data = d;
+        PAGE.worth = d.install_check || null;
+        applyFromData(d);
+      }
+    }).catch(function(){});
+  }, 5000);
 }
 function audPreview(){
   clearTimeout(AUD_PREV_T);
@@ -1926,7 +1950,12 @@ function _renderPending(){
   nums.innerHTML = '<div class="pc-total"><div class="n">'
     + fmtNum(PAGE.audCount || 0)
     + '</div><div class="l">Total leads in this campaign</div></div>';
+  // worth gate (Matt 11/3, live-caught): a failing list disables Start
+  // the moment the verdict lands - never a request that will refuse
+  var worthOk = !(PAGE.worth && PAGE.worth.ok !== false
+                  && PAGE.worth.pass === false);
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
+  if (!worthOk) $('pcStart').disabled = true;
 }
 // STEP EDITORS (Matt 11/3: every workflow step fixable before start)
 var _pcEditFlow = null;
