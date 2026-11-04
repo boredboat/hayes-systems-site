@@ -542,6 +542,9 @@ body{padding:0}
 <div class="notice-card" id="failCard" style="display:none;margin-bottom:18px">
     <h3>Your campaign did not start</h3>
     <p id="failBody"></p>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-primary" id="failOver" style="padding:9px 18px">Start over</button>
+    </div>
     <div id="failFix" class="hide" style="margin-top:14px">
       <p style="margin:0 0 10px;font-size:13.5px;color:#4b5563"><b>Pick the calendar appointments should land on</b> (a round-robin in GoHighLevel with every agent who takes calls). Don't have one yet? Create it in GoHighLevel under Calendars, choose Round Robin, add your agents, then come back and refresh.</p>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -1510,9 +1513,8 @@ function _renderLaunchFail(){
     } else {
       // non client-fixable: route to support, never show internal notes
       $('failBody').innerHTML = 'Something on our side stopped this'
-        + ' campaign from starting. Questions? Write'
-        + ' <a href="mailto:team@hayessystems.com" style="color:var(--acc);font-weight:600">team@hayessystems.com</a>'
-        + ' and a person answers.';
+        + ' campaign from starting. Start over below to try again, or'
+        + ' write <a href="mailto:team@hayessystems.com" style="color:var(--acc);font-weight:600">team@hayessystems.com</a>.';
     }
   }
 }
@@ -1548,6 +1550,22 @@ function _loadFailCals(){
     });
     obs.observe(el, {attributes: true, attributeFilter: ['style']});
   }
+  $('failOver').addEventListener('click', function(){
+    var btn = this; btn.disabled = true;
+    btn.innerHTML = '<span class="spin-sm"></span>Starting over';
+    api('/api/ghl/discard-start', {}).then(function(j){
+      btn.disabled = false; btn.textContent = 'Start over';
+      if (j && j.ok) {
+        toast('Starting over.');
+        PAGE.launchFailed = false;
+        loadPageData();
+      } else {
+        toast((j && j.error) || 'Could not start over. Try again.');
+      }
+    }).catch(function(){ btn.disabled = false;
+      btn.textContent = 'Start over';
+      toast('Could not start over. Try again.'); });
+  });
   $('failRetry').addEventListener('click', function(){
     var btn = this; btn.disabled = true;
     btn.innerHTML = '<span class="spin-sm"></span>Starting';
