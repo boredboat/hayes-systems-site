@@ -2056,6 +2056,17 @@ function _renderPending(){
         c.textContent = part;
         v.appendChild(c);
       });
+    } else if (s[2].length > 1) {
+      // multiple values = one card each (Matt 11/3: name and email are
+      // separate entries, not combined with a dot)
+      s[2].forEach(function(part, i){
+        var seg = document.createElement(i === 0 ? 'b' : 'span');
+        if (i > 0) { seg.style.fontWeight = '500'; seg.style.marginLeft = '6px'; }
+        seg.className = 'pc-val';
+        seg.textContent = part;
+        v.appendChild(seg);
+      });
+      v.style.display = 'inline-block';
     } else {
       s[2].forEach(function(part, i){
         if (i > 0) v.appendChild(document.createTextNode(' \u00b7 '));
@@ -2064,8 +2075,6 @@ function _renderPending(){
         seg.textContent = part;
         v.appendChild(seg);
       });
-      // every value wears the card (Matt 11/3: same class as the
-      // audience chips - one visual language for all selections)
       v.classList.add('pc-val');
       v.style.display = 'inline-block';
     }
