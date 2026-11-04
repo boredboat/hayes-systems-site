@@ -601,7 +601,10 @@ body{padding:0}
   <div class="pc-flow" id="pcFlow"></div>
   <div class="pc-nums" id="pcNums"></div>
   <div class="pc-acts">
-    <button class="btn btn-primary" id="pcStart">Start campaign</button>
+    <label class="ad-check" style="margin:0 0 14px;display:flex;align-items:center;gap:10px;font-size:13px">
+      <input type="checkbox" id="pcGuard">
+      <span>I understand that Start campaign begins the paid service per the terms I agreed to.</span></label>
+    <button class="btn btn-primary" id="pcStart" disabled>Start campaign</button>
   </div>
 </div>
 
@@ -813,9 +816,11 @@ body{padding:0}
     service per the terms you agreed to: we read your list now (a minute
     or two), then your audience receives their emails and interested
     leads book straight onto your calendar.</p>
+    <label class="ob-check" style="margin:0 0 16px"><input type="checkbox" id="csAgree">
+      <span>I understand that Start campaign begins the paid service per the terms I agreed to.</span></label>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
-      <button class="btn btn-primary" id="confirmReq">Start campaign</button>
+      <button class="btn btn-primary" id="confirmReq" disabled>Start campaign</button>
     </div>
   </div>
 </div>
@@ -1326,10 +1331,13 @@ $('connectLocBtn').addEventListener('click', function(){
 // acknowledgment before the button unlocks; the ack rides the request
 // into the approval trail and the checkbox resets after each send
 function _openReqDialog(){
-  // the terms checkbox is gone (signed in onboarding) - the confirm
-  // button starts enabled; nothing to reset
+  var cb = $('csAgree');
+  if (cb) { cb.checked = false; $('confirmReq').disabled = true; }
   open_('reqOverlay');
 }
+$('csAgree').addEventListener('change', function(){
+  $('confirmReq').disabled = !this.checked;
+});
 function _renderCfgCheck(d){
   var card = $('cfgCard'), find = $('cfgFind'), pass = $('cfgPassed');
   var items = (d && d.findings) || [];
@@ -1898,6 +1906,9 @@ function _fileCampaignRequest(){
       toast('Could not start the check. Try again.'); });
   }
 }
+$('pcGuard').addEventListener('change', function(){
+  $('pcStart').disabled = !this.checked;
+});
 $('pcStart').addEventListener('click', function(){
   _runCfgCheck(_fileCampaignRequest);
 });
