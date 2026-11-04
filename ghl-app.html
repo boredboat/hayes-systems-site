@@ -235,7 +235,7 @@ td .when{color:var(--mut);font-size:13px}
 .pc-edit{font-size:12.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 .pc-edit:hover{color:var(--acch)}
 .pc-ov{margin-top:20px;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
-.pc-ov-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.pc-ov-grid{display:grid;grid-template-columns:repeat(3,1fr)}
 .pc-ov-cell{padding:16px 12px;text-align:center;border-right:1px solid var(--bd)}
 .pc-ov-cell:last-child{border-right:none}
 .pc-ov-cell .n{font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--tx);line-height:1.1}
@@ -2104,13 +2104,11 @@ function _renderPending(){
   });
   var nums = $('pcNums');
   var _aud_n = PAGE.audCount || 0;
-  var _est_appts = Math.round(_aud_n * 0.01);   // 1% upper seed band
   var _est_wks = Math.max(4, Math.ceil(_aud_n / 700));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">' + fmtNum(_aud_n) + '</div><div class="l">Leads</div></div>'
     + '<div class="pc-ov-cell"><div class="n">~' + _est_wks + ' wks</div><div class="l">Est. length</div></div>'
-    + '<div class="pc-ov-cell"><div class="n">~' + fmtNum(_est_appts) + '</div><div class="l">Est. appts</div></div>'
     + '<div class="pc-ov-cell"><div class="n">$60</div><div class="l">Per appt</div></div>'
     + '</div><div class="pc-ov-foot">Estimates based on your list size and typical conversion.</div></div>';
   // worth gate (Matt 11/3, live-caught): a failing list disables Start
