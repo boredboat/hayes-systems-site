@@ -449,13 +449,22 @@ body{padding:0}
 
     <div class="ob-step" id="obCalStep">
       <h3>Appointments</h3>
-      <p>Appointments book onto a <b>whole team calendar</b> in
-      GoHighLevel: a round-robin with every agent who should take calls
-      added to it. Pick the calendar your appointments should land on.</p>
+      <p>Where should booked appointments land? Most teams using this app
+      pick their <b>whole team calendar</b> in GoHighLevel: a round-robin
+      with every agent who should take calls added to it.</p>
       <div class="ob-fields" style="grid-template-columns:1fr">
-        <div class="ob-field"><label for="obCal">Calendar for appointments</label>
+        <div class="ob-field"><label for="obSurface">Appointments land on</label>
+          <select id="obSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+            <option value="ghl">Your GoHighLevel calendar</option>
+            <option value="calendly">Calendly</option>
+          </select></div>
+        <div class="ob-field" id="obCalField"><label for="obCal">Calendar for appointments</label>
           <select id="obCal" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
           <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Don't have one yet? Create it in GoHighLevel under Calendars (choose Round Robin, add your agents), then <span id="obCalRelink" style="color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px">refresh the list</span>.</p></div>
+        <div class="ob-field hide" id="obClyField">
+          <p style="margin:0;font-size:13px;color:#4b5563">We will connect
+          your Calendly when your campaign is set up - nothing to do here
+          now. Appointments will book onto your team's Calendly.</p></div>
       </div>
     </div>
 
@@ -2065,6 +2074,22 @@ function _loadObCals(){
   }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
 }
 (function(){
+  var sf = $('obSurface');
+  if (sf) {
+    // prefill from the recorded surface (auto-stamped ghl is the
+    // DEFAULT - the deliberate choice here overrides it, Matt 11/3)
+    sf.value = (PAGE.data && PAGE.data.scheduling_surface) === 'calendly'
+      ? 'calendly' : 'ghl';
+    var _syncSurface = function(save){
+      var cly = sf.value === 'calendly';
+      $('obCalField').classList.toggle('hide', cly);
+      $('obClyField').classList.toggle('hide', !cly);
+      if (save) api('/api/ghl/sched-verify', {surface: sf.value})
+        .catch(function(){});
+    };
+    sf.addEventListener('change', function(){ _syncSurface(true); });
+    _syncSurface(false);   // layout only - no write on every page load
+  }
   var sel = $('obCal'), relink = $('obCalRelink');
   if (sel) sel.addEventListener('change', function(){
     var c = _obCals[sel.selectedIndex];
