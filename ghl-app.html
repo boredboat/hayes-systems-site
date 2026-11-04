@@ -829,6 +829,27 @@ body{padding:0}
   </div>
 </div>
 
+<div class="overlay" id="calOverlay">
+  <div class="dialog">
+    <h3>Where appointments land</h3>
+    <div class="ob-fields" style="grid-template-columns:1fr">
+      <div class="ob-field"><label for="calOvSurface">Appointments land on</label>
+        <select id="calOvSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+          <option value="ghl">Your GoHighLevel calendar</option>
+          <option value="calendly">Calendly</option>
+        </select></div>
+      <div class="ob-field" id="calOvCalField"><label for="calOvCal">Calendar for appointments</label>
+        <select id="calOvCal" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+        <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Create one in GoHighLevel under Calendars if none appear.</p></div>
+      <div class="ob-field hide" id="calOvClyField">
+        <p style="margin:0;font-size:13px;color:#4b5563">We will connect your Calendly when your campaign is set up.</p></div>
+    </div>
+    <div class="dialog-actions" style="margin-top:20px">
+      <button class="btn btn-primary" data-close="calOverlay">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="audOverlay">
   <div class="dialog">
     <h3>Edit your audience</h3>
@@ -1930,9 +1951,11 @@ function _renderPending(){
     ['Location', null,
      [((PAGE.data.client || {}).name || '')]],
     ['Audience', 'editAudience', audParts],
-    ['Agreement', 'editAgreement',
-     [(ag.by ? 'Signed by ' + ag.by : 'Signed')]
-       .concat(ag.at ? [fmtLongDate(ag.at)] : [])],
+    ['Calendar', 'editCalendar',
+     [((PAGE.data && PAGE.data.calendar) || {}).surface === 'calendly'
+       ? 'Calendly'
+       : (((PAGE.data && PAGE.data.calendar) || {}).name
+          || 'Not picked yet')]],
     ['Payment method', 'editCard',
      [(b.card_summary || (b.card_invalid ? 'Card needs attention'
                                          : 'Saved during setup'))]]
@@ -1987,6 +2010,56 @@ function _renderPending(){
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   if (!worthOk) $('pcStart').disabled = true;
 }
+var _calOvCals = [], _calOvCur = '';
+function _loadCalOverlay(){
+  var sf = $('calOvSurface'), sel = $('calOvCal');
+  var cal = (PAGE.data && PAGE.data.calendar) || {};
+  sf.value = cal.surface === 'calendly' ? 'calendly' : 'ghl';
+  var cly = sf.value === 'calendly';
+  $('calOvCalField').classList.toggle('hide', cly);
+  $('calOvClyField').classList.toggle('hide', !cly);
+  sel.innerHTML = '<option>Loading calendars...</option>';
+  api('/api/ghl/calendars').then(function(j){
+    if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
+    _calOvCals = (j.calendars || []).filter(function(c){ return c.rr; });
+    _calOvCur = j.current || '';
+    sel.innerHTML = '';
+    if (!_calOvCals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
+    _calOvCals.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      if (c.id === _calOvCur) o.selected = true;
+      sel.appendChild(o);
+    });
+  }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
+}
+(function(){
+  var sf = $('calOvSurface'), sel = $('calOvCal');
+  sf.addEventListener('change', function(){
+    var cly = sf.value === 'calendly';
+    $('calOvCalField').classList.toggle('hide', cly);
+    $('calOvClyField').classList.toggle('hide', !cly);
+    api('/api/ghl/sched-verify', {surface: sf.value}).then(function(){
+      if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
+      PAGE.data.calendar.surface = sf.value;
+      _renderPending();
+    }).catch(function(){});
+  });
+  sel.addEventListener('change', function(){
+    var c = _calOvCals[sel.selectedIndex];
+    if (!c || !c.id) return;
+    api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
+      .then(function(j){
+        if (j && j.ok) {
+          _calOvCur = c.id;
+          if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
+          PAGE.data.calendar.name = c.name;
+          toast('Calendar saved: ' + c.name);
+          _renderPending();
+        }
+      }).catch(function(){});
+  });
+})();
 // STEP EDITORS (Matt 11/3: every workflow step fixable before start)
 var _pcEditFlow = null;
 function _pcEdit(target){
@@ -1996,6 +2069,11 @@ function _pcEdit(target){
     var ov = $('agreeOverlay');
     if (ov) { open_('agreeOverlay'); return; }
     window.open('https://www.hayessystems.com/terms.html', '_blank');
+    return;
+  }
+  if (target === 'editCalendar') {
+    _loadCalOverlay();
+    open_('calOverlay');
     return;
   }
   if (target === 'editAudience') {
