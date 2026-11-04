@@ -198,6 +198,14 @@ td .when{color:var(--mut);font-size:13px}
 .mailprev .mb{padding:16px 18px;font-size:13.5px;color:#1f2937;line-height:1.7;white-space:pre-wrap}
 .mailprev .mf{border-top:1px solid var(--bd);padding:10px 14px;font-size:11px;color:#9ca3af;line-height:1.6}
 
+/* pricing wizard step (Matt 11/3) */
+.ob-price{border:1px solid var(--bd);border-radius:10px;padding:20px;margin:16px 0}
+.ob-price .op-big{font-size:32px;font-weight:800;color:var(--tx);letter-spacing:-.5px}
+.ob-price .op-big small{font-size:14px;font-weight:600;color:var(--mut)}
+.ob-price ul{list-style:none;margin:14px 0 0 0;padding:0;display:grid;gap:8px}
+.ob-price li{font-size:13.5px;color:#374151;display:flex;gap:8px;align-items:flex-start}
+.ob-price li::before{content:"\2713";color:#15803d;font-weight:700;font-size:13px;flex-shrink:0;margin-top:2px}
+
 /* pending campaign card (variant A, Matt 11/3) */
 .pcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:26px 30px;max-width:680px;margin:0 auto 22px;box-shadow:0 10px 30px rgba(17,24,39,.06)}
 .pcard h1{font-size:22px;font-weight:700;margin:10px 0 2px}
@@ -226,6 +234,10 @@ td .when{color:var(--mut);font-size:13px}
 .pc-d b{color:var(--tx)}
 .pc-edit{font-size:12.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 .pc-edit:hover{color:var(--acch)}
+.pc-price{text-align:center;margin:20px 0 2px;padding:14px 10px 12px;background:#e8f9ee;border:1px solid #bbf7d0;border-radius:10px}
+.pc-pn{font-size:32px;font-weight:800;letter-spacing:-.5px;color:#15803d;line-height:1.05}
+.pc-pl{font-size:13px;font-weight:600;color:#166534;margin-top:3px}
+.pc-pz{font-size:12px;color:#15803d;margin-top:6px}
 .pc-acts{margin-top:22px}
 
 /* audience picker (11/3) */
@@ -448,6 +460,22 @@ body{padding:0}
       details please review our <a href="https://www.hayessystems.com/terms.html" target="_blank">data agreement</a>.</p>
     </div>
 
+    <div class="ob-step" id="obPricingStep">
+      <h3>What you pay</h3>
+      <p>Simple and performance-based. You only pay when an appointment
+      lands on your calendar.</p>
+      <div class="ob-price">
+        <div class="op-big">$60 <small>per appointment</small></div>
+        <ul>
+          <li>Billed weekly</li>
+          <li>No setup fee</li>
+          <li>No subscription</li>
+          <li>If nothing books: $0</li>
+          <li>A no-show is refunded when you report it</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="ob-step" id="obAudienceStep">
       <h3>Who we contact</h3>
       <p>The default audience is <b>everyone except open opportunities</b>
@@ -623,6 +651,11 @@ body{padding:0}
   </div>
   <div class="pc-flow" id="pcFlow"></div>
   <div class="pc-nums" id="pcNums"></div>
+  <div class="pc-price" id="pcPrice">
+    <div class="pc-pn">$60</div>
+    <div class="pc-pl">per appointment that books &middot; billed weekly</div>
+    <div class="pc-pz">If nothing books: $0 &middot; no-shows refunded on your report</div>
+  </div>
   <div class="pc-acts">
     <div style="display:flex;gap:10px;align-items:center">
       <button class="btn btn-primary" id="pcStart">Start campaign</button>
