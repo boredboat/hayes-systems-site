@@ -1274,8 +1274,8 @@ $('connectLocBtn').addEventListener('click', function(){
 // acknowledgment before the button unlocks; the ack rides the request
 // into the approval trail and the checkbox resets after each send
 function _openReqDialog(){
-  $('csAgree').checked = false;
-  $('confirmReq').disabled = true;
+  // the terms checkbox is gone (signed in onboarding) - the confirm
+  // button starts enabled; nothing to reset
   open_('reqOverlay');
 }
 function _renderCfgCheck(d){
