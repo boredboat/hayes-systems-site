@@ -377,7 +377,7 @@ body{padding:0}
 
 <div class="ob-card hide" id="billingCloser">
     <h2 id="bcTitle">Payment confirmed</h2>
-    <p id="bcBody" style="font-size:14px;color:#4b5563">Your card is saved.
+    <p id="bcBody" style="font-size:14px;color:#4b5563">Your payment method is saved.
     Return to the Hayes Systems app in your GHL dashboard to finish
     setting up.</p>
   </div>
@@ -810,7 +810,7 @@ body{padding:0}
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Applies from your next campaign onward. Duplicates, opted-out contacts, and contacts with no email are always removed.</p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
-        <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Card on file</span>
+        <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Payment method on file</span>
         <button class="btn btn-ghost" id="setCardUpdate" style="padding:8px 14px">Update card</button>
       </div></div>
     <div class="dialog-actions">
@@ -878,8 +878,8 @@ body{padding:0}
     window.__CARD_JUST_SAVED = (_bp === 'success');
     setTimeout(function(){
       try {
-        toast(_bp === 'success' ? 'Your card is saved.'
-                                : 'Card setup was cancelled.');
+        toast(_bp === 'success' ? 'Your payment method is saved.'
+                                : 'Payment setup was cancelled.');
         if (typeof _pollCard === 'function' && !_cardOk) _pollCard();
       } catch (e) {}
     }, 1400);
@@ -889,8 +889,8 @@ body{padding:0}
   document.body.classList.add('billing-close');
   document.getElementById('billingCloser').classList.remove('hide');
   if (_bp === 'cancelled') {
-    document.getElementById('bcTitle').textContent = 'Card setup cancelled';
-    document.getElementById('bcBody').textContent = 'No card was saved.'
+    document.getElementById('bcTitle').textContent = 'Payment setup cancelled';
+    document.getElementById('bcBody').textContent = 'No payment method was saved.'
       + ' Return to the Hayes Systems app in your GHL dashboard to'
       + ' try again.';
   }
@@ -1176,11 +1176,11 @@ function renderActionBar(st){
     if (b.card_invalid && st.client && st.client.state !== 'onboarding') {
       // onboarding owns card messaging in its own wizard step - the
       // amber billing banner is for ACTIVE clients (Matt 11/3)
-      items.push(['Your card on file could not be charged. Update your card so invoices keep working.',
+      items.push(['Your payment method could not be charged. Update it so invoices keep working.',
                   'Update card', 'openCardUpdate']);
     } else if (!b.card_on_file && st.client && st.client.state !== 'none'
                && st.client.state !== 'onboarding') {
-      items.push(['No working card on file. Add one so appointments can be invoiced.',
+      items.push(['No working payment method on file. Add one so appointments can be invoiced.',
                   'Add card', 'openCardUpdate']);
     }
     var h = st.health || {};
@@ -1218,8 +1218,8 @@ function openReconnect(){
   }).catch(function(){ toast('Reconnect is unavailable right now.'); });
 }
 function openCardUpdate(){
-  if (!PAGE.token) { toast('Card setup is unavailable in preview mode.'); return; }
-  toast('Opening secure card update...');
+  if (!PAGE.token) { toast('Payment setup is unavailable in preview mode.'); return; }
+  toast('Opening secure payment update...');
   fetch(API + '/api/ghl/stripe-setup', {
     method: 'POST',
     headers: {'Content-Type': 'application/json',
@@ -1228,8 +1228,8 @@ function openCardUpdate(){
       new URLSearchParams(location.search).get('locationId') || ''})
   }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
     if (d && d.checkout_url) window.open(d.checkout_url, '_blank');
-    else toast('Card update is unavailable right now. We will reach out.');
-  }).catch(function(){ toast('Card update is unavailable right now.'); });
+    else toast('Payment update is unavailable right now. We will reach out.');
+  }).catch(function(){ toast('Payment update is unavailable right now.'); });
 }
 
 // PAGE state lives ABOVE the demo renders: renderPast stamps PAGE.pastN
@@ -1736,7 +1736,7 @@ $('settingsLink').addEventListener('click', function(){
   var _cs = $('setCardState');
   if (_cs) {
     _cs.textContent = _b.card_invalid ? 'Card needs attention'
-      : (_b.card_on_file ? 'Card on file' : 'No card on file');
+      : (_b.card_on_file ? 'Payment method on file' : 'No payment method on file');
     _cs.style.color = _b.card_invalid ? '#b45309'
       : (_b.card_on_file ? 'var(--mut)' : '#b91c1c');
   }
@@ -1924,7 +1924,7 @@ function _renderPending(){
     ['Agreement', 'editAgreement',
      [(ag.by ? 'Signed by ' + ag.by : 'Signed')]
        .concat(ag.at ? [fmtLongDate(ag.at)] : [])],
-    ['Card on file', 'editCard',
+    ['Payment method', 'editCard',
      [(b.card_summary || (b.card_invalid ? 'Card needs attention'
                                          : 'Saved during setup'))]]
   ];
