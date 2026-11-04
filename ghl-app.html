@@ -189,6 +189,15 @@ td .when{color:var(--mut);font-size:13px}
 .listcheck{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .listcheck h3{margin:0;font-size:15px;color:var(--tx)}
 .listcheck p{margin:4px 0 0 0;font-size:13.5px;color:#4b5563}
+/* real email preview (Matt 11/3) */
+.mailprev{margin-top:20px;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.mailprev .mh{background:#fafbfc;border-bottom:1px solid var(--bd);padding:11px 14px}
+.mailprev .mh .r{display:flex;font-size:12px;color:var(--mut);gap:7px}
+.mailprev .mh .r b{color:var(--tx);font-weight:600}
+.mailprev .mh .r + .r{margin-top:2px}
+.mailprev .mb{padding:16px 18px;font-size:13.5px;color:#1f2937;line-height:1.7;white-space:pre-wrap}
+.mailprev .mf{border-top:1px solid var(--bd);padding:10px 14px;font-size:11px;color:#9ca3af;line-height:1.6}
+
 /* pending campaign card (variant A, Matt 11/3) */
 .pcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:26px 30px;max-width:680px;margin:0 auto 22px;box-shadow:0 10px 30px rgba(17,24,39,.06)}
 .pcard h1{font-size:22px;font-weight:700;margin:10px 0 2px}
@@ -470,7 +479,8 @@ body{padding:0}
 
     <div class="ob-step" data-ob="3">
       <h3>Agency details</h3>
-      <p>Please provide the business name leads will see in our outreach.</p>
+      <p>Please provide the business name leads will see in our outreach.
+      The first email your leads receive updates live as you type.</p>
       <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
@@ -478,6 +488,11 @@ body{padding:0}
           <input id="obNotice" placeholder="you@brokerage.com">
           <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
       </div>
+      <div class="mailprev" id="mailPrev"></div>
+      <p style="margin:10px 0 0;font-size:12.5px;color:var(--mut)">This is
+      the first of the emails your leads receive - the exact copy that
+      will be sent, with a sample lead. Leads who reply get a call from
+      our AI booking assistant.</p>
     </div>
 
     <div class="ob-step" data-ob="4">
@@ -2231,8 +2246,48 @@ function _loadObCals(){
   });
   if (relink) relink.addEventListener('click', _loadObCals);
 })();
+var MAIL_TPL = null;   // {subject, from_line, body} with {agency} intact
+function _loadMailPreview(){
+  if (!PAGE.token || MAIL_TPL) return;
+  api('/api/ghl/email-preview').then(function(j){
+    if (!(j && j.ok)) return;
+    MAIL_TPL = j;
+    _fillMailPreview();
+  }).catch(function(){});
+}
+function _fillMailPreview(){
+  var box = $('mailPrev'); if (!box || !MAIL_TPL) return;
+  var agency = ($('obBusiness') && $('obBusiness').value.trim())
+               || 'Your business';
+  var body = String(MAIL_TPL.body || '')
+    .split('\n\n- The {agency} follow-up team').join('')
+    .trim();
+  body = body.replace(/\{agency\}/g, agency);
+  var from = String(MAIL_TPL.from_line || '')
+    .replace('{agency}', agency);
+  // esc() then restore newlines via pre-wrap
+  box.innerHTML =
+    '<div class="mh">'
+    + '<div class="r"><b>From:</b> <span></span></div>'
+    + '<div class="r"><b>To:</b> Karen Wheeler</div>'
+    + '<div class="r"><b>Subject:</b> <span></span></div>'
+    + '</div>'
+    + '<div class="mb"></div>'
+    + '<div class="mf">Don\'t want these emails? <a>Unsubscribe</a>'
+    + ' &middot; Hayes Systems LLC &middot; 413 Main St, Lenox MA</div>';
+  box.querySelectorAll('.mh .r span')[0].textContent = from;
+  box.querySelectorAll('.mh .r span')[1].textContent = MAIL_TPL.subject || '';
+  box.querySelector('.mb').textContent = body;
+}
+(function(){
+  var b = $('obBusiness');
+  if (b) b.addEventListener('input', function(){
+    if (MAIL_TPL) _fillMailPreview();
+  });
+})();
 function audInit(){
   if (!PAGE.token) return;
+  _loadMailPreview();
   _loadObCals();
   var _nb = $('obNotice');
   if (_nb && !_nb.value) {
