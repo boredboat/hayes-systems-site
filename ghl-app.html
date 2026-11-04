@@ -995,14 +995,35 @@ document.querySelectorAll('#tabsCard .tab').forEach(function(tb){
     $(tb.getAttribute('data-pane')).classList.add('on');
   });
 });
+function _pcEligible(){
+  var d = PAGE.data || {};
+  return !!(S === 'none' && d && !PAGE.preparing
+            && !PAGE.launchFailed && !_pcCancelled()
+            && !(d.past_campaigns || []).length
+            && (d.billing || {}).card_on_file);
+}
+function _pcKey(){
+  return 'ghlpc:' + (new URLSearchParams(location.search)
+                     .get('locationId') || 'x');
+}
+function _pcCancelled(){
+  try { return localStorage.getItem(_pcKey() + ':cancelled') === '1'; }
+  catch(e) { return !!PAGE.pcDismissed; }
+}
 function apply(s, until){
   S = s;
   var ob = (s === 'onboarding');
+  // PENDING CARD OWNS THE PAGE (Matt 11/3, live-caught split-brain): the
+  // same eligibility the card render uses drives the section hides HERE
+  // - one writer, so no ordering or exception can ever leave the banner
+  // and tabs visible beside the checklist
+  var pc = (s === 'none' && _pcEligible());
+  if (pc) ob = true;   // reuse the onboarding section-standdown
   var has = (s === 'running' || s === 'paused' || s === 'cancelled' || s === 'retainer' || s === 'completed');
   // hero always visible except onboarding (none shows the pre-campaign
   // hero: grey pill, lead-reactivation title, zeroed numbers)
   $('heroBand').classList.toggle('hide', ob);
-  $('spine').classList.toggle('hide', !(s === 'running' || s === 'paused' || s === 'cancelled' || s === 'completed'));
+  $('spine').classList.toggle('hide', pc || !(s === 'running' || s === 'paused' || s === 'cancelled' || s === 'completed'));
   $('tabsCard').classList.toggle('hide', ob);
   // apply() OWNS the action bar's visibility (Matt 11/3, live-caught:
   // applyOb hides it for onboarding but nothing un-hid it on the in-page
@@ -1926,26 +1947,12 @@ function _audSummary(){
 }
 function _renderPending(){
   var card = $('pendingCard'); if (!card) return;
-  var on = !!(S === 'none' && PAGE.data && !PAGE.preparing
-              && !PAGE.launchFailed
-              && !_pcCancelled()
-              && !(PAGE.data.past_campaigns || []).length
-              && (PAGE.data.billing || {}).card_on_file);
+  var on = _pcEligible();
   if (!on) {
     card.classList.add('hide');
-    // apply() owns section visibility when the card is absent - re-run
-    // its default toggles so nothing stays hidden from a prior visit
-    apply(S);
-    return;
+    return;   // apply() owns section visibility in every path
   }
-  // while the pending card shows, it IS the page (Matt 11/3): the
-  // hero banner, the progress spine, the tabs (Appointments / Recent
-  // activity / Past campaigns / Billing) and the action bar all stand
-  // down - nothing campaign-ish exists to show yet
   card.classList.remove('hide');
-  ['heroBand', 'spine', 'tabsCard', 'actRow'].forEach(function(id){
-    var el = $(id); if (el) el.classList.add('hide');
-  });
   var b = PAGE.data.billing || {};
   var flow = $('pcFlow');
   flow.innerHTML = '';
@@ -2163,14 +2170,6 @@ function _fileCampaignRequest(){
 $('pcGuard').addEventListener('change', function(){
   $('pcStart').disabled = !this.checked;
 });
-function _pcKey(){
-  return 'ghlpc:' + (new URLSearchParams(location.search)
-                     .get('locationId') || 'x');
-}
-function _pcCancelled(){
-  try { return localStorage.getItem(_pcKey() + ':cancelled') === '1'; }
-  catch(e) { return !!PAGE.pcDismissed; }
-}
 // Cancel (Matt 11/3): back to the main page, and it STICKS across
 // refreshes (per location); Start campaign clears it and brings the
 // workflow back
