@@ -2177,7 +2177,8 @@ $('pcGuard').addEventListener('change', function(){
 $('pcCancel').addEventListener('click', function(){
   PAGE.pcDismissed = true;
   try { localStorage.setItem(_pcKey() + ':cancelled', '1'); } catch(e) {}
-  _renderPending();   // hides the card and restores the page sections
+  apply(S);           // sections restore lives HERE now (pc -> false)
+  _renderPending();   // card hides
 });
 $('pcStart').addEventListener('click', function(){
   _runCfgCheck(_fileCampaignRequest);
