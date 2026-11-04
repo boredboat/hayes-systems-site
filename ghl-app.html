@@ -1464,10 +1464,7 @@ function _runCfgCheck(then){
       _renderCfgCheck(j);
     } else {
       $('cfgCard').classList.add('hide');
-      if (j && j.ok && j.passed && j.passed.length) {
-        toast('Calendar settings look good.');
-      }
-      then();
+      then();   // pass = silence (Matt 11/3: the toast was noise)
     }
   }).catch(function(){ then(); });   // check unavailable: never block the request
 }
@@ -1493,6 +1490,7 @@ $('reqBtn').addEventListener('click', function(){
   if (S === 'none' && !(d.past_campaigns || []).length
       && (d.billing || {}).card_on_file && !PAGE.preparing) {
     PAGE.pcDismissed = false;
+    try { localStorage.removeItem(_pcKey() + ':cancelled'); } catch(e) {}
     _renderPending();
     return;
   }
@@ -1930,7 +1928,7 @@ function _renderPending(){
   var card = $('pendingCard'); if (!card) return;
   var on = !!(S === 'none' && PAGE.data && !PAGE.preparing
               && !PAGE.launchFailed
-              && !PAGE.pcDismissed
+              && !_pcCancelled()
               && !(PAGE.data.past_campaigns || []).length
               && (PAGE.data.billing || {}).card_on_file);
   if (!on) {
@@ -2165,10 +2163,20 @@ function _fileCampaignRequest(){
 $('pcGuard').addEventListener('change', function(){
   $('pcStart').disabled = !this.checked;
 });
-// Cancel (Matt 11/3): back to the main page for this session - the
-// card returns on the next visit, nothing is lost or persisted
+function _pcKey(){
+  return 'ghlpc:' + (new URLSearchParams(location.search)
+                     .get('locationId') || 'x');
+}
+function _pcCancelled(){
+  try { return localStorage.getItem(_pcKey() + ':cancelled') === '1'; }
+  catch(e) { return !!PAGE.pcDismissed; }
+}
+// Cancel (Matt 11/3): back to the main page, and it STICKS across
+// refreshes (per location); Start campaign clears it and brings the
+// workflow back
 $('pcCancel').addEventListener('click', function(){
   PAGE.pcDismissed = true;
+  try { localStorage.setItem(_pcKey() + ':cancelled', '1'); } catch(e) {}
   _renderPending();   // hides the card and restores the page sections
 });
 $('pcStart').addEventListener('click', function(){
