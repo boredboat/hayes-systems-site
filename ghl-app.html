@@ -1791,8 +1791,8 @@ function audRender(){
       '<label class="ad-check aud-row"><input type="checkbox" id="' + id + '_open"><span>Skip contacts with an open opportunity</span></label>' +
       '<label class="ad-check aud-row"><input type="checkbox" id="' + id + '_lost"><span>Include lost opportunities</span></label>' +
       '</div>' +
-      '<div class="aud-lab">Only these tags (optional)</div><div class="aud-chips" id="' + id + '_inc"></div>' +
-      '<div class="aud-lab" style="margin-top:12px">Never these tags (optional)</div><div class="aud-chips" id="' + id + '_exc"></div>' +
+      '<div class="aud-lab">Include</div><div class="aud-chips" id="' + id + '_inc"></div>' +
+      '<div class="aud-lab" style="margin-top:12px">Exclude</div><div class="aud-chips" id="' + id + '_exc"></div>' +
       '<div class="aud-prev" id="' + id + '_prev"><span class="aud-cap">Counting your contacts...</span></div>';
     var o = $(id + '_open'), l = $(id + '_lost');
     o.checked = AUD.skip_open_opp; l.checked = AUD.include_lost_opp;
@@ -1876,9 +1876,9 @@ function _audSummary(){
   bits.push(AUD.include_lost_opp ? 'Lost opportunities included'
                                  : 'Lost opportunities skipped');
   if (AUD.include_tags.length)
-    bits.push('Only: ' + AUD.include_tags.join(', '));
+    bits.push('Include: ' + AUD.include_tags.join(', '));
   if (AUD.exclude_tags.length)
-    bits.push('Never: ' + AUD.exclude_tags.join(', '));
+    bits.push('Exclude: ' + AUD.exclude_tags.join(', '));
   return bits.join(' \u00b7 ');
 }
 function _renderPending(){
