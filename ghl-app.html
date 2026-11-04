@@ -205,6 +205,8 @@ td .when{color:var(--mut);font-size:13px}
 .pc-nums{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)}
 .pc-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#15803d}
 .pc-lbl{font-size:11.5px;color:var(--mut);margin-top:2px}
+.pc-edit{font-size:12.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
+.pc-edit:hover{color:var(--acch)}
 .pc-acts{margin-top:22px}
 
 /* audience picker (11/3) */
@@ -805,6 +807,28 @@ body{padding:0}
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="audOverlay">
+  <div class="dialog">
+    <h3>Edit your audience</h3>
+    <div id="audCard"></div>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="audOverlay">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="agreeOverlay">
+  <div class="dialog">
+    <h3>Your agreement</h3>
+    <p>You signed the Data Agreement and Campaign Terms during setup.
+    Starting the campaign begins the paid service per those terms.</p>
+    <p><a href="https://www.hayessystems.com/terms.html" target="_blank" style="color:var(--acc);font-weight:600">Read the full terms</a></p>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="agreeOverlay">Close</button>
     </div>
   </div>
 </div>
@@ -1751,7 +1775,7 @@ function audChips(el, key){
   });
 }
 function audRender(){
-  ['audWizard', 'audSettings'].forEach(function(id){
+  ['audWizard', 'audSettings', 'audCard'].forEach(function(id){
     var box = $(id); if (!box) return;
     box.innerHTML =
       '<div class="aud-rows">' +
@@ -1797,7 +1821,7 @@ function audPreview(){
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       PAGE.audCount = n;
-      ['audWizard_prev', 'audSettings_prev'].forEach(function(id){
+      ['audWizard_prev', 'audSettings_prev', 'audCard_prev'].forEach(function(id){
         var el = $(id);
         if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
           + '</span><span class="aud-cap">' + cap + '</span>';
@@ -1838,18 +1862,14 @@ function _renderPending(){
   var b = PAGE.data.billing || {};
   var flow = $('pcFlow');
   flow.innerHTML = '';
+  // titles only (Matt 11/3: the second detail lines were pointless -
+  // the audience count lives in the big number) and every step is
+  // EDITABLE so mistakes get fixed before starting
   var steps = [
-    ['Location connected',
-     ((PAGE.data.client || {}).name || 'Your location')
-     + ' \u00b7 CRM read-only, calendars read and write'],
-    ['Audience selected',
-     _audSummary() + ' \u00b7 <b>' + fmtNum(PAGE.audCount || 0)
-     + ' contacts</b>'],
-    ['Agreement signed',
-     'Data Agreement and Campaign Terms \u00b7 signed in-app'],
-    ['Card on file',
-     b.card_invalid ? 'Card needs attention'
-     : 'Billed weekly per appointment \u00b7 refunded on no-shows']
+    ['Location connected', 'editLocation'],
+    ['Audience', 'editAudience'],
+    ['Agreement signed', 'editAgreement'],
+    ['Card on file', 'editCard']
   ];
   steps.forEach(function(s){
     var row = document.createElement('div');
@@ -1858,11 +1878,14 @@ function _renderPending(){
     n.className = 'pc-n'; n.textContent = '\u2713';
     var t = document.createElement('div');
     t.className = 'pc-t'; t.textContent = s[0];
-    var d = document.createElement('div');
-    d.className = 'pc-d'; d.innerHTML = s[1];
+    t.style.flex = '1';
+    var e = document.createElement('span');
+    e.className = 'pc-edit'; e.textContent = 'Edit';
+    e.setAttribute('data-act', s[1]);
     row.appendChild(n);
     var wrap = document.createElement('div');
-    wrap.appendChild(t); wrap.appendChild(d);
+    wrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:10px';
+    wrap.appendChild(t); wrap.appendChild(e);
     row.appendChild(wrap);
     flow.appendChild(row);
   });
@@ -1871,6 +1894,30 @@ function _renderPending(){
     + '</div><div class="pc-lbl">Contacts in your audience</div>';
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
 }
+// STEP EDITORS (Matt 11/3: every workflow step fixable before start)
+var _pcEditFlow = null;
+function _pcEdit(target){
+  if (target === 'editLocation') { openReconnect(); return; }
+  if (target === 'editCard') { openCardUpdate(); return; }
+  if (target === 'editAgreement') {
+    var ov = $('agreeOverlay');
+    if (ov) { open_('agreeOverlay'); return; }
+    window.open('https://www.hayessystems.com/terms.html', '_blank');
+    return;
+  }
+  if (target === 'editAudience') {
+    audRender();   // refresh chips/toggles into every container
+    open_('audOverlay');
+    return;
+  }
+}
+document.addEventListener('click', function(ev){
+  var el = ev.target;
+  if (el && el.classList && el.classList.contains('pc-edit')) {
+    ev.preventDefault();
+    _pcEdit(el.getAttribute('data-act'));
+  }
+});
 function _fileCampaignRequest(){
   var btn = $('pcStart') || $('confirmReq');
   function _resetReq(){
