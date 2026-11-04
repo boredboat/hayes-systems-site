@@ -624,7 +624,10 @@ body{padding:0}
     <label class="ad-check" style="margin:0 0 14px;display:flex;align-items:center;gap:10px;font-size:13px">
       <input type="checkbox" id="pcGuard">
       <span>I understand that Start campaign begins the paid service per the terms I agreed to.</span></label>
-    <button class="btn btn-primary" id="pcStart" disabled>Start campaign</button>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" id="pcStart" disabled>Start campaign</button>
+      <button class="btn btn-ghost" id="pcCancel">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1917,6 +1920,7 @@ function _renderPending(){
   var card = $('pendingCard'); if (!card) return;
   var on = !!(S === 'none' && PAGE.data && !PAGE.preparing
               && !PAGE.launchFailed
+              && !PAGE.pcDismissed
               && !(PAGE.data.past_campaigns || []).length
               && (PAGE.data.billing || {}).card_on_file);
   if (!on) {
@@ -2150,6 +2154,12 @@ function _fileCampaignRequest(){
 }
 $('pcGuard').addEventListener('change', function(){
   $('pcStart').disabled = !this.checked;
+});
+// Cancel (Matt 11/3): back to the main page for this session - the
+// card returns on the next visit, nothing is lost or persisted
+$('pcCancel').addEventListener('click', function(){
+  PAGE.pcDismissed = true;
+  _renderPending();   // hides the card and restores the page sections
 });
 $('pcStart').addEventListener('click', function(){
   _runCfgCheck(_fileCampaignRequest);
