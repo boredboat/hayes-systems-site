@@ -1512,6 +1512,7 @@ $('reqBtn').addEventListener('click', function(){
       && (d.billing || {}).card_on_file && !PAGE.preparing) {
     PAGE.pcDismissed = false;
     try { localStorage.removeItem(_pcKey() + ':cancelled'); } catch(e) {}
+    apply(S);          // the section standdown lives HERE now
     _renderPending();
     return;
   }
