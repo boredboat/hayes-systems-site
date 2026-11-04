@@ -852,7 +852,9 @@ body{padding:0}
         <input id="bizEmail" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px">
         <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
     </div>
-    <div class="dialog-actions" style="margin-top:20px">
+    <p style="margin:14px 0 0;font-size:12.5px"><a id="bizMailLink" href="#"
+       style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email with this business name</a></p>
+    <div class="dialog-actions" style="margin-top:16px">
       <button class="btn btn-ghost" data-close="bizOverlay">Cancel</button>
       <button class="btn btn-primary" id="bizSave">Save</button>
     </div>
@@ -2074,17 +2076,13 @@ function _renderPending(){
   var nums = $('pcNums');
   nums.innerHTML = '<div class="pc-total"><div class="n">'
     + fmtNum(PAGE.audCount || 0)
-    + '</div><div class="l">Total leads in this campaign</div></div>'
-    + '<div style="text-align:center;margin-top:8px;font-size:12.5px">'
-    + '<a id="pcMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></div>';
+    + '</div><div class="l">Total leads in this campaign</div></div>';
   // worth gate (Matt 11/3, live-caught): a failing list disables Start
   // the moment the verdict lands - never a request that will refuse
   var worthOk = !(PAGE.worth && PAGE.worth.ok !== false
                   && PAGE.worth.pass === false);
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   if (!worthOk) $('pcStart').disabled = true;
-  var ml = $('pcMailLink');
-  if (ml) ml.onclick = function(ev){ ev.preventDefault(); _openMailPreview(); };
 }
 var _calOvCals = [], _calOvCur = '';
 function _loadCalOverlay(){
@@ -2159,6 +2157,12 @@ function _openBizOverlay(){
   var c = (PAGE.data && PAGE.data.client) || {};
   $('bizName').value = c.name || '';
   $('bizEmail').value = c.email || '';
+  var ml = $('bizMailLink');
+  if (ml) ml.onclick = function(ev){
+    ev.preventDefault();
+    // preview what they are TYPING, not just what is saved
+    _openMailPreview($('bizName').value.trim());
+  };
   open_('bizOverlay');
 }
 (function(){
@@ -2313,7 +2317,10 @@ function _loadObCals(){
   if (relink) relink.addEventListener('click', _loadObCals);
 })();
 var MAIL_TPL = null;   // {subject, from_line, body} with {agency} intact
-function _openMailPreview(){
+var MAIL_AGENCY = null;   // explicit override (the Business editor
+                         // previews the name being typed, pre-save)
+function _openMailPreview(agencyOverride){
+  MAIL_AGENCY = agencyOverride || null;
   // lazy: fetch the real template once, then fill from the account name
   if (!MAIL_TPL && PAGE.token) {
     api('/api/ghl/email-preview').then(function(j){
@@ -2325,7 +2332,8 @@ function _openMailPreview(){
 }
 function _fillMailPreview(){
   var box = $('mailPrev'); if (!box || !MAIL_TPL) return;
-  var agency = (((PAGE.data || {}).client || {}).name || '').trim()
+  var agency = MAIL_AGENCY
+               || (((PAGE.data || {}).client || {}).name || '').trim()
                || ($('obBusiness') && $('obBusiness').value.trim())
                || 'Your business';
   var body = String(MAIL_TPL.body || '')
