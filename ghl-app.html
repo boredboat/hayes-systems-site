@@ -205,6 +205,8 @@ td .when{color:var(--mut);font-size:13px}
 .pc-nums{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)}
 .pc-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#15803d}
 .pc-lbl{font-size:11.5px;color:var(--mut);margin-top:2px}
+.pc-d{font-size:12.5px;color:var(--mut);margin-top:1px}
+.pc-d b{color:var(--tx)}
 .pc-edit{font-size:12.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 .pc-edit:hover{color:var(--acch)}
 .pc-acts{margin-top:22px}
@@ -1870,11 +1872,19 @@ function _renderPending(){
   // being broken - there is no sensible in-app edit for which location
   // is connected). The health banner's Reconnect owns the dead-
   // connection case; everything the client can genuinely fix keeps Edit.
+  // VALUES under each step (Matt 11/3: the client checks at a glance
+  // whether each choice is the right one - real values, never boilerplate)
+  var ag = (PAGE.data && PAGE.data.agreement) || {};
   var steps = [
-    ['Location connected', null],
-    ['Audience', 'editAudience'],
-    ['Agreement signed', 'editAgreement'],
-    ['Card on file', 'editCard']
+    ['Location connected', null,
+     ((PAGE.data.client || {}).name || '')],
+    ['Audience', 'editAudience',
+     _audSummary() + ' \u00b7 ' + fmtNum(PAGE.audCount || 0) + ' contacts'],
+    ['Agreement signed', 'editAgreement',
+     (ag.by ? 'Signed by ' + ag.by : 'Signed')
+       + (ag.at ? ' \u00b7 ' + ag.at : '')],
+    ['Card on file', 'editCard',
+     b.card_summary || b.card_invalid ? (b.card_summary || 'Card needs attention') : 'Saved during setup']
   ];
   steps.forEach(function(s){
     var row = document.createElement('div');
@@ -1883,11 +1893,15 @@ function _renderPending(){
     n.className = 'pc-n'; n.textContent = '\u2713';
     var t = document.createElement('div');
     t.className = 'pc-t'; t.textContent = s[0];
-    t.style.flex = '1';
+    var d = document.createElement('div');
+    d.className = 'pc-d'; d.textContent = s[2];
+    var mid = document.createElement('div');
+    mid.style.flex = '1';
+    mid.appendChild(t); mid.appendChild(d);
     row.appendChild(n);
     var wrap = document.createElement('div');
     wrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:10px';
-    wrap.appendChild(t);
+    wrap.appendChild(mid);
     if (s[1]) {
       var e = document.createElement('span');
       e.className = 'pc-edit'; e.textContent = 'Edit';
