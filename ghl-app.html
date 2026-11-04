@@ -199,8 +199,11 @@ td .when{color:var(--mut);font-size:13px}
 .pc-step::before{content:"";position:absolute;left:13px;top:28px;bottom:-2px;width:2px;background:var(--grnb,#e8f9ee)}
 .pc-step:last-child::before{display:none}
 .pc-n{width:28px;height:28px;border-radius:50%;background:#e8f9ee;border:2px solid #bfe9cd;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;z-index:1}
-.pc-t{font-size:14px;font-weight:600;padding-top:2px}
-.pc-d{font-size:12.5px;color:var(--mut);margin-top:1px}
+/* value-first steps (Matt 11/3: the value IS the content - title reads
+   as the label, value reads as the fact) */
+.pc-t{font-size:11px;font-weight:700;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--mut);padding-top:3px}
+.pc-d{font-size:14.5px;font-weight:600;color:var(--tx);margin-top:2px}
 .pc-d b{color:var(--tx)}
 .pc-nums{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)}
 .pc-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#15803d}
