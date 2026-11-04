@@ -217,6 +217,8 @@ td .when{color:var(--mut);font-size:13px}
 .pc-d{font-size:14.5px;font-weight:600;color:var(--tx);margin-top:2px}
 .pc-d b{color:var(--tx)}
 .pc-chip{display:inline-block;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;color:var(--tx);margin:2px 6px 2px 0;white-space:nowrap}
+.pc-val{display:inline-block;border:1px solid var(--bd);background:#fff;border-radius:8px;padding:5px 12px;font-size:14px;font-weight:700;color:var(--tx);margin:1px 0;max-width:100%}
+.pc-val small{font-weight:600;color:var(--mut);font-size:12.5px}
 .pc-total{text-align:center;margin:20px 0 2px;padding:16px 10px 14px;background:#e8f9ee;border:1px solid #bbf7d0;border-radius:10px}
 .pc-total .n{font-size:38px;font-weight:800;letter-spacing:-.5px;color:#15803d;line-height:1.05}
 .pc-total .l{font-size:12.5px;font-weight:600;color:#166534;margin-top:4px}
@@ -2062,6 +2064,10 @@ function _renderPending(){
         seg.textContent = part;
         v.appendChild(seg);
       });
+      // every value wears the card (Matt 11/3: same class as the
+      // audience chips - one visual language for all selections)
+      v.classList.add('pc-val');
+      v.style.display = 'inline-block';
     }
     kv.appendChild(k); kv.appendChild(v);
     row.appendChild(ck); row.appendChild(kv);
