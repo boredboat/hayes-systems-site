@@ -189,6 +189,24 @@ td .when{color:var(--mut);font-size:13px}
 .listcheck{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .listcheck h3{margin:0;font-size:15px;color:var(--tx)}
 .listcheck p{margin:4px 0 0 0;font-size:13.5px;color:#4b5563}
+/* pending campaign card (variant A, Matt 11/3) */
+.pcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:26px 30px;max-width:680px;margin:0 auto 22px;box-shadow:0 10px 30px rgba(17,24,39,.06)}
+.pcard h1{font-size:22px;font-weight:700;margin:10px 0 2px}
+.pc-sub{font-size:13px;color:var(--mut)}
+.pc-flow{margin:22px 0 4px;display:flex;flex-direction:column}
+.pc-step{display:flex;gap:14px;position:relative;padding-bottom:20px}
+.pc-step:last-child{padding-bottom:0}
+.pc-step::before{content:"";position:absolute;left:13px;top:28px;bottom:-2px;width:2px;background:var(--grnb,#e8f9ee)}
+.pc-step:last-child::before{display:none}
+.pc-n{width:28px;height:28px;border-radius:50%;background:#e8f9ee;border:2px solid #bfe9cd;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;z-index:1}
+.pc-t{font-size:14px;font-weight:600;padding-top:2px}
+.pc-d{font-size:12.5px;color:var(--mut);margin-top:1px}
+.pc-d b{color:var(--tx)}
+.pc-nums{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)}
+.pc-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#15803d}
+.pc-lbl{font-size:11.5px;color:var(--mut);margin-top:2px}
+.pc-acts{margin-top:22px}
+
 /* audience picker (11/3) */
 .aud-lab{font-size:12px;font-weight:600;color:var(--tx);margin:0 0 6px}
 .aud-chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -550,6 +568,19 @@ body{padding:0}
     <div class="hnum"><div class="num" id="numE">1,204</div><div class="lbl">Emails</div></div>
     <div class="hnum"><div class="num good" id="numA">23</div><div class="lbl">Appointments</div></div>
     <div class="hnum"><div class="num" id="numC">$1,380</div><div class="lbl">Cost to date</div></div>
+  </div>
+</div>
+
+<div class="pcard hide" id="pendingCard">
+  <div class="pc-head">
+    <span class="pill ready"><span class="dot"></span>Ready to start</span>
+    <h1>Campaign 1</h1>
+    <div class="pc-sub">Setup is complete. It starts the moment you say go.</div>
+  </div>
+  <div class="pc-flow" id="pcFlow"></div>
+  <div class="pc-nums" id="pcNums"></div>
+  <div class="pc-acts">
+    <button class="btn btn-primary" id="pcStart">Start campaign</button>
   </div>
 </div>
 
@@ -1654,14 +1685,107 @@ function audPreview(){
       var n = Math.max(0, base - skip);
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
+      PAGE.audCount = n;
       ['audWizard_prev', 'audSettings_prev'].forEach(function(id){
         var el = $(id);
         if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
           + '</span><span class="aud-cap">' + cap + '</span>';
       });
+      _renderPending();
     }).catch(function(){});
   }, 250);
 }
+// PENDING CAMPAIGN CARD (variant A, Matt 11/3): the first campaign
+// lives on the main page as a short setup workflow; its Start button
+// starts directly - the terms were signed in onboarding, the card IS
+// the confirmation surface.
+function _audSummary(){
+  var bits = [];
+  if (AUD.include_tags.length)
+    bits.push('only: ' + AUD.include_tags.join(', '));
+  if (AUD.exclude_tags.length)
+    bits.push('never: ' + AUD.exclude_tags.join(', '));
+  var base = AUD.skip_open_opp
+    ? 'Everyone except open opportunities'
+    : 'Everyone';
+  if (!AUD.include_lost_opp) base += ', lost opportunities skipped';
+  return base + (bits.length ? ' \u00b7 ' + bits.join(' \u00b7 ') : '');
+}
+function _renderPending(){
+  var card = $('pendingCard'); if (!card) return;
+  var on = !!(S === 'none' && PAGE.data && !PAGE.preparing
+              && !(PAGE.data.past_campaigns || []).length
+              && (PAGE.data.billing || {}).card_on_file);
+  if (!on) { card.classList.add('hide'); }
+  // while the pending card shows, it IS the page: hero + action bar
+  // stand down (apply()'s defaults own them otherwise)
+  $('heroBand').classList.toggle('hide', on || S === 'onboarding');
+  $('actRow').classList.toggle('hide', on || S === 'onboarding');
+  if (!on) return;
+  card.classList.remove('hide');
+  var b = PAGE.data.billing || {};
+  var flow = $('pcFlow');
+  flow.innerHTML = '';
+  var steps = [
+    ['Location connected',
+     ((PAGE.data.client || {}).name || 'Your location')
+     + ' \u00b7 CRM read-only, calendars read and write'],
+    ['Audience selected',
+     _audSummary() + ' \u00b7 <b>' + fmtNum(PAGE.audCount || 0)
+     + ' contacts</b>'],
+    ['Agreement signed',
+     'Data Agreement and Campaign Terms \u00b7 signed in-app'],
+    ['Card on file',
+     b.card_invalid ? 'Card needs attention'
+     : 'Billed weekly per appointment \u00b7 refunded on no-shows']
+  ];
+  steps.forEach(function(s){
+    var row = document.createElement('div');
+    row.className = 'pc-step';
+    var n = document.createElement('span');
+    n.className = 'pc-n'; n.textContent = '\u2713';
+    var t = document.createElement('div');
+    t.className = 'pc-t'; t.textContent = s[0];
+    var d = document.createElement('div');
+    d.className = 'pc-d'; d.innerHTML = s[1];
+    row.appendChild(n);
+    var wrap = document.createElement('div');
+    wrap.appendChild(t); wrap.appendChild(d);
+    row.appendChild(wrap);
+    flow.appendChild(row);
+  });
+  var nums = $('pcNums');
+  nums.innerHTML = '<div class="pc-num">' + fmtNum(PAGE.audCount || 0)
+    + '</div><div class="pc-lbl">Contacts in your audience</div>';
+  $('pcStart').style.display = b.card_invalid ? 'none' : '';
+}
+function _fileCampaignRequest(){
+  var btn = $('pcStart') || $('confirmReq');
+  function _resetReq(){
+    if (btn) { btn.disabled = false; btn.textContent = 'Start campaign'; }
+  }
+  if (PAGE.live) {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin-sm"></span>Updating your list';
+    }
+    api('/api/ghl/request-campaign', {}).then(function(j){
+      if (j && j.ok) {
+        toast(j.already
+          ? 'A check is already running. Your list updates in a moment.'
+          : 'Updating your list. This takes a minute or two.');
+        if (btn) btn.disabled = true;
+      } else {
+        _resetReq();
+        toast((j && j.error) || 'Could not start the check. Try again.');
+      }
+    }).catch(function(){ _resetReq();
+      toast('Could not start the check. Try again.'); });
+  }
+}
+$('pcStart').addEventListener('click', function(){
+  _runCfgCheck(_fileCampaignRequest);
+});
 function audInit(){
   if (!PAGE.token) return;
   var _nb = $('obNotice');
@@ -1749,6 +1873,7 @@ function loadPageData(){
     applyFromData(d);
     renderActionBar(d);
     audInit();   // audience picker state (wizard step + Settings)
+    _renderPending();
     // FIX (Matt 11/2: "no recent activity"): the activity fetch was
     // UNREACHABLE - the appointments return above exited the callback
     // before this line ever ran. Chained properly now.
