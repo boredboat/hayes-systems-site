@@ -193,11 +193,13 @@ td .when{color:var(--mut);font-size:13px}
 .pcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:26px 30px;max-width:680px;margin:0 auto 22px;box-shadow:0 10px 30px rgba(17,24,39,.06)}
 .pcard h1{font-size:22px;font-weight:700;margin:10px 0 2px}
 .pc-sub{font-size:13px;color:var(--mut)}
-.pc-flow{margin:22px 0 4px;display:flex;flex-direction:column}
-.pc-step{display:flex;gap:14px;position:relative;padding-bottom:20px}
-.pc-step:last-child{padding-bottom:0}
-.pc-step::before{content:"";position:absolute;left:13px;top:28px;bottom:-2px;width:2px;background:var(--grnb,#e8f9ee)}
-.pc-step:last-child::before{display:none}
+.pc-flow{display:flex;flex-direction:column;gap:8px;margin:20px 0 2px}
+.pc-rowc{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--bd);border-radius:10px}
+.pc-rowc .ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.pc-rowc .kv{flex:1;min-width:0}
+.pc-k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.pc-rowc .v{font-size:14.5px;font-weight:700;margin-top:1px}
+.pc-rowc .v small{font-weight:600;color:var(--mut);font-size:12.5px}
 .pc-n{width:28px;height:28px;border-radius:50%;background:#e8f9ee;border:2px solid #bfe9cd;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;z-index:1}
 /* value-first steps (Matt 11/3: the value IS the content - title reads
    as the label, value reads as the fact) */
@@ -205,9 +207,9 @@ td .when{color:var(--mut);font-size:13px}
       text-transform:uppercase;color:var(--mut);padding-top:3px}
 .pc-d{font-size:14.5px;font-weight:600;color:var(--tx);margin-top:2px}
 .pc-d b{color:var(--tx)}
-.pc-nums{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)}
-.pc-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#15803d}
-.pc-lbl{font-size:11.5px;color:var(--mut);margin-top:2px}
+.pc-total{text-align:center;margin:20px 0 2px;padding:16px 10px 14px;background:#e8f9ee;border:1px solid #bbf7d0;border-radius:10px}
+.pc-total .n{font-size:38px;font-weight:800;letter-spacing:-.5px;color:#15803d;line-height:1.05}
+.pc-total .l{font-size:12.5px;font-weight:600;color:#166534;margin-top:4px}
 .pc-d{font-size:12.5px;color:var(--mut);margin-top:1px}
 .pc-d b{color:var(--tx)}
 .pc-edit{font-size:12.5px;font-weight:600;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
@@ -1875,48 +1877,54 @@ function _renderPending(){
   // being broken - there is no sensible in-app edit for which location
   // is connected). The health banner's Reconnect owns the dead-
   // connection case; everything the client can genuinely fix keeps Edit.
-  // VALUES under each step (Matt 11/3: the client checks at a glance
-  // whether each choice is the right one - real values, never boilerplate)
+  // ROW CARDS (variant A, Matt 11/3): every value boxed - label quiet,
+  // value loud, qualifiers small; the count is the centered green total
   var ag = (PAGE.data && PAGE.data.agreement) || {};
+  var audParts = _audSummary().split(' \u00b7 ');
   var steps = [
-    ['Location connected', null,
-     ((PAGE.data.client || {}).name || '')],
-    ['Audience', 'editAudience',
-     _audSummary() + ' \u00b7 ' + fmtNum(PAGE.audCount || 0) + ' contacts'],
-    ['Agreement signed', 'editAgreement',
-     (ag.by ? 'Signed by ' + ag.by : 'Signed')
-       + (ag.at ? ' \u00b7 ' + ag.at : '')],
+    ['Location', null,
+     [((PAGE.data.client || {}).name || '')]],
+    ['Audience', 'editAudience', audParts],
+    ['Agreement', 'editAgreement',
+     [(ag.by ? 'Signed by ' + ag.by : 'Signed')].concat(ag.at ? [ag.at] : [])],
     ['Card on file', 'editCard',
-     b.card_summary || b.card_invalid ? (b.card_summary || 'Card needs attention') : 'Saved during setup']
+     [(b.card_summary || (b.card_invalid ? 'Card needs attention'
+                                         : 'Saved during setup'))]]
   ];
   steps.forEach(function(s){
     var row = document.createElement('div');
-    row.className = 'pc-step';
-    var n = document.createElement('span');
-    n.className = 'pc-n'; n.textContent = '\u2713';
-    var t = document.createElement('div');
-    t.className = 'pc-t'; t.textContent = s[0];
-    var d = document.createElement('div');
-    d.className = 'pc-d'; d.textContent = s[2];
-    var mid = document.createElement('div');
-    mid.style.flex = '1';
-    mid.appendChild(t); mid.appendChild(d);
-    row.appendChild(n);
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:10px';
-    wrap.appendChild(mid);
+    row.className = 'pc-rowc';
+    var ck = document.createElement('span');
+    ck.className = 'ck'; ck.textContent = '\u2713';
+    var kv = document.createElement('span');
+    kv.className = 'kv';
+    var k = document.createElement('div');
+    k.className = 'pc-k'; k.textContent = s[0];
+    var v = document.createElement('div');
+    v.className = 'v';
+    s[2].forEach(function(part, i){
+      if (i > 0) v.appendChild(document.createTextNode(' \u00b7 '));
+      if (i === 0) { v.appendChild(document.createTextNode(part)); }
+      else {
+        var sm = document.createElement('small');
+        sm.textContent = part;
+        v.appendChild(sm);
+      }
+    });
+    kv.appendChild(k); kv.appendChild(v);
+    row.appendChild(ck); row.appendChild(kv);
     if (s[1]) {
       var e = document.createElement('span');
       e.className = 'pc-edit'; e.textContent = 'Edit';
       e.setAttribute('data-act', s[1]);
-      wrap.appendChild(e);
+      row.appendChild(e);
     }
-    row.appendChild(wrap);
     flow.appendChild(row);
   });
   var nums = $('pcNums');
-  nums.innerHTML = '<div class="pc-num">' + fmtNum(PAGE.audCount || 0)
-    + '</div><div class="pc-lbl">Contacts in your audience</div>';
+  nums.innerHTML = '<div class="pc-total"><div class="n">'
+    + fmtNum(PAGE.audCount || 0)
+    + '</div><div class="l">Total leads in this campaign</div></div>';
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
 }
 // STEP EDITORS (Matt 11/3: every workflow step fixable before start)
