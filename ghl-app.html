@@ -489,6 +489,8 @@ body{padding:0}
           <input id="obNotice" placeholder="you@brokerage.com">
           <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
       </div>
+      <p style="margin:14px 0 0;font-size:12.5px"><a id="obMailLink" href="#"
+         style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email with this business name</a></p>
     </div>
 
     <div class="ob-step" data-ob="4">
@@ -2373,6 +2375,11 @@ function _fillMailPreview(){
 }
 function audInit(){
   if (!PAGE.token) return;
+  var oml = $('obMailLink');
+  if (oml) oml.onclick = function(ev){
+    ev.preventDefault();
+    _openMailPreview($('obBusiness') ? $('obBusiness').value.trim() : '');
+  };
   _loadObCals();
   var _nb = $('obNotice');
   if (_nb && !_nb.value) {
