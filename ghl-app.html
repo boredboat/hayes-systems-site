@@ -2342,8 +2342,8 @@ function _fillMailPreview(){
     + '<div class="r"><b>Subject:</b> <span></span></div>'
     + '</div>'
     + '<div class="mb"></div>'
-    + '<div class="mf">Don\'t want these emails? <a>Unsubscribe</a>'
-    + ' &middot; Hayes Systems LLC &middot; 28 Main St Unit #137 &middot; Westfield, MA 01085</div>';
+    + '<div class="mf"><a>Click here to opt out of these messages.</a><br>'
+    + 'Hayes Systems LLC &middot; 28 Main St Unit #137 &middot; Westfield, MA 01085</div>';
   box.querySelectorAll('.mh .r span')[0].textContent = from;
   box.querySelectorAll('.mh .r span')[1].textContent = MAIL_TPL.subject || '';
   box.querySelector('.mb').textContent = body;
