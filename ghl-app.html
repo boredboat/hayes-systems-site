@@ -207,6 +207,7 @@ td .when{color:var(--mut);font-size:13px}
       text-transform:uppercase;color:var(--mut);padding-top:3px}
 .pc-d{font-size:14.5px;font-weight:600;color:var(--tx);margin-top:2px}
 .pc-d b{color:var(--tx)}
+.pc-chip{display:inline-block;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;color:var(--tx);margin:2px 6px 2px 0;white-space:nowrap}
 .pc-total{text-align:center;margin:20px 0 2px;padding:16px 10px 14px;background:#e8f9ee;border:1px solid #bbf7d0;border-radius:10px}
 .pc-total .n{font-size:38px;font-weight:800;letter-spacing:-.5px;color:#15803d;line-height:1.05}
 .pc-total .l{font-size:12.5px;font-weight:600;color:#166534;margin-top:4px}
@@ -1870,6 +1871,8 @@ function _audSummary(){
   // explicit selections (Matt 11/3: the value LISTS the checkbox states
   // and tags so each choice is confirmable at a glance)
   var bits = [];
+  bits.push(AUD.skip_open_opp ? 'No open opportunities'
+                              : 'Open opportunities included');
   bits.push(AUD.include_lost_opp ? 'Lost opportunities included'
                                  : 'Lost opportunities skipped');
   if (AUD.include_tags.length)
@@ -1929,13 +1932,13 @@ function _renderPending(){
     var v = document.createElement('div');
     v.className = 'v';
     if (s[1] === 'editAudience') {
-      // selections stacked, one per line - all visible at once (Matt 11/3)
-      s[2].forEach(function(part, i){
-        var ln = document.createElement('div');
-        if (i === 0) { ln.style.fontWeight = '700'; }
-        else { ln.style.fontWeight = '500'; ln.style.marginTop = '1px'; }
-        ln.textContent = part;
-        v.appendChild(ln);
+      // selections as chips (Matt 11/3: discrete tokens, one visual
+      // class - no bold sentence with tag afterthoughts)
+      s[2].forEach(function(part){
+        var c = document.createElement('span');
+        c.className = 'pc-chip';
+        c.textContent = part;
+        v.appendChild(c);
       });
     } else {
       s[2].forEach(function(part, i){
