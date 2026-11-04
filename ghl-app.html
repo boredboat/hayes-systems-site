@@ -1775,6 +1775,11 @@ function _fileCampaignRequest(){
           ? 'A check is already running. Your list updates in a moment.'
           : 'Updating your list. This takes a minute or two.');
         if (btn) btn.disabled = true;
+        // hand off to the preparing view IMMEDIATELY (Matt 11/3: the
+        // card used to sit on 'Setup is complete' until the next poll)
+        PAGE.preparing = true;
+        _renderPending();
+        _renderPrep();
       } else {
         _resetReq();
         toast((j && j.error) || 'Could not start the check. Try again.');
