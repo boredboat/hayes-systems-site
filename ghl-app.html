@@ -226,6 +226,7 @@ td .when{color:var(--mut);font-size:13px}
 .aud-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
 .aud-row:hover{border-color:var(--acc)}
 .aud-row + .aud-row{margin-top:8px}
+#audOverlay .dialog-actions{margin-top:20px}
 .aud-prev{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;text-align:center}
 .aud-n{font-size:34px;font-weight:700;color:#15803d;letter-spacing:-.5px;line-height:1}
 .aud-cap{font-size:13px;color:var(--mut)}
@@ -1869,8 +1870,6 @@ function _audSummary(){
   // explicit selections (Matt 11/3: the value LISTS the checkbox states
   // and tags so each choice is confirmable at a glance)
   var bits = [];
-  bits.push(AUD.skip_open_opp ? 'Except open opportunities'
-                              : 'Open opportunities included');
   bits.push(AUD.include_lost_opp ? 'Lost opportunities included'
                                  : 'Lost opportunities skipped');
   if (AUD.include_tags.length)
@@ -1929,13 +1928,24 @@ function _renderPending(){
     k.className = 'pc-k'; k.textContent = s[0];
     var v = document.createElement('div');
     v.className = 'v';
-    s[2].forEach(function(part, i){
-      if (i > 0) v.appendChild(document.createTextNode(' \u00b7 '));
-      var seg = document.createElement(i === 0 ? 'b' : 'span');
-      if (i > 0) seg.style.fontWeight = '500';
-      seg.textContent = part;
-      v.appendChild(seg);
-    });
+    if (s[1] === 'editAudience') {
+      // selections stacked, one per line - all visible at once (Matt 11/3)
+      s[2].forEach(function(part, i){
+        var ln = document.createElement('div');
+        if (i === 0) { ln.style.fontWeight = '700'; }
+        else { ln.style.fontWeight = '500'; ln.style.marginTop = '1px'; }
+        ln.textContent = part;
+        v.appendChild(ln);
+      });
+    } else {
+      s[2].forEach(function(part, i){
+        if (i > 0) v.appendChild(document.createTextNode(' \u00b7 '));
+        var seg = document.createElement(i === 0 ? 'b' : 'span');
+        if (i > 0) seg.style.fontWeight = '500';
+        seg.textContent = part;
+        v.appendChild(seg);
+      });
+    }
     kv.appendChild(k); kv.appendChild(v);
     row.appendChild(ck); row.appendChild(kv);
     if (s[1]) {
