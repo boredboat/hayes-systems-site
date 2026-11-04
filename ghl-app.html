@@ -896,7 +896,7 @@ function apply(s, until){
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
-  req.textContent = ((PAGE && PAGE.pastN) ? 'Start a new campaign'
+  req.textContent = (PAGE && PAGE.pastN) ? 'Start a new campaign'
                                         : 'Start campaign';
   req.disabled = !(s === 'none' || s === 'completed');
   // retainer badge is an ACTIVE-ONLY green card (Matt 10/29: the old
