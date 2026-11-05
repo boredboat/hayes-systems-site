@@ -2104,7 +2104,9 @@ function _renderPending(){
   var _est_wks = Math.max(4, Math.ceil(_aud_n / 700));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
-    + '<div class="pc-ov-cell"><div class="n grn">' + fmtNum(_aud_n) + '</div><div class="l">Leads</div></div>'
+    + '<div class="pc-ov-cell"><div class="n'
+    + (PAGE.audSmall ? '" style="color:#92600a' : ' grn"')
+    + '">' + fmtNum(_aud_n) + '</div><div class="l">Leads</div></div>'
     + '<div class="pc-ov-cell"><div class="n">~' + _est_wks + ' wks</div><div class="l">Est. length</div></div>'
     + '<div class="pc-ov-cell"><div class="n">$60</div><div class="l">Per appt</div></div>'
     + '</div><div class="pc-ov-foot">Estimates based on your list size and typical conversion.</div></div>';
@@ -2114,6 +2116,7 @@ function _renderPending(){
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   var _warn = $('pcBarWarn');
   if (_warn) {
+    _warn.classList.remove('hide');
     _warn.style.display = PAGE.audSmall ? '' : 'none';
     if (PAGE.audSmall) {
       _warn.style.background = '#fff7e0';
