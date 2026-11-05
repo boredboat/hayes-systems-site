@@ -1981,17 +1981,14 @@ function audPreview(){
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       PAGE.audCount = n;
-      PAGE.audBar = j.bar || 5000;
-      PAGE.audBelowBar = n < (PAGE.audBar || 5000);
+      PAGE.audSmall = n < 1000;   // advisory only - never blocks (Matt 11/3)
       ['audWizard_prev', 'audSettings_prev', 'audCard_prev'].forEach(function(id){
         var el = $(id);
-        if (el) el.innerHTML = '<span class="aud-n">'
-          + (PAGE.audBelowBar ? '<span style="color:#b91c1c">' + fmtNum(n) + '</span>' : fmtNum(n))
+        if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
           + '</span><span class="aud-cap">' + cap + '</span>'
-          + (PAGE.audBelowBar
-             ? '<div style="margin-top:6px;font-size:12px;color:#b91c1c;font-weight:600;width:100%">'
-             + 'A campaign needs at least ' + fmtNum(PAGE.audBar) + ' leads. '
-             + 'Widen your audience to continue.</div>'
+          + (PAGE.audSmall
+             ? '<div style="margin-top:6px;font-size:12px;color:#92600a;width:100%">'
+             + 'Small lists typically produce few appointments. Most teams run 5,000 or more.</div>'
              : '') + '</span>';
       });
       _renderPending();
@@ -2122,17 +2119,16 @@ function _renderPending(){
     + '</div><div class="pc-ov-foot">Estimates based on your list size and typical conversion.</div></div>';
   // worth gate (Matt 11/3, live-caught): a failing list disables Start
   // the moment the verdict lands - never a request that will refuse
-  var worthOk = !(PAGE.audBelowBar
-                  || (PAGE.worth && PAGE.worth.ok !== false
-                      && PAGE.worth.pass === false));
+  var worthOk = true;   // no hard bar (Matt 11/3); advisory only
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   var _warn = $('pcBarWarn');
   if (_warn) {
-    _warn.style.display = PAGE.audBelowBar ? '' : 'none';
-    if (PAGE.audBelowBar) {
-      _warn.innerHTML = 'Your audience of ' + fmtNum(PAGE.audCount || 0)
-        + ' leads is below the ' + fmtNum(PAGE.audBar || 5000)
-        + '-lead minimum. Edit your audience to widen the selection.';
+    _warn.style.display = PAGE.audSmall ? '' : 'none';
+    if (PAGE.audSmall) {
+      _warn.style.background = '#fff7e0';
+      _warn.style.borderColor = '#fde68a';
+      _warn.style.color = '#92600a';
+      _warn.innerHTML = 'Small lists typically produce few appointments. Most teams run 5,000 or more.';
     }
   }
 
