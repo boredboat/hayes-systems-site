@@ -565,15 +565,6 @@ body{padding:0}
   </div>
 </div>
 
-<div class="sec" id="worthNotice" style="display:none;margin-bottom:18px">
-    <div class="notice-card">
-      <h3>Not enough workable leads yet</h3>
-      <p id="worthBody"></p>
-      <div class="worth-track"><div class="worth-fill" id="worthFill" style="width:0%"></div></div>
-      <div class="worth-count" id="worthCount"></div>
-    </div>
-  </div>
-
 <div class="sec" id="schedCard" style="display:none;margin-bottom:18px">
     <div class="notice-card" style="border-left-color:#188bf6">
       <h3>Where do appointments live at your business?</h3>
@@ -2523,24 +2514,7 @@ function loadPageData(){
     });
   }).catch(function(){});
 }
-function _renderWorth(){
-  var w = PAGE.worth;
-  var show = !!(w && w.ok !== false && w.pass === false
-                && S !== 'onboarding' && !PAGE.needsConnect);
-  $('worthNotice').style.display = show ? '' : 'none';
-  if (show) {
-    $('worthBody').textContent =
-      'A campaign needs at least 5,000 workable leads. Your list has '
-      + fmtNum(w.workable || 0) + ' workable of ' + fmtNum(w.total || 0)
-      + ' total. Duplicates, unreachable entries, and opted-out contacts'
-      + ' are removed before counting.';
-    var bar = (PAGE.data && PAGE.data.worth_bar) || 5000;
-    var pct = Math.min(100, Math.round((w.workable || 0) / bar * 100));
-    $('worthFill').style.width = Math.max(pct, 2) + '%';
-    $('worthCount').textContent = fmtNum(w.workable || 0) + ' of '
-      + fmtNum(bar) + ' workable leads';
-  }
-}
+
 // Scheduling-surface verify (10/29): the scan's raw tally is shown, the
 // client's own answer is the record. Card stays hidden until a scan
 // result exists, and hides permanently once verified.
@@ -2650,7 +2624,6 @@ function applyFromData(d){
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
   PAGE.launchFix = d.launch_fix || '';
-  _renderWorth();
   _renderSched();
   _renderPrep();
   _renderLaunchFail();
