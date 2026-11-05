@@ -655,6 +655,7 @@ body{padding:0}
   </div>
   <div class="pc-flow" id="pcFlow"></div>
   <div class="pc-nums" id="pcNums"></div>
+  <div id="pcBarWarn" class="hide" style="margin-top:12px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#b91c1c;font-weight:600;text-align:center"></div>
   <div class="pc-acts">
     <div style="display:flex;gap:10px;align-items:center">
       <button class="btn btn-primary" id="pcStart">Start campaign</button>
@@ -1980,10 +1981,18 @@ function audPreview(){
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       PAGE.audCount = n;
+      PAGE.audBar = j.bar || 5000;
+      PAGE.audBelowBar = n < (PAGE.audBar || 5000);
       ['audWizard_prev', 'audSettings_prev', 'audCard_prev'].forEach(function(id){
         var el = $(id);
-        if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
-          + '</span><span class="aud-cap">' + cap + '</span>';
+        if (el) el.innerHTML = '<span class="aud-n">'
+          + (PAGE.audBelowBar ? '<span style="color:#b91c1c">' + fmtNum(n) + '</span>' : fmtNum(n))
+          + '</span><span class="aud-cap">' + cap + '</span>'
+          + (PAGE.audBelowBar
+             ? '<div style="margin-top:6px;font-size:12px;color:#b91c1c;font-weight:600;width:100%">'
+             + 'A campaign needs at least ' + fmtNum(PAGE.audBar) + ' leads. '
+             + 'Widen your audience to continue.</div>'
+             : '') + '</span>';
       });
       _renderPending();
     }).catch(function(){});
@@ -2113,9 +2122,19 @@ function _renderPending(){
     + '</div><div class="pc-ov-foot">Estimates based on your list size and typical conversion.</div></div>';
   // worth gate (Matt 11/3, live-caught): a failing list disables Start
   // the moment the verdict lands - never a request that will refuse
-  var worthOk = !(PAGE.worth && PAGE.worth.ok !== false
-                  && PAGE.worth.pass === false);
+  var worthOk = !(PAGE.audBelowBar
+                  || (PAGE.worth && PAGE.worth.ok !== false
+                      && PAGE.worth.pass === false));
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
+  var _warn = $('pcBarWarn');
+  if (_warn) {
+    _warn.style.display = PAGE.audBelowBar ? '' : 'none';
+    if (PAGE.audBelowBar) {
+      _warn.innerHTML = 'Your audience of ' + fmtNum(PAGE.audCount || 0)
+        + ' leads is below the ' + fmtNum(PAGE.audBar || 5000)
+        + '-lead minimum. Edit your audience to widen the selection.';
+    }
+  }
 
 }
 var _calOvCals = [], _calOvCur = '';
