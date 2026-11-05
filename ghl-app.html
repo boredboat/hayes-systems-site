@@ -1988,7 +1988,7 @@ function audPreview(){
           + '</span><span class="aud-cap">' + cap + '</span>'
           + (PAGE.audSmall
              ? '<div style="margin-top:6px;font-size:12px;color:#92600a;width:100%">'
-             + 'Small lists typically produce few appointments. Most teams run 5,000 or more.</div>'
+             + 'Small lists typically produce few or no appointments and we recommend you postpone campaigns until you have at least 1,000 dormant leads or to modify your filters and allow more leads to be included.</div>'
              : '') + '</span>';
       });
       _renderPending();
@@ -2128,7 +2128,7 @@ function _renderPending(){
       _warn.style.background = '#fff7e0';
       _warn.style.borderColor = '#fde68a';
       _warn.style.color = '#92600a';
-      _warn.innerHTML = 'Small lists typically produce few appointments. Most teams run 5,000 or more.';
+      _warn.innerHTML = 'Small lists typically produce few or no appointments and we recommend you postpone campaigns until you have at least 1,000 dormant leads or to modify your filters and allow more leads to be included.';
     }
   }
 
