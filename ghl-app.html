@@ -2134,6 +2134,30 @@ function _loadCalOverlay(){
   var st = $('calOvState');
   if (st) st.textContent = cal.surface === 'calendly'
     ? (cal.connected ? 'Connected' : 'Not connected yet') : '';
+  // 11/3: self-resolve the connect (Matt: the overlay sat on 'not
+  // connected' after the OAuth tab finished). Poll page-data while the
+  // Calendly surface is open + unconnected; stop on connect or close.
+  if (window._calPoll) { clearInterval(window._calPoll); window._calPoll = null; }
+  if (cal.surface === 'calendly' && !cal.connected) {
+    window._calPoll = setInterval(function(){
+      if (!document.getElementById('calOverlay')
+          || document.getElementById('calOverlay').style.display === 'none') {
+        clearInterval(window._calPoll); window._calPoll = null; return;
+      }
+      api('/api/ghl/page-data').then(function(d){
+        if (!d || !d.ok) return;
+        var nc = (d.calendar || {}).connected;
+        if (nc) {
+          clearInterval(window._calPoll); window._calPoll = null;
+          PAGE.data = d;
+          var s2 = $('calOvState');
+          if (s2) s2.textContent = 'Connected';
+          toast('Calendly connected.');
+          _renderPending();
+        }
+      }).catch(function(){});
+    }, 3000);
+  }
   var cal = (PAGE.data && PAGE.data.calendar) || {};
   sf.value = cal.surface === 'calendly' ? 'calendly' : 'ghl';
   var cly = sf.value === 'calendly';
@@ -2483,6 +2507,17 @@ $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@
 // (PAGE itself is declared above the demo renders - see that note.)
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
+  // 11/3: the Calendly callback redirects back with ?connected=calendly -
+  // greet it, then clean the param so refresh doesn't re-toast
+  var _cn = new URLSearchParams(location.search).get('connected');
+  if (_cn === 'calendly') {
+    try {
+      var _u = new URL(location.href);
+      _u.searchParams.delete('connected');
+      history.replaceState({}, '', _u);
+    } catch (e) {}
+    setTimeout(function(){ toast('Calendly connected.'); }, 600);
+  }
   return api('/api/ghl/page-data').then(function(d){
     if (!d || !d.ok) return;
     PAGE.data = d;
