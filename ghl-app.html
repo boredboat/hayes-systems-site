@@ -1040,7 +1040,12 @@ body{padding:0}
 // request path and cooldown line live there. ?state= sets the initial
 // state for review; every in-page action runs through the same apply()
 // so what you click is what ships.
+// PAUSEWHY: why a paused campaign is paused ('billing' when an unpaid
+// invoice holds outreach, W4-8; null for a dated client pause). Set
+// from page-data before apply(); the paused pill reads it so the client
+// is never surprised by a hold they cannot Resume out of.
 var S = 'running';
+var PAUSEWHY = null;
 function $(id){return document.getElementById(id);}
 function pill(cls, txt, sub){
   var p = $('pill'); p.className = 'pill ' + cls; $('pillTxt').textContent = txt; $('pillSub').textContent = sub;
@@ -1149,7 +1154,7 @@ function apply(s, until){
   if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
   if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); setStats(0, 0, 0, 0, 0, 0); }
   if (s === 'running') { pill('run', 'Running', 'Week 3 \u00b7 Projected end ~Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
-  if (s === 'paused') { pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
+  if (s === 'paused') { pill('pausepill', 'Paused', PAUSEWHY === 'billing' ? 'Paused until the invoice is paid \u00b7 replies still answered \u00b7 appointments still book' : until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
   if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
   if (s === 'completed') {
     var lp = (PAGE && PAGE.lastPast) || null;
@@ -1453,7 +1458,7 @@ $('confirmResume').addEventListener('click', function(){
         apply('running');
         toast('Campaign resumed. Outreach starts again.');
       } else {
-        toast(j.error || 'The resume did not go through. Try again in a moment.');
+        toast(j.message || j.error || 'The resume did not go through. Try again in a moment.');
       }
     }).catch(function(){ toast('The resume did not go through. Try again in a moment.'); });
     return;
@@ -2787,6 +2792,9 @@ function applyFromData(d){
   // a live campaign inside its pause window shows the paused state;
   // the server keeps state 'running' (the campaign stays fully alive)
   if (st === 'running' && c && c.paused) st = 'paused';
+  // W4-8: a billing hold pauses with a REASON - the pill says why so
+  // the client knows payment (not a date, not Resume) resumes outreach
+  PAUSEWHY = (c && c.paused_reason) || null;
   // none + history = the completed rest state: blue pill, spine done,
   // request + cooldown live (10/29 Mission Control)
   if (st === 'none' && (d.past_campaigns || []).length) st = 'completed';
