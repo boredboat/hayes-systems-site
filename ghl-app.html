@@ -2628,6 +2628,39 @@ $('contactLink').addEventListener('click', function(){ window.open('mailto:Matt@
 // then pull page-data + appointments and populate every state from real
 // data. Demo mode (no locationId param) skips all of this silently.
 // (PAGE itself is declared above the demo renders - see that note.)
+// SESSION REBOOT (W4-10, Matt 11/6: "so someone deletes their data.
+// the app should revert to a new client state right?"): when the panel's
+// page-data turns 401 unknown-client in live mode, the engagement this
+// token belonged to has ENDED (delete-data or uninstall archives the
+// row). The locationId in the frame is the identity - re-exchange it:
+// the server resolves the fresh client row for the location (minting
+// one on the deleted shape), and the panel reverts to the new client
+// state right there in the sitting: wizard from step one, empty panel,
+// nothing left from the deleted engagement. Capped + rate-limited so a
+// pathological 401 loop can never spin.
+var _rebootN = 0, _rebootAt = 0;
+function _sessionReboot(){
+  if (!PAGE.live) return;
+  var nowMs = Date.now();
+  if (_rebootN >= 3 || (nowMs - _rebootAt) < 10000) return;
+  _rebootAt = nowMs; _rebootN++;
+  var loc = new URLSearchParams(location.search).get('locationId');
+  if (!loc) return;
+  fetch(API + '/api/ghl/session', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({locationId: loc})
+  }).then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (d && d.ok && d.token) {
+        PAGE.token = d.token;
+        if (d.name) PAGE.name = d.name;
+        _rebootN = 0;   // a live session answered - a later 401 may reboot again
+        loadPageData();
+      }
+    }).catch(function(){});
+}
+
 function loadPageData(){
   if (!PAGE.token) return Promise.resolve();
   // 11/3: the Calendly callback redirects back with ?connected=calendly -
@@ -2642,7 +2675,10 @@ function loadPageData(){
     setTimeout(function(){ toast('Calendly connected.'); }, 600);
   }
   return api('/api/ghl/page-data').then(function(d){
-    if (!d || !d.ok) return;
+    if (!d || !d.ok) {
+      if (d && d._status === 401) { _sessionReboot(); }
+      return;
+    }
     PAGE.data = d;
     PAGE.dataAt = Date.now();   // W4-6: fresh-data stamp (the steady loop's error detector)
     applyFromData(d);
@@ -2803,6 +2839,32 @@ function applyFromData(d){
     document.body.classList.remove('boot-loading');
     document.getElementById('bootSpinner').classList.add('hide');
   }
+  // FRESH ENGAGEMENT DETECT (W4-10, Matt 11/6: "so someone deletes
+  // their data. the app should revert to a new client state right?"):
+  // page-data carries the client row's id. A DIFFERENT id for this
+  // location means the prior engagement ended (delete-data or
+  // uninstall) and the server minted a fresh client - so every trace
+  // of the deleted engagement in local state goes NOW: the wizard
+  // resume (it must open from step one, not mid-walk) and the pending
+  // campaign card's dismissal. Mid-engagement refreshes see the same
+  // id and keep the saved step.
+  try {
+    var _locId = new URLSearchParams(location.search)
+      .get('locationId') || 'x';
+    var _cidNow = (d.client && d.client.id) || '';
+    if (_cidNow && _locId !== 'x') {
+      var _cidKey = 'ghlob:' + _locId + ':cid';
+      var _cidPrev = localStorage.getItem(_cidKey);
+      if (_cidPrev && _cidPrev !== _cidNow) {
+        localStorage.removeItem('ghlob:' + _locId + ':started');
+        localStorage.removeItem('ghlob:' + _locId + ':step');
+        localStorage.removeItem('ghlpc:' + _locId + ':cancelled');
+        _obResumed = false;
+        PAGE.pcDismissed = false;
+      }
+      localStorage.setItem(_cidKey, _cidNow);
+    }
+  } catch(e) {}
   // W4-3: the agency frame every datetime below renders in (tzOpts).
   // Every page-data consumer flows through here (boot + prep/worth/
   // calendar polls), so the pin stays fresh on each poll.
@@ -3040,6 +3102,12 @@ function applyOb(s){
         return el.id !== 'obConnectStep'
           || (PAGE.needsConnect && !_connectDone);
       });
+    // W4-10: a fresh engagement (the client id switched mid-sitting)
+    // rebuilds the walk - drop any previously built footer rows first
+    _obSteps.forEach(function(el){
+      Array.prototype.slice.call(
+        el.querySelectorAll('.ob-walk')).forEach(function(r){ r.remove(); });
+    });
     var pr = $('obProgress'); pr.innerHTML = '';
     _obSteps.forEach(function(){ pr.appendChild(document.createElement('span')); });
     _obSteps.forEach(function(el, i){
