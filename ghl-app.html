@@ -143,7 +143,7 @@ td .when{color:var(--mut);font-size:13px}
 /* overlays */
 .overlay{display:none;position:fixed;inset:0;background:rgba(17,24,39,.45);align-items:center;justify-content:center;z-index:10}
 .overlay.show{display:flex}
-.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(17,24,39,.3)}
+.dialog{background:#fff;border-radius:12px;padding:28px;max-width:440px;width:calc(100vw - 40px);box-shadow:0 20px 60px rgba(17,24,39,.3);max-height:calc(100vh - 48px);overflow-y:auto}
 .dialog h3{font-weight:700;font-size:18px;color:var(--tx);margin-bottom:10px}
 .noshow-dlg{padding:0;overflow:hidden}
 .noshow-head{background:#fef2f2;border-bottom:1px solid #fecaca;padding:18px 20px 14px;display:flex;gap:12px;align-items:center}
@@ -850,9 +850,46 @@ body{padding:0}
         <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Payment method on file</span>
         <button class="btn btn-ghost" id="setCardUpdate" style="padding:8px 14px">Update card</button>
       </div></div>
+    <div class="field" id="setDataRow"><label>Your data</label>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Lead data is deleted automatically when an engagement ends, or now at your request. Opt-out and consent records are kept because suppression obligations outlive campaigns. <a href="https://www.hayessystems.com/privacy.html" target="_blank" rel="noopener" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">Privacy policy</a></p>
+      <button class="btn btn-danger" id="setDeleteData" style="margin-top:10px;padding:8px 14px">Delete my data</button></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deleteOverlay">
+  <div class="dialog">
+    <h3>Delete your data?</h3>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:2px">This cannot be undone. Here is exactly what happens:</p>
+    <ul class="cx-list">
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Any running campaign <b>stops today</b>. Appointments already on your calendar stay there and are billed on your final invoice</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Lead data for your campaigns is <b>deleted</b>: names, emails, phone numbers, and message history are removed from our systems</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>The connection to your GoHighLevel location is <b>revoked</b>. We can no longer see your contacts</span></li>
+      <li><span class='cx-x'><svg width="16" height="16" viewBox="0 0 16 16" style="width:10px;height:10px"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>What stays: opt-out and consent records, so contacts who asked to stop contact stay suppressed. <a href="https://www.hayessystems.com/privacy.html" target="_blank" rel="noopener">Privacy policy</a></span></li>
+    </ul>
+    <div class="field"><label for="delConfirm">Type <b id="delName"></b> to confirm</label>
+      <input id="delConfirm" class="set-in" autocomplete="off" spellcheck="false" placeholder="Business name" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="deleteOverlay">Keep my data</button>
+      <button class="btn btn-danger" id="confirmDelete" disabled>Delete my data</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deletedOverlay">
+  <div class="dialog">
+    <h3>Your data has been deleted</h3>
+    <ul class="noshow-facts">
+      <li>Your campaign is stopped. Appointments already on your calendar are unaffected.</li>
+      <li>Appointments that already happened are billed on your final invoice.</li>
+      <li>Your connection is revoked. We can no longer see your contacts.</li>
+      <li>Opt-out and consent records are kept, so suppression stays in force.</li>
+    </ul>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="deletedOverlay">Close</button>
     </div>
   </div>
 </div>
@@ -1890,7 +1927,46 @@ $('settingsLink').addEventListener('click', function(){
   var sml = $('setMailLink');
   if (sml) sml.onclick = function(ev){ ev.preventDefault(); _openMailPreview(); };
   _loadCalPicker();
+  // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
+  // preview never offers a deletion
+  var dr = $('setDataRow');
+  if (dr) dr.classList.toggle('hide', !PAGE.live);
   open_('settingsOverlay');
+});
+
+// Delete my data (W4-1, Matt 11/5): a confirm dialog that is hard to
+// trigger by accident. Opening it does nothing; the Delete button stays
+// disabled until the typed text matches the business name exactly
+// (case-insensitive), and the server verifies the typed name again.
+function delGate(){
+  var want = ($('delName').textContent || '').trim().toLowerCase();
+  var got = ($('delConfirm').value || '').trim().toLowerCase();
+  $('confirmDelete').disabled = !(want && got === want);
+}
+$('setDeleteData').addEventListener('click', function(){
+  if (!PAGE.live) return;   // demo mode: the row is hidden, belt here
+  var c = (PAGE.data && PAGE.data.client) || {};
+  $('delName').textContent = c.name || PAGE.name || '';
+  $('delConfirm').value = '';
+  delGate();
+  open_('deleteOverlay');
+});
+$('delConfirm').addEventListener('input', delGate);
+$('confirmDelete').addEventListener('click', function(){
+  var btn = this;
+  btn.disabled = true;
+  api('/api/ghl/delete-data',
+      {confirm_name: $('delConfirm').value.trim()}).then(function(j){
+    if (j && j.ok) {
+      close_('deleteOverlay');
+      close_('settingsOverlay');
+      open_('deletedOverlay');
+    } else {
+      delGate();
+      toast((j && j.error) || 'The deletion did not go through. Try again or write Matt@hayessystems.com.');
+    }
+  }).catch(function(){ delGate();
+    toast('The deletion did not go through. Try again in a moment.'); });
 });
 // AUDIENCE (Matt 11/3): the client's own inactive decision. Default:
 // everyone except open opportunities; tags and the lost/won toggles
