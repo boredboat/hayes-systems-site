@@ -261,7 +261,6 @@ td .when{color:var(--mut);font-size:13px}
 .aud-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
 .aud-row:hover{border-color:var(--acc)}
 .aud-row + .aud-row{margin-top:8px}
-#audOverlay .dialog-actions{margin-top:20px}
 .aud-prev{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;text-align:center}
 .aud-n{font-size:34px;font-weight:700;color:#15803d;letter-spacing:-.5px;line-height:1}
 .aud-cap{font-size:13px;color:var(--mut)}
@@ -493,7 +492,8 @@ body{padding:0}
       - the leads your team is not actively working a deal with right
       now. You know your list best, so shape it with your own tags if
       you want it tighter or wider. Duplicates, opted-out contacts, and
-      contacts with no email address are filtered on our end.</p>
+      contacts with no email address are filtered on our end. Your
+      choice applies to this campaign and locks in when it starts.</p>
       <div id="audWizard"></div>
     </div>
 
@@ -666,7 +666,7 @@ body{padding:0}
   <div class="pc-head">
     <span class="pill ready"><span class="dot"></span>Ready to start</span>
     <h1>Campaign 1</h1>
-    <div class="pc-sub">Review your selections for accuracy and make any necessary changes. Location is set during app install and cannot be changed here.</div>
+    <div class="pc-sub">Review your selections for accuracy and make any necessary changes. Location is set during app install and your audience was picked during setup; neither can be changed here.</div>
   </div>
   <div class="pc-flow" id="pcFlow"></div>
   <div class="pc-nums" id="pcNums"></div>
@@ -865,10 +865,6 @@ body{padding:0}
     <div class="field"><label>Calendar for appointments</label>
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
-    <div class="field"><label>Audience</label>
-      <div id="audSettings"></div>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Applies from your next campaign onward. Duplicates, opted-out contacts, and contacts with no email are always removed.
-      <br><a id="setMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></p></div>
     <div class="field"><label>Payment method</label>
       <div style="display:flex;align-items:center;gap:12px">
         <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Payment method on file</span>
@@ -937,20 +933,6 @@ body{padding:0}
   </div>
 </div>
 
-<div class="overlay" id="mailOverlay">
-  <div class="dialog">
-    <h3>A sample email your leads receive</h3>
-    <div class="mailprev" id="mailPrev"></div>
-    
-    <p style="margin:12px 0 0;font-size:12.5px;color:var(--mut)">Shown with
-    a sample lead. Our emails are tested and go out under your name; the
-    wording is tuned for deliverability and can't be edited per account.</p>
-    <div class="dialog-actions" style="margin-top:18px">
-      <button class="btn btn-primary" data-close="mailOverlay">Done</button>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="calOverlay">
   <div class="dialog">
     <h3>Where appointments land</h3>
@@ -974,16 +956,6 @@ body{padding:0}
   </div>
 </div>
 
-<div class="overlay" id="audOverlay">
-  <div class="dialog">
-    <h3>Edit your audience</h3>
-    <div id="audCard"></div>
-    <div class="dialog-actions">
-      <button class="btn btn-primary" data-close="audOverlay">Done</button>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="agreeOverlay">
   <div class="dialog">
     <h3>Your agreement</h3>
@@ -1003,9 +975,27 @@ body{padding:0}
     service per the terms you agreed to: we read your list now (a minute
     or two), then your audience receives their emails and interested
     leads book straight onto your calendar.</p>
+    <div class="field"><label>Who this campaign contacts</label>
+      <div id="audReq"></div>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Your choice applies to this campaign and locks in when it starts. Duplicates, opted-out contacts, and contacts with no email are always removed.
+      <br><a id="reqMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></p></div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
       <button class="btn btn-primary" id="confirmReq">Start campaign</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="mailOverlay">
+  <div class="dialog">
+    <h3>A sample email your leads receive</h3>
+    <div class="mailprev" id="mailPrev"></div>
+    
+    <p style="margin:12px 0 0;font-size:12.5px;color:var(--mut)">Shown with
+    a sample lead. Our emails are tested and go out under your name; the
+    wording is tuned for deliverability and can't be edited per account.</p>
+    <div class="dialog-actions" style="margin-top:18px">
+      <button class="btn btn-primary" data-close="mailOverlay">Done</button>
     </div>
   </div>
 </div>
@@ -1569,6 +1559,17 @@ $('connectLocBtn').addEventListener('click', function(){
 // acknowledgment before the button unlocks; the ack rides the request
 // into the approval trail and the checkbox resets after each send
 function _openReqDialog(){
+  // W4-9 (Matt 11/6): the audience ask lives in this dialog - the same
+  // controls as the wizard's step, prefilled with the previous
+  // campaign's choice (page-data; default on first run), the live
+  // About-N count, and the sample-email link that used to ride in
+  // Settings. Submitted WITH the request; frozen from launch.
+  if (PAGE.token) { audFromData(); audRender(); }
+  var rml = $('reqMailLink');
+  if (rml) rml.onclick = function(ev){
+    ev.preventDefault();
+    _openMailPreview();
+  };
   open_('reqOverlay');
 }
 function _renderCfgCheck(d){
@@ -1672,7 +1673,10 @@ $('confirmReq').addEventListener('click', function(){
     // (Matt 10/29) - show work for the whole wait
     btn.disabled = true;
     btn.innerHTML = '<span class="spin-sm"></span>Updating your list';
-    api('/api/ghl/request-campaign', {agreed: true}).then(function(j){
+    // the audience ask rides the request (W4-9): prefilled from the
+    // previous campaign, edited in this dialog, frozen from launch
+    api('/api/ghl/request-campaign', {agreed: true,
+                                      audience: AUD}).then(function(j){
       _resetReq();
       toast(j.message || j.error || 'Request received. We will be in touch shortly.');
       if (j && j.ok && !j.duplicate) {
@@ -1952,9 +1956,9 @@ $('settingsLink').addEventListener('click', function(){
   var c = (PAGE.data && PAGE.data.client) || {};
   $('setEmail').value = c.email || '';
   $('setBusiness').value = c.name || '';
-  audInit();
-  var sml = $('setMailLink');
-  if (sml) sml.onclick = function(ev){ ev.preventDefault(); _openMailPreview(); };
+  // (no audience here anymore, W4-9 11/6: audience is asked per
+  // campaign in the request flow - the sample-email link moved to the
+  // start dialog's ask)
   _loadCalPicker();
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
@@ -1997,10 +2001,14 @@ $('confirmDelete').addEventListener('click', function(){
   }).catch(function(){ delGate();
     toast('The deletion did not go through. Try again in a moment.'); });
 });
-// AUDIENCE (Matt 11/3): the client's own inactive decision. Default:
-// everyone except open opportunities; tags and the lost/won toggles
-// shape it. One shared state serves the onboarding step and Settings;
-// every change persists (debounced) and refreshes the count preview.
+// AUDIENCE (Matt 11/3; W4-9 11/6): the client's own decision, asked
+// PER CAMPAIGN - in the onboarding wizard for the first campaign, in
+// the start dialog for every later one - and frozen from launch (the
+// list imports at staging; nothing edits a running campaign's
+// audience). Default: everyone except open opportunities; tags and the
+// lost/won toggles shape it. One shared state serves both asks; a
+// change refreshes the count preview and NOTHING else - it persists
+// only when the request carries it (settings no longer accepts it).
 var AUD = {skip_open_opp: true, include_lost_opp: true,
            include_tags: [], exclude_tags: []};
 var AUD_TAGS = null, AUD_SAVE_T = null, AUD_PREV_T = null;
@@ -2034,7 +2042,7 @@ function audChips(el, key){
   });
 }
 function audRender(){
-  ['audWizard', 'audSettings', 'audCard'].forEach(function(id){
+  ['audWizard', 'audReq'].forEach(function(id){
     var box = $(id); if (!box) return;
     box.innerHTML =
       '<div class="aud-rows">' +
@@ -2054,36 +2062,13 @@ function audRender(){
   audPreview();
 }
 function audChanged(){
+  // W4-9 (Matt 11/6): the choice is NOT persisted here anymore - it
+  // lives in page state until the request carries it (the wizard's
+  // Start, or the start dialog's confirm). Nothing respawns the worth
+  // check on a mere edit; the count comes from the live preview below
+  // and the server re-derives everything when the request fires.
   clearTimeout(AUD_SAVE_T);
-  AUD_SAVE_T = setTimeout(function(){
-    api('/api/ghl/settings', {audience: AUD}).then(function(j){
-      if (j && j.ok && PAGE.data) PAGE.data.audience = JSON.parse(JSON.stringify(AUD));
-      _worthRepoll();   // the verdict re-derives server-side; the page must follow (Matt 11/3)
-    }).catch(function(){});
-  }, 700);
-}
-// the worth check respawns on every audience change; poll page-data
-// until its checked_at advances so the not-enough-leads warning (and
-// the Start gating) land LIVE, not on the next refresh
-var _WR_T = null;
-function _worthRepoll(){
-  if (!PAGE.token) return;
-  var before = ((PAGE.data || {}).install_check || {}).checked_at || '';
-  var tries = 0;
-  if (_WR_T) clearInterval(_WR_T);
-  _WR_T = setInterval(function(){
-    tries += 1;
-    api('/api/ghl/page-data').then(function(d){
-      if (!d || !d.ok) return;
-      var at = ((d.install_check || {}).checked_at) || '';
-      if ((at && at !== before) || tries >= 12) {
-        clearInterval(_WR_T); _WR_T = null;
-        PAGE.data = d;
-        PAGE.worth = d.install_check || null;
-        applyFromData(d);
-      }
-    }).catch(function(){});
-  }, 5000);
+  AUD_SAVE_T = setTimeout(audPreview, 700);
 }
 function audPreview(){
   clearTimeout(AUD_PREV_T);
@@ -2105,7 +2090,7 @@ function audPreview(){
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       PAGE.audCount = n;
       PAGE.audSmall = n < 1000;   // advisory only - never blocks (Matt 11/3)
-      ['audWizard_prev', 'audSettings_prev', 'audCard_prev'].forEach(function(id){
+      ['audWizard_prev', 'audReq_prev'].forEach(function(id){
         var el = $(id);
         if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
           + '</span><span class="aud-cap">' + cap + '</span>'
@@ -2166,7 +2151,10 @@ function _renderPending(){
      [((PAGE.data.client || {}).name || '')]
        .concat((((PAGE.data.client || {}).email) || '')
                 ? [((PAGE.data.client || {}).email)] : [])],
-    ['Audience', 'editAudience', audParts],
+    // Audience is DISPLAY-ONLY here (W4-9, Matt 11/6): it was asked in
+    // the wizard (this campaign's one ask) and locks in at launch -
+    // same convention as Location: informational, no Edit
+    ['Audience', null, audParts],
     (function(){
       var c = (PAGE.data && PAGE.data.calendar) || {};
       if (c.surface === 'calendly')
@@ -2190,9 +2178,10 @@ function _renderPending(){
     k.className = 'pc-k'; k.textContent = s[0];
     var v = document.createElement('div');
     v.className = 'v';
-    if (s[1] === 'editAudience') {
+    if (s[0] === 'Audience') {
       // selections as chips (Matt 11/3: discrete tokens, one visual
-      // class - no bold sentence with tag afterthoughts)
+      // class - no bold sentence with tag afterthoughts; W4-9: the row
+      // is display-only now, the chip rendering stays)
       s[2].forEach(function(part){
         var c = document.createElement('span');
         c.className = 'pc-chip';
@@ -2404,11 +2393,9 @@ function _pcEdit(target){
     open_('calOverlay');
     return;
   }
-  if (target === 'editAudience') {
-    audRender();   // refresh chips/toggles into every container
-    open_('audOverlay');
-    return;
-  }
+  // (editAudience retired with #audOverlay, W4-9 11/6: the audience is
+  // asked once per campaign - wizard or start dialog - and never
+  // edited from a standalone dialog)
 }
 document.addEventListener('click', function(ev){
   var el = ev.target;
@@ -2427,7 +2414,9 @@ function _fileCampaignRequest(){
       btn.disabled = true;
       btn.innerHTML = '<span class="spin-sm"></span>Updating your list';
     }
-    api('/api/ghl/request-campaign', {}).then(function(j){
+    // the first campaign's ask came from the wizard step; it rides the
+    // Start request the same way the dialog's ask does (W4-9)
+    api('/api/ghl/request-campaign', {audience: AUD}).then(function(j){
       if (j && j.ok) {
         toast(j.already
           ? 'A check is already running. Your list updates in a moment.'
@@ -2564,7 +2553,10 @@ function audInit(){
   if (_nb && !_nb.value) {
     _nb.value = ((PAGE.data && PAGE.data.client) || {}).email || '';
   }
-  audFromData();
+  // NO audFromData() here (W4-9): the ask now persists only when the
+  // request carries it, so un-submitted edits must survive the steady
+  // page-data refresh - the seed runs once at boot (loadPageData) and
+  // the prefill resets only when an ask surface OPENS
   if (AUD_TAGS === null) {
     AUD_TAGS = [];
     api('/api/ghl/tags').then(function(j){
@@ -2656,7 +2648,12 @@ function loadPageData(){
     PAGE.dataAt = Date.now();   // W4-6: fresh-data stamp (the steady loop's error detector)
     applyFromData(d);
     renderActionBar(d);
-    audInit();   // audience picker state (wizard step + Settings)
+    // AUDIENCE SEED, ONCE (W4-9): prefill AUD from page-data (the last
+    // campaign's choice, default on first run) on the FIRST load only;
+    // every later refresh keeps in-page edits - the choice only
+    // persists when a request carries it
+    if (!PAGE._audSeeded) { audFromData(); PAGE._audSeeded = true; }
+    audInit();   // audience picker state (wizard step + start dialog)
     _renderPending();
     // FIX (Matt 11/2: "no recent activity"): the activity fetch was
     // UNREACHABLE - the appointments return above exited the callback
