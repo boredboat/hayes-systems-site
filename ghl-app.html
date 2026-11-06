@@ -1153,17 +1153,44 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function fmtNum(n){ return Number(n || 0).toLocaleString('en-US'); }
 function fmtMoney(n){ return '$' + fmtNum(n); }
+// AGENCY-TZ PIN (W4-3, Matt 11/5: "appointments need to be pinned to
+// the agency"): every datetime below renders in the LOCATION timezone
+// carried by page-data (calendar.tz), never the viewer's browser
+// clock. One helper feeds every date render site. Unknown tz (demo
+// mode, pre-upgrade server) falls back to the browser frame and says
+// so ONCE in the console - no UI banner, never silent.
+var LOC_TZ = null, _tzNoted = false;
+function tzOpts(o){
+  if (!LOC_TZ && !_tzNoted) {
+    _tzNoted = true;
+    try { console.info('[hayes] location timezone unknown; times render in your device timezone'); } catch(e){}
+  }
+  o = o || {};
+  if (LOC_TZ) o.timeZone = LOC_TZ;
+  return o;
+}
 function fmtDay(iso){ var s = String(iso || '');
-  // date-only stamps parse as UTC midnight and would display a day early
-  // behind UTC; force local midnight for the YYYY-MM-DD shape
-  var d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
-  return isNaN(d) ? '' : d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}); }
+  // date-only stamps are literal agency-frame calendar dates: render
+  // the written day for every viewer (UTC-midnight basis), never
+  // shifted by anyone's clock. Full datetimes render agency-frame.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    var dd = new Date(s + 'T00:00:00Z');
+    return isNaN(dd) ? '' : dd.toLocaleDateString('en-US',
+      {month: 'short', day: 'numeric', timeZone: 'UTC'});
+  }
+  var d = new Date(s);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US', tzOpts({month: 'short', day: 'numeric'})); }
 function fmtLongDate(iso){ var s = String(iso || '');
-  var d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
-  return isNaN(d) ? '' : d.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}); }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    var dd = new Date(s + 'T00:00:00Z');
+    return isNaN(dd) ? '' : dd.toLocaleDateString('en-US',
+      {month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'});
+  }
+  var d = new Date(s);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US', tzOpts({month: 'long', day: 'numeric', year: 'numeric'})); }
 function fmtWhen(iso){ var d = new Date(iso); if (isNaN(d)) return iso;
-  return d.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
-    + ' \u00b7 ' + d.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}); }
+  return d.toLocaleDateString('en-US', tzOpts({weekday: 'short', month: 'short', day: 'numeric'}))
+    + ' \u00b7 ' + d.toLocaleTimeString('en-US', tzOpts({hour: 'numeric', minute: '2-digit'})); }
 function setStats(w, lp, e, a, cv, cost){
   // five hero metrics (conversion folded away 10/29: appointments and
   // emails carry the story; cv stays in the signature so callers hold)
@@ -2630,6 +2657,10 @@ function applyFromData(d){
     document.body.classList.remove('boot-loading');
     document.getElementById('bootSpinner').classList.add('hide');
   }
+  // W4-3: the agency frame every datetime below renders in (tzOpts).
+  // Every page-data consumer flows through here (boot + prep/worth/
+  // calendar polls), so the pin stays fresh on each poll.
+  LOC_TZ = (d.calendar && d.calendar.tz) || null;
   var st = (d.client && d.client.state) || 'none';
   var c = d.campaign;
   // a live campaign inside its pause window shows the paused state;
