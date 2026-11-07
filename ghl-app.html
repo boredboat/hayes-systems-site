@@ -179,13 +179,10 @@ td .when{color:var(--mut);font-size:13px}
 .field input[type=date]:focus{outline:none;border-color:var(--acc)}
 .btn-danger-solid{background:#E53935;color:#fff}
 .btn-danger-solid:hover{background:#C62828}
-/* notice cards (worth, sched, connect) */
+/* notice cards (sched, connect) */
 .notice-card{background:#fff;border:1px solid var(--bd);border-left:4px solid #E8A13A;border-radius:10px;padding:16px 20px}
 .notice-card h3{margin:0 0 6px 0;font-size:15px;color:var(--tx)}
 .notice-card p{margin:0;font-size:13.5px;color:#4b5563;line-height:1.6}
-.worth-track{height:8px;border-radius:4px;background:#e5e7eb;overflow:hidden;margin-top:12px}
-.worth-fill{height:100%;border-radius:4px;background:var(--acc);transition:width .6s ease}
-.worth-count{font-size:12.5px;color:var(--mut);margin-top:6px}
 .listcheck{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .listcheck h3{margin:0;font-size:15px;color:var(--tx)}
 .listcheck p{margin:4px 0 0 0;font-size:13.5px;color:#4b5563}
@@ -321,7 +318,7 @@ td .when{color:var(--mut);font-size:13px}
 body.billing-close>*:not(#billingCloser):not(.bar):not(.wrap){display:none!important}
 body.billing-close .wrap>*:not(#billingCloser){display:none!important}
 body.boot-loading #heroBand, body.boot-loading #spine, body.boot-loading #tabsCard,
-body.boot-loading #actRow, body.boot-loading #connectBanner, body.boot-loading #worthNotice,
+body.boot-loading #actRow, body.boot-loading #connectBanner,
 body.boot-loading #schedCard{display:none!important}
 #bootSpinner{padding:48px 0;text-align:center}
 #bootSpinner p{font-size:13.5px;color:var(--mut)}
@@ -670,7 +667,6 @@ body{padding:0}
   </div>
   <div class="pc-flow" id="pcFlow"></div>
   <div class="pc-nums" id="pcNums"></div>
-  <div id="pcBarWarn" class="hide" style="margin-top:12px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#b91c1c;font-weight:600;text-align:center"></div>
   <div class="pc-acts">
     <div style="display:flex;gap:10px;align-items:center;justify-content:center">
       <button class="btn btn-primary" id="pcStart">Start campaign</button>
@@ -1429,7 +1425,7 @@ function openCardUpdate(){
 // PAGE state lives ABOVE the demo renders: renderPast stamps PAGE.pastN
 // at load, so declaring it lower (as history had it) threw on the
 // hoisted-undefined and killed every binding after it (found live 10/29)
-var PAGE = {token: null, name: null, data: null, dataAt: 0, live: false, worth: null, cooldownClosed: false, needsConnect: false, pastN: 0, lastPast: null};
+var PAGE = {token: null, name: null, data: null, dataAt: 0, live: false, cooldownClosed: false, needsConnect: false, pastN: 0, lastPast: null};
 renderAppts(DEMO_APPTS);
 renderPast(DEMO_PAST);
 
@@ -2063,7 +2059,7 @@ function audRender(){
 function audChanged(){
   // W4-9 (Matt 11/6): the choice is NOT persisted here anymore - it
   // lives in page state until the request carries it (the wizard's
-  // Start, or the start dialog's confirm). Nothing respawns the worth
+  // Start, or the start dialog's confirm). Nothing respawns the count
   // check on a mere edit; the count comes from the live preview below
   // and the server re-derives everything when the request fires.
   clearTimeout(AUD_SAVE_T);
@@ -2087,16 +2083,11 @@ function audPreview(){
       var n = Math.max(0, base - skip);
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
-      PAGE.audCount = n;
-      PAGE.audSmall = n < 1000;   // advisory only - never blocks (Matt 11/3)
+      PAGE.audCount = n;   // the count display (the advisory is retired - W4-12)
       ['audWizard_prev', 'audReq_prev'].forEach(function(id){
         var el = $(id);
         if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
-          + '</span><span class="aud-cap">' + cap + '</span>'
-          + (PAGE.audSmall
-             ? '<div style="margin-top:6px;font-size:12px;color:#92600a;width:100%">'
-             + 'Small lists typically produce few or no appointments and we recommend you postpone campaigns until you have at least 1,000 dormant leads or to modify your filters and allow more leads to be included.</div>'
-             : '') + '</span>';
+          + '</span><span class="aud-cap">' + cap + '</span>';
       });
       _renderPending();
     }).catch(function(){});
@@ -2224,27 +2215,15 @@ function _renderPending(){
   var _est_wks = Math.max(4, Math.ceil(_aud_n / 700));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
-    + '<div class="pc-ov-cell"><div class="n'
-    + (PAGE.audSmall ? '" style="color:#92600a' : ' grn"')
-    + '">' + fmtNum(_aud_n) + '</div><div class="l">Leads</div></div>'
+    + '<div class="pc-ov-cell"><div class="n grn">'
+    + fmtNum(_aud_n) + '</div><div class="l">Leads</div></div>'
     + '<div class="pc-ov-cell"><div class="n">~' + _est_wks + ' wks</div><div class="l">Est. length</div></div>'
     + '<div class="pc-ov-cell"><div class="n">$60</div><div class="l">Per appt</div></div>'
     + '</div><div class="pc-ov-foot">Estimates based on your list size and typical conversion.</div></div>';
-  // worth gate (Matt 11/3, live-caught): a failing list disables Start
-  // the moment the verdict lands - never a request that will refuse
-  var worthOk = true;   // no hard bar (Matt 11/3); advisory only
+  // (the 11/3 list-verdict gate and the small-list advisory are retired
+  // - W4-12, Matt 11/6: counts and health states only, no pass/fail
+  // framing of the client's list anywhere on the page)
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
-  var _warn = $('pcBarWarn');
-  if (_warn) {
-    _warn.classList.remove('hide');
-    _warn.style.display = PAGE.audSmall ? '' : 'none';
-    if (PAGE.audSmall) {
-      _warn.style.background = '#fff7e0';
-      _warn.style.borderColor = '#fde68a';
-      _warn.style.color = '#92600a';
-      _warn.innerHTML = 'Small lists typically produce few or no appointments and we recommend you postpone campaigns until you have at least 1,000 dormant leads or to modify your filters and allow more leads to be included.';
-    }
-  }
 
 }
 var _calOvCals = [], _calOvCur = '';
@@ -2866,7 +2845,7 @@ function applyFromData(d){
     }
   } catch(e) {}
   // W4-3: the agency frame every datetime below renders in (tzOpts).
-  // Every page-data consumer flows through here (boot + prep/worth/
+  // Every page-data consumer flows through here (boot + prep/count/
   // calendar polls), so the pin stays fresh on each poll.
   LOC_TZ = (d.calendar && d.calendar.tz) || null;
   var st = (d.client && d.client.state) || 'none';
@@ -2895,7 +2874,6 @@ function applyFromData(d){
       'ghlob:' + (new URLSearchParams(location.search)
                    .get('locationId') || 'x') + ':step'); } catch(e) {}
   }
-  PAGE.worth = d.install_check || null;
   PAGE.sched = d.sched_scan || null;
   PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
@@ -2915,9 +2893,7 @@ function applyFromData(d){
   if (PAGE.needsConnect) { $('reqBtn').disabled = true; }
   else if (st === 'none' || st === 'completed') {
     var rq = $('reqBtn');
-    if (PAGE.cooldownClosed
-        || (PAGE.worth && PAGE.worth.ok !== false
-            && PAGE.worth.pass === false)) { rq.disabled = true; }
+    if (PAGE.cooldownClosed) { rq.disabled = true; }
   }
   if (st === 'running' && c) {
     var sub = c.stopping
