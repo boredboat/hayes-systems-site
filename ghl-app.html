@@ -858,6 +858,13 @@ body{padding:0}
       <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
     <div class="field"><label>Business name</label>
       <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
+    <div class="field"><label>Appointments land on</label>
+      <select id="setSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+        <option value="ghl">Your GoHighLevel calendar</option>
+        <option value="calendly">Calendly</option>
+      </select>
+      <p id="setSurfaceState" style="margin:6px 0 0;font-size:12px;color:var(--mut)"></p>
+      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">This choice remains locked during a campaign.</p></div>
     <div class="field"><label>Calendar for appointments</label>
       <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
       <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
@@ -1910,7 +1917,9 @@ var _calOptions = [], _calCurrent = '';
 function _loadCalPicker(){
   var sel = $('setCalendar');
   var locked = (S === 'running' || S === 'paused');
-  sel.disabled = locked;
+  // W4-15: the GHL pick sits DORMANT while appointments land on
+  // Calendly - kept, never deleted, just not the active surface
+  sel.disabled = locked || _storedSurface() === 'calendly';
   sel.innerHTML = '<option>Loading calendars...</option>';
   if (!PAGE.live) {
     sel.innerHTML = '<option>Whole team calendar</option>';
@@ -1938,6 +1947,125 @@ function _loadCalPicker(){
     });
   }).catch(function(){ sel.innerHTML = '<option>Unavailable</option>'; });
 }
+// APPOINTMENTS LAND ON (W4-15, Matt 11/7: "settings should include a
+// way to change from GHL to calendly calendar and vice versa. it
+// should be locked during a campaign"): the booking-surface switch.
+// Gated both directions - Calendly needs its OAuth connection reading
+// connected (the switch launches the existing connect flow and only
+// saves once the return boot shows connected); GoHighLevel needs a
+// picked whole team calendar (the picker row right below serves, the
+// pick + flip save together). Locked during a campaign on the page AND
+// the server; the dormant side stays stored, never deleted.
+function _storedSurface(){
+  return (((PAGE.data && PAGE.data.calendar) || {}).surface
+          === 'calendly') ? 'calendly' : 'ghl';
+}
+function _surfStateLine(){
+  var el = $('setSurfaceState'); if (!el) return;
+  var cal = (PAGE.data && PAGE.data.calendar) || {};
+  if (!PAGE.live) { el.textContent = ''; return; }
+  if (_storedSurface() === 'calendly') {
+    el.textContent = cal.connected ? 'Calendly connected'
+                                   : 'Calendly not connected yet';
+    el.style.color = cal.connected ? 'var(--grnd,#15803d)' : '#b45309';
+  } else {
+    el.textContent = cal.name ? 'Books to ' + cal.name
+                              : 'No whole team calendar picked yet';
+    el.style.color = cal.name ? 'var(--mut)' : '#b45309';
+  }
+}
+function _loadSurfaceRow(){
+  var sf = $('setSurface'); if (!sf) return;
+  sf.value = _storedSurface();
+  sf.disabled = !PAGE.live || (S === 'running' || S === 'paused');
+  _surfStateLine();
+}
+function _saveSurface(v){
+  api('/api/ghl/settings', {scheduling_surface: v}).then(function(j){
+    if (j && j.ok) {
+      if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
+      PAGE.data.calendar.surface = v;
+      _surfStateLine();
+      _loadCalPicker();
+      toast(v === 'calendly' ? 'Appointments land on Calendly.'
+                             : 'Appointments land on your GoHighLevel calendar.');
+    } else {
+      $('setSurface').value = _storedSurface();
+      _surfStateLine();
+      toast((j && j.error) || 'Could not switch. Try again.');
+    }
+  }).catch(function(){
+    $('setSurface').value = _storedSurface();
+    _surfStateLine();
+    toast('Could not switch. Try again in a moment.');
+  });
+}
+function _surfaceConnectThenFlip(){
+  var sf = $('setSurface');
+  var el = $('setSurfaceState');
+  if (el) {
+    el.textContent = 'Connect Calendly in the tab that opened. This'
+                     + ' switches once Calendly is connected.';
+    el.style.color = 'var(--mut)';
+  }
+  api('/api/ghl/calendly-connect-url').then(function(j){
+    if (!(j && j.ok && j.url)) {
+      sf.value = _storedSurface(); _surfStateLine();
+      toast((j && j.error) || 'Could not start Calendly connect.');
+      return;
+    }
+    window.open(j.url, '_blank');
+    toast('Connect Calendly in the tab that opened.');
+    if (window._surfPoll) { clearInterval(window._surfPoll);
+                            window._surfPoll = null; }
+    window._surfPoll = setInterval(function(){
+      var ov = document.getElementById('settingsOverlay');
+      if (!ov || !ov.classList.contains('show')) {
+        clearInterval(window._surfPoll); window._surfPoll = null;
+        sf.value = _storedSurface(); _surfStateLine();
+        return;
+      }
+      api('/api/ghl/page-data').then(function(d){
+        if (!d || !d.ok) return;
+        if ((d.calendar || {}).connected) {
+          clearInterval(window._surfPoll); window._surfPoll = null;
+          PAGE.data = d;
+          _saveSurface('calendly');
+        }
+      }).catch(function(){});
+    }, 3000);
+  }).catch(function(){
+    sf.value = _storedSurface(); _surfStateLine();
+    toast('Could not start Calendly connect.');
+  });
+}
+(function(){
+  var sf = $('setSurface'); if (!sf) return;
+  sf.addEventListener('change', function(){
+    if (this.disabled) return;
+    var v = this.value;
+    if (v === _storedSurface()) { _surfStateLine(); return; }
+    if (v === 'calendly') {
+      var cal = (PAGE.data && PAGE.data.calendar) || {};
+      if (cal.connected) { _saveSurface(v); return; }
+      _surfaceConnectThenFlip();
+      return;
+    }
+    // ghl: the flip needs a whole team calendar. With a pick already
+    // stored the flip is immediate; without one the picker row below
+    // serves and the pick + flip save together on Save.
+    var cal2 = (PAGE.data && PAGE.data.calendar) || {};
+    if (_calCurrent || cal2.name) { _saveSurface(v); return; }
+    var el = $('setSurfaceState');
+    if (el) {
+      el.textContent = 'Pick the calendar appointments should land on'
+                       + ' below, then Save.';
+      el.style.color = '#b45309';
+    }
+    var crow = $('setCalendar');
+    if (crow && !crow.disabled) crow.focus();
+  });
+})();
 $('setCardUpdate').addEventListener('click', openCardUpdate);
 $('settingsLink').addEventListener('click', function(){
   var _b = (PAGE.data && PAGE.data.billing) || {};
@@ -1954,6 +2082,7 @@ $('settingsLink').addEventListener('click', function(){
   // (no audience here anymore, W4-9 11/6: audience is asked per
   // campaign in the request flow - the sample-email link moved to the
   // start dialog's ask)
+  _loadSurfaceRow();
   _loadCalPicker();
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
@@ -2229,6 +2358,12 @@ function _renderPending(){
 var _calOvCals = [], _calOvCur = '';
 function _loadCalOverlay(){
   var sf = $('calOvSurface'), sel = $('calOvCal');
+  // W4-15: surface + pick refuse mid-campaign server-side - the edit
+  // dialog (a pre-launch reach) never offers them as live controls
+  var _lk = (S === 'running' || S === 'paused');
+  sf.disabled = _lk;
+  sel.disabled = _lk;
+  $('calOvConnect').disabled = _lk;
   var cal = (PAGE.data && PAGE.data.calendar) || {};
   var st = $('calOvState');
   if (st) st.textContent = cal.surface === 'calendly'
@@ -2283,7 +2418,13 @@ function _loadCalOverlay(){
     var cly = sf.value === 'calendly';
     $('calOvCalField').classList.toggle('hide', cly);
     $('calOvClyField').classList.toggle('hide', !cly);
-    api('/api/ghl/sched-verify', {surface: sf.value}).then(function(){
+    api('/api/ghl/sched-verify', {surface: sf.value}).then(function(j){
+      if (!(j && j.ok)) {   // W4-15: a refusal (locked mid-campaign)
+        sf.value = ((PAGE.data && PAGE.data.calendar || {}).surface
+                    === 'calendly') ? 'calendly' : 'ghl';
+        toast((j && j.error) || 'Could not save. Try again.');
+        return;
+      }
       if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
       PAGE.data.calendar.surface = sf.value;
       _renderPending();
@@ -2548,6 +2689,13 @@ $('settingsSave').addEventListener('click', function(){
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
   var btn = this; btn.disabled = true;
   var body = { email: em, business: $('setBusiness').value.trim() };
+  // W4-15: the surface flip rides the same save when the ghl direction
+  // had no pick yet (pick first, then flip - one settings call)
+  var _sfv = $('setSurface');
+  if (_sfv && !_sfv.disabled && _sfv.value
+      && _sfv.value !== _storedSurface()) {
+    body.scheduling_surface = _sfv.value;
+  }
   var sel = $('setCalendar');
   if (!sel.disabled && sel.value && sel.value !== _calCurrent
       && sel.selectedIndex >= 0) {
@@ -2565,6 +2713,10 @@ $('settingsSave').addEventListener('click', function(){
       if (PAGE.data && PAGE.data.client) {
         PAGE.data.client.email = em;
         PAGE.data.client.name = $('setBusiness').value.trim();
+      }
+      if (body.scheduling_surface && j.surface) {
+        if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
+        PAGE.data.calendar.surface = j.surface;
       }
     } else { toast((j && j.error) || 'Could not save. Try again.'); }
   }).catch(function(){ btn.disabled = false;
