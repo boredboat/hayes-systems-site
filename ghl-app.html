@@ -1381,7 +1381,14 @@ function renderActionBar(st){
                   'Add card', 'openCardUpdate']);
     }
     var h = st.health || {};
-    if (h.connection_ok === false) {
+    // the wizard's connect step owns the FIRST-RUN connect (the same
+    // rule the card banners follow): a pre-onboarding client always
+    // probes connection_ok=false because no credential exists yet -
+    // the reconnect item is the fallback for ALREADY-ONBOARDED clients
+    // (revoked token, reinstall), never a welcome mat (Matt 11/7
+    // live-caught on the fresh walkthrough)
+    if (h.connection_ok === false
+        && st.client && st.client.state !== 'onboarding') {
       items.push(['The connection to your GoHighLevel account needs attention.',
                   'Reconnect', 'openReconnect']);
     }
