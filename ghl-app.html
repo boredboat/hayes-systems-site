@@ -954,7 +954,7 @@ body{padding:0}
       <li>Opt-out and consent records are kept, so suppression stays in force. Invoices and payment records are kept for accounting.</li>
     </ul>
     <div class="dialog-actions">
-      <button class="btn btn-primary" data-close="deletedOverlay">Close</button>
+      <button class="btn btn-primary" id="deletedGo">Start over</button>
     </div>
   </div>
 </div>
@@ -2188,6 +2188,22 @@ $('confirmDelete').addEventListener('click', function(){
       close_('deleteOverlay');
       close_('settingsOverlay');
       open_('deletedOverlay');
+      // POST-DELETE = NEW CLIENT (Matt 11/8: 'after a delete it should
+      // redirect to the beginning of the onboarding flow'): the confirm
+      // button routes straight into the wizard's welcome screen - a
+      // fresh page-data read lands the fresh client row, the fresh-
+      // engagement detect has already cleared the wizard resume state
+      // (new client id), and onboarding owns the page
+      $('deletedGo').addEventListener('click', function(){
+        close_('deletedOverlay');
+        S = 'onboarding'; apply('onboarding'); applyOb('onboarding');
+        try {
+          localStorage.removeItem('ghlob:' + new URLSearchParams(
+            location.search).get('locationId') + ':started');
+        } catch(e) {}
+        _obResumed = false;
+        if (PAGE.live) loadPageData();
+      });
     } else {
       delGate();
       toast((j && j.error) || 'The deletion did not go through. Try again or write Matt@hayessystems.com.');
