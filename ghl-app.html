@@ -47,7 +47,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 @media (max-width:759px){.hiw{position:static}.hiw-panel{position:fixed;top:56px;left:12px;right:12px;width:auto;max-width:none}}
 /* HOW IT WORKS readability pass (Matt 11/8: variant B - all open,
    numbered, bigger type, SCROLLABLE: every answer visible at once) */
-.hiw-panel{max-height:calc(100vh - 110px);overflow-y:auto}
+.hiw-panel{max-height:min(520px,calc(100vh - 110px));overflow-y:auto;overscroll-behavior:contain}
 .hiw-head{padding:16px 18px 6px;font-size:15px;font-weight:800;color:var(--tx)}
 .hiw-item{padding:12px 18px 6px}
 .hiw-q{font-size:14px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;gap:10px}
