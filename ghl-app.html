@@ -209,7 +209,8 @@ td .when{color:var(--mut);font-size:13px}
 .pc-sub{font-size:13px;color:var(--mut)}
 .pc-flow{display:flex;flex-direction:column;gap:8px;margin:20px 0 2px}
 .pc-rowc{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--bd);border-radius:10px}
-.pc-rowc .ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.pc-rowc .ck.warn{color:#b45309}
+.ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .pc-rowc .kv{flex:1;min-width:0}
 .pc-k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
 .pc-rowc .v{font-size:14.5px;font-weight:700;margin-top:1px}
@@ -967,6 +968,17 @@ body{padding:0}
     </div>
     <div class="dialog-actions" style="margin-top:20px">
       <button class="btn btn-primary" data-close="calOverlay">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="audPcOverlay">
+  <div class="dialog">
+    <h3>Edit your audience</h3>
+    <div id="audPc"></div>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--mut)">Your choice applies when the campaign starts.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" data-close="audPcOverlay">Done</button>
     </div>
   </div>
 </div>
@@ -2186,7 +2198,7 @@ function audChips(el, key){
   });
 }
 function audRender(){
-  ['audWizard', 'audReq'].forEach(function(id){
+  ['audWizard', 'audReq', 'audPc'].forEach(function(id){
     var box = $(id); if (!box) return;
     box.innerHTML =
       '<div class="aud-rows">' +
@@ -2233,7 +2245,7 @@ function audPreview(){
       var cap = 'contacts in this audience';
       if (skip) cap += ' · ' + fmtNum(skip) + ' open deals skipped';
       PAGE.audCount = n;   // the count display (the advisory is retired - W4-12)
-      ['audWizard_prev', 'audReq_prev'].forEach(function(id){
+      ['audWizard_prev', 'audReq_prev', 'audPc_prev'].forEach(function(id){
         var el = $(id);
         if (el) el.innerHTML = '<span class="aud-n">' + fmtNum(n)
           + '</span><span class="aud-cap">' + cap + '</span>';
@@ -2285,32 +2297,41 @@ function _renderPending(){
   var audParts = _audSummary().split(' \u00b7 ');
   var steps = [
     ['Location', null,
-     [(PAGE.data && PAGE.data.location_name) || 'GoHighLevel location']],
+     [(PAGE.data && PAGE.data.location_name) || 'GoHighLevel location'],
+     true],
     ['Business', 'editBusiness',
      [((PAGE.data.client || {}).name || '')]
        .concat((((PAGE.data.client || {}).email) || '')
-                ? [((PAGE.data.client || {}).email)] : [])],
-    // Audience is DISPLAY-ONLY here (W4-9, Matt 11/6): it was asked in
-    // the wizard (this campaign's one ask) and locks in at launch -
-    // same convention as Location: informational, no Edit
-    ['Audience', null, audParts],
+                ? [((PAGE.data.client || {}).email)] : []),
+     true],
+    // Audience is EDITABLE pre-launch (Matt 11/7: 'it should be able
+    // to be edited') - the editor writes page state; the choice ships
+    // with the Start click, still frozen once the campaign runs
+    ['Audience', 'editAudience', audParts, true],
     (function(){
       var c = (PAGE.data && PAGE.data.calendar) || {};
       if (c.surface === 'calendly')
         return ['Calendar', 'editCalendar',
-                ['Calendly' + (c.connected ? '' : ' \u00b7 not connected')]];
+                ['Calendly' + (c.connected ? '' : ' \u00b7 not connected')],
+                !!c.connected];
       return ['Calendar', 'editCalendar',
-              [c.name || 'Not picked yet']];
+              [c.name || 'Not picked yet'], !!c.name];
     })(),
     ['Payment method', 'editCard',
      [(b.card_summary || (b.card_invalid ? 'Card needs attention'
-                                         : 'Saved during setup'))]]
+                                         : 'Saved during setup'))],
+     !!b.card_on_file && !b.card_invalid]
   ];
   steps.forEach(function(s){
     var row = document.createElement('div');
     row.className = 'pc-rowc';
     var ck = document.createElement('span');
-    ck.className = 'ck'; ck.textContent = '\u2713';
+    // state-aware (Matt 11/7): a row that still needs action shows an
+    // amber mark, never a green check - 'Not picked yet' carried a
+    // decorative check before
+    var _ok = (s.length > 3) ? !!s[3] : true;
+    ck.className = _ok ? 'ck' : 'ck warn';
+    ck.textContent = _ok ? '\u2713' : '!';
     var kv = document.createElement('span');
     kv.className = 'kv';
     var k = document.createElement('div');
@@ -2532,9 +2553,14 @@ function _pcEdit(target){
     open_('calOverlay');
     return;
   }
-  // (editAudience retired with #audOverlay, W4-9 11/6: the audience is
-  // asked once per campaign - wizard or start dialog - and never
-  // edited from a standalone dialog)
+  if (target === 'editAudience') {
+    // pre-launch audience edit (Matt 11/7): the same editor bound to
+    // its own container; changes live in page state and ship with the
+    // Start click - nothing is requested or frozen by opening this
+    try { audRender(); } catch(e) {}
+    open_('audPcOverlay');
+    return;
+  }
 }
 document.addEventListener('click', function(ev){
   var el = ev.target;
