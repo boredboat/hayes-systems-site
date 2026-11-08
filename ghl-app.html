@@ -3179,6 +3179,22 @@ function applyFromData(d){
   // boot default stayed rendered: demo running stats), and leaving
   // onboarding must close the gate
   if (st === 'onboarding') { applyOb('onboarding'); }
+  // STEP-LIST SYNC (Matt 11/8, the hard-refresh lock): the wizard can
+  // build its steps BEFORE the first payload lands (needsConnect
+  // defaults false), silently OMITTING the connect step - the client
+  // walked into calendar selection unconnected and locked. Runs AFTER
+  // applyOb so the gate is open even on a stale-resumed tab: when the
+  // payload's connect requirement disagrees with what the list was
+  // built for, REBUILD and land on the connect step when required.
+  try {
+    if (typeof _obInit === 'function'
+        && _obNeedConnBuilt !== null
+        && _obNeedConnBuilt !== !!PAGE.needsConnect
+        && st === 'onboarding') {
+      _obInit();
+      if (PAGE.needsConnect && !_connectDone) _obGo(0);
+    }
+  } catch (e) {}
   else if (_wasOb) { $('obGate').classList.add('hide');
     try { localStorage.removeItem(
       'ghlob:' + (new URLSearchParams(location.search)
@@ -3192,21 +3208,6 @@ function applyFromData(d){
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
   PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trustworthy
-  // STEP-LIST SYNC (Matt 11/8, the hard-refresh lock): the wizard can
-  // build its steps BEFORE this payload lands (needsConnect defaults
-  // false), which silently OMITTED the connect step - the client
-  // walked into calendar selection unconnected and locked. When the
-  // payload disagrees with what the list was built for, REBUILD, and
-  // if the connect step just became required, land on it.
-  (function(){
-    if (_obNeedConnBuilt === null || _obNeedConnBuilt === !!PAGE.needsConnect)
-      return;
-    var gate = document.getElementById('obGate');
-    if (!gate || gate.classList.contains('hide')) return;
-    if (typeof _obInit !== 'function') return;
-    _obInit();
-    if (PAGE.needsConnect && !_connectDone) _obGo(0);
-  })();
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
@@ -3421,6 +3422,7 @@ function applyOb(s){
           || (PAGE.needsConnect && !_connectDone);
       });
     _obNeedConnBuilt = !!PAGE.needsConnect;
+    window._obNeedConnBuilt = _obNeedConnBuilt;
     // W4-10: a fresh engagement (the client id switched mid-sitting)
     // rebuilds the walk - drop any previously built footer rows first
     _obSteps.forEach(function(el){
@@ -3465,7 +3467,7 @@ function applyOb(s){
   }
   // exposed for the applyFromData step-list sync (the sync lives outside
   // this closure; without these it throws and breaks the render)
-  window._obInit = _obInit; window._obGo = _obGo;
+  window._obInit = _obInit; window._obGo = _obGo; window._obNeedConnBuilt = null;
   function _obGo(i) {
     if (i < 0 || i >= _obSteps.length) return;
     _obCur = i;
