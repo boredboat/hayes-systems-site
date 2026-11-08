@@ -45,12 +45,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .tips-list li:last-child{border-bottom:none}
 .tips-list li::before{content:'';position:absolute;left:18px;top:17px;width:6px;height:6px;border-radius:50%;background:var(--acc)}
 @media (max-width:759px){.hiw{position:static}.hiw-panel{position:fixed;top:56px;left:12px;right:12px;width:auto;max-width:none}}
-.hiw-item{padding:10px 16px;border-radius:8px}
-.hiw-item:hover{background:var(--bg)}
-.hiw-q{font-size:13px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:8px}
-.hiw-a{font-size:12.5px;color:var(--mut);line-height:1.5;margin-top:3px;display:none;padding-left:26px}
-.hiw-item.open .hiw-a{display:block}
-.hiw-item.open .hiw-chev{transform:rotate(90deg)}
+/* HOW IT WORKS readability pass (Matt 11/8: variant B - all open,
+   numbered, bigger type, SCROLLABLE: every answer visible at once) */
+.hiw-panel{max-height:calc(100vh - 110px);overflow-y:auto}
+.hiw-head{padding:16px 18px 6px;font-size:15px;font-weight:800;color:var(--tx)}
+.hiw-item{padding:12px 18px 6px}
+.hiw-q{font-size:14px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;gap:10px}
+.hiw-q .hiw-n{flex:none;width:21px;height:21px;border-radius:999px;background:#e8f2fe;color:#095dc3;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;transform:translateY(4px)}
+.hiw-a{font-size:14px;color:#374151;line-height:1.62;margin:6px 0 8px 31px}
+.hiw-sep{height:1px;background:#f3f4f6;margin:2px 18px}
 .hiw-chev{transition:transform .15s;flex:0 0 auto;color:#9ca3af}
 
 .actionbar{background:#fff7e0;border:1px solid #f3d68a;border-left:4px solid #E8A13A;border-radius:10px;padding:13px 18px;margin:0 0 18px;font-size:13.5px;color:#7a5a0d;line-height:1.5;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -353,31 +356,37 @@ body{padding:0}
     <div class="hiw-panel" id="hiwPanel">
       <div class="hiw-head">How lead reactivation works</div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>The connection</div>
+        <div class="hiw-q"><span class="hiw-n">1</span>The connection</div>
         <div class="hiw-a">CRM data is accessed in read-only mode. Calendars are accessed with read and write permissions to facilitate the serving of appointments.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>The campaign</div>
+        <div class="hiw-q"><span class="hiw-n">2</span>The campaign</div>
         <div class="hiw-a">We use paced email outreach via Amazon SES to contact leads at favorable days and times and book appointments to your calendar with the help of a Retell AI booking agent. Run times typically vary between 1-3 months depending on list size.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Appointments</div>
+        <div class="hiw-q"><span class="hiw-n">3</span>Appointments</div>
         <div class="hiw-a">Interested leads reply to our email and receive an immediate phone call from our conversational AI booking agent who assists them in picking an available time from your calendar. Appointments follow your GHL calendar settings for type and length, we require a phone call type appointment and suggest a length of between 15-30 minutes.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Your control</div>
+        <div class="hiw-q"><span class="hiw-n">4</span>Your control</div>
         <div class="hiw-a">Request, pause, or stop a campaign from this app. Outreach stops the same day you stop it.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Billing</div>
+        <div class="hiw-q"><span class="hiw-n">5</span>Billing</div>
         <div class="hiw-a">You are billed per appointment booked, invoiced weekly via Stripe. Retainers are charged a non-refundable monthly fee and a reduced appointment fee.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Opt-outs</div>
+        <div class="hiw-q"><span class="hiw-n">6</span>Opt-outs</div>
         <div class="hiw-a">Every email carries an opt out link which stops all outreach to that lead, permanently.</div>
       </div>
+      <div class="hiw-sep"></div>
       <div class="hiw-item">
-        <div class="hiw-q"><svg class="hiw-chev" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Cancellation</div>
+        <div class="hiw-q"><span class="hiw-n">7</span>Cancellation</div>
         <div class="hiw-a">Stop any time from this app. Campaign cancellation stops outreach and sends an invoice to cover existing uncharged appointments. Cancellation ends appointment booking; leads who respond will not receive a response. Retainer cancellation stops the monthly fee and your current campaign finishes at the retainer rate. Campaigns run and charge the standard rate after retainer cancellation. There are no cancellation fees.</div>
       </div>    </div>
   </div>
@@ -2854,7 +2863,7 @@ $('settingsSave').addEventListener('click', function(){
     hiw.classList.toggle('open');
   });
   hiw.querySelectorAll('.hiw-item').forEach(function(it){
-    it.querySelector('.hiw-q').addEventListener('click', function(e){
+    it.querySelector('.hiw-q') && it.querySelector('.hiw-q').addEventListener('click', function(e){
       e.stopPropagation();
       var was = it.classList.contains('open');
       hiw.querySelectorAll('.hiw-item').forEach(function(o){ o.classList.remove('open'); });
