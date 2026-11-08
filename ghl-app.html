@@ -40,12 +40,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .hiw-panel{position:absolute;top:calc(100% + 10px);right:0;width:400px;max-width:calc(100vw - 24px);background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 18px 50px rgba(17,24,39,.16);padding:6px;display:none;z-index:60}
 .hiw.open .hiw-panel{display:block}
 .hiw-head{padding:14px 16px 8px;font-size:13px;font-weight:700;color:var(--tx)}
-/* Tips: the same readability treatment as How it works (Matt 11/8) */
+/* Tips: the SAME numbered-row style as How it works (Matt 11/8) */
 #tipsPanel{max-height:min(520px,calc(100vh - 110px));overflow-y:auto;overscroll-behavior:contain}
-.tips-list{margin:6px 0 10px;padding:0;list-style:none}
-.tips-list li{font-size:14px;color:#374151;line-height:1.62;padding:11px 18px 11px 40px;position:relative}
+.tips-list{margin:6px 0 10px;padding:0;list-style:none;counter-reset:tip}
+.tips-list li{font-size:14px;color:#374151;line-height:1.62;padding:12px 18px;display:flex;align-items:baseline;gap:11px}
 .tips-list li + li{border-top:1px solid #f3f4f6}
-.tips-list li::before{content:'';position:absolute;left:20px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--acc)}
+.tips-list li::before{counter-increment:tip;content:counter(tip);flex:none;width:21px;height:21px;
+  border-radius:999px;background:#e8f2fe;color:#095dc3;font-size:12px;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;transform:translateY(3px)}
 @media (max-width:759px){.hiw{position:static}.hiw-panel{position:fixed;top:56px;left:12px;right:12px;width:auto;max-width:none}}
 /* HOW IT WORKS readability pass (Matt 11/8: variant B - all open,
    numbered, bigger type, SCROLLABLE: every answer visible at once) */
