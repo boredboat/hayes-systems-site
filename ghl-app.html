@@ -2389,13 +2389,23 @@ function _renderPending(){
   });
   var nums = $('pcNums');
   var _aud_n = PAGE.audCount || 0;
-  // estimate from the SEND BUDGET (corrected 11/7: the binding
-  // constraint is the per-campaign daily SEND quota across all ladder
-  // touches - leads x 6 / quota; 7k reads ~10 weeks and that is true)
+  // estimate from the CAMPAIGN'S OWN QUOTA (W4-16): Q =
+  // clamp(ceil(6n/63), 1500, 8000) - the same derivation the planner
+  // runs server-side. The plan's stored quota wins once a plan exists
+  // (sends_per_day); pre-plan the live audience count derives it from
+  // the basis constants page-data exposes. FLOOR = the ladder (~5
+  // wks): the sequence tail alone is the fastest a campaign can run -
+  // the old 2-wk minimum was impossible.
   var _pac = (PAGE.data && PAGE.data.pacing) || {};
-  var _spd = _pac.sends_per_day || 600, _tch = _pac.touches || 6;
-  var _est_wks = Math.max(2, Math.ceil(
-    (_aud_n * _tch / _spd) / 7));
+  var _tch = _pac.touches || 6;
+  var _q = _pac.sends_per_day;
+  if (!_q) {
+    var _fl = _pac.quota_floor || 1500, _ce = _pac.quota_ceiling || 8000;
+    _q = Math.min(_ce, Math.max(_fl,
+      Math.ceil(_aud_n * _tch / (_pac.quota_window_days || 63))));
+  }
+  var _est_wks = Math.max(5, Math.ceil(
+    (_aud_n * _tch / _q) / 7));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">'
