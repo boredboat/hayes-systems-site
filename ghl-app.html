@@ -3594,6 +3594,13 @@ function applyOb(s){
   // WIZARD: one step at a time, progress bar, back/continue injected.
   // The welcome screen opens first (obStart); gate entry resets there.
   var _obSteps = [], _obCur = -1;
+  // CONNECT BUTTON REFERENCE (Matt 11/8, live-caught: 'connect goes away
+  // and continue goes grey'): _obInit MOVES the live button into a footer
+  // row; a later rebuild strips that row - detaching the button - and
+  // $('obConnectBtn') then returns null (getElementById cannot see a
+  // detached node), so the button never came back. A held reference
+  // survives detachment and re-attaches cleanly.
+  var _obConnectBtnEl = $('obConnectBtn');
   // CALENDAR GATE (Matt 11/7: 'it should only ask once'): the wizard's
   // calendar step never advances without a SAVED pick (or the Calendly
   // path, whose connect flow gates itself) - a failed list can no
@@ -3634,7 +3641,7 @@ function applyOb(s){
       var sp = document.createElement('div'); sp.className = 'spacer';
       row.appendChild(sp);
       if (el.id === 'obConnectStep') {
-        var cb = $('obConnectBtn');
+        var cb = _obConnectBtnEl;
         if (cb) { row.insertBefore(cb, sp); }   // one footer row
       }
       if (i < _obSteps.length - 1) {
@@ -3689,6 +3696,7 @@ function applyOb(s){
     try { localStorage.setItem(_obKey() + ':started', '1'); } catch(e) {}
     $('obWelcome').classList.add('hide');
     $('obForm').classList.remove('hide');
+    _obResumed = true;   // manual start consumes the resume (see above)
     _obInit(); _obGo(0);
   });
 
