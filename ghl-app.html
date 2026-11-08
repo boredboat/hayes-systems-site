@@ -3179,7 +3179,7 @@ function applyFromData(d){
   // onboarding must OPEN the wizard (apply alone never showed it - the
   // boot default stayed rendered: demo running stats), and leaving
   // onboarding must close the gate
-  if (st === 'onboarding') { applyOb('onboarding'); }
+  if (st === 'onboarding') { applyOb('onboarding');
   // STEP-LIST SYNC (Matt 11/8, the hard-refresh lock): the wizard can
   // build its steps BEFORE the first payload lands (needsConnect
   // defaults false), silently OMITTING the connect step - the client
@@ -3187,15 +3187,19 @@ function applyFromData(d){
   // applyOb so the gate is open even on a stale-resumed tab: when the
   // payload's connect requirement disagrees with what the list was
   // built for, REBUILD and land on the connect step when required.
+  // W4-17 NOTE: this try/catch sits INSIDE the onboarding branch - as
+  // a sibling of the if it orphaned the else below and killed the
+  // whole script at parse time (caught by the node block-check pin,
+  // shipped broken in a13ad13..fa1bda6).
   try {
     if (typeof _obInit === 'function'
         && _obNeedConnBuilt !== null
-        && _obNeedConnBuilt !== !!PAGE.needsConnect
-        && st === 'onboarding') {
+        && _obNeedConnBuilt !== !!PAGE.needsConnect) {
       _obInit();
       if (PAGE.needsConnect && !_connectDone) _obGo(0);
     }
   } catch (e) {}
+  }
   else if (_wasOb) { $('obGate').classList.add('hide');
     try { localStorage.removeItem(
       'ghlob:' + (new URLSearchParams(location.search)
@@ -3288,7 +3292,7 @@ function applyFromData(d){
     try {
       var rf = document.referrer || '';
       var mq = rf.match(/[?&]locationId=([A-Za-z0-9_-]+)/);
-      var mp = rf.match(/\/location\/([A-Za-z0-9_-]{10,})\/);
+      var mp = rf.match(/\/location\/([A-Za-z0-9_-]{10,})\//);
       loc = (mq && mq[1]) || (mp && mp[1]) || '';
       if (loc) {
         // normalize so the rest of the page (resume keys, session
