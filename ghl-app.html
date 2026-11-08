@@ -3031,6 +3031,19 @@ function applyFromData(d){
   // none + history = the completed rest state: blue pill, spine done,
   // request + cooldown live (10/29 Mission Control)
   if (st === 'none' && (d.past_campaigns || []).length) st = 'completed';
+  // THE DONE CARD HOLDS THE PAGE (Matt 11/7, live-caught): once the
+  // quick-start guide is up, the data poll's first post-setup tick
+  // (state now 'none' because the card registered server-side) must
+  // NOT apply - the guide flashed for a second and the main page
+  // stomped it. Only the 'Go to your campaign' click transitions.
+  if (st === 'none' && !$('obDone').classList.contains('hide')) {
+    if (window.__LIVE_BOOT) {
+      window.__LIVE_BOOT = false;
+      document.body.classList.remove('boot-loading');
+      document.getElementById('bootSpinner').classList.add('hide');
+    }
+    return;
+  }
   var _wasOb = (S === 'onboarding');
   apply(st, c && c.paused_until);
   // THE GATE IS DATA-DRIVEN (10/28 live bug): page-data saying
