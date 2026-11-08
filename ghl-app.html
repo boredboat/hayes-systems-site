@@ -303,6 +303,10 @@ td .when{color:var(--mut);font-size:13px}
 .ob-card h2{font-weight:700;font-size:21px;color:var(--tx);margin-bottom:6px}
 .ob-card .ob-sub{font-size:13.5px;color:var(--mut);margin-bottom:24px}
 .ob-step{margin-bottom:26px}
+.cperm{display:flex;flex-direction:column;gap:8px;margin:14px 0 18px}
+.cperm-row{display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid var(--bd);border-radius:9px;padding:10px 14px}
+.cperm-row b{display:block;font-size:13.5px;font-weight:700}
+.cperm-row span{font-size:12.5px;color:var(--mut)}
 .ob-step h3{font-weight:600;font-size:14px;color:var(--tx);margin-bottom:8px}
 .ob-step p{font-size:14px;line-height:1.65;color:#4b5563;margin:0 0 12px 0}
 .ob-step p b{color:var(--tx);font-weight:600}
@@ -480,7 +484,22 @@ body{padding:0}
 
     <div class="ob-step" id="obConnectStep" style="display:none">
       <h3>Connect your location</h3>
-      <p>One click connects us to this location. CRM data is accessed in read-only mode. Calendars are accessed with read and write permissions to facilitate the serving of appointments.</p>
+      <p>One authorization, and nothing about your account changes. Your
+      team keeps working the way they already do.</p>
+      <div class="cperm">
+        <div class="cperm-row">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2.3 9s2.5-4.6 6.7-4.6S15.7 9 15.7 9 13.2 13.6 9 13.6 2.3 9 2.3 9Z" stroke="#095dc3" stroke-width="1.5" stroke-linejoin="round"/><circle cx="9" cy="9" r="2.1" stroke="#095dc3" stroke-width="1.5"/></svg>
+          <div><b>Contacts</b><span>read-only, to build the campaign list</span></div>
+        </div>
+        <div class="cperm-row">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.2" y="3.7" width="13.6" height="11.6" rx="2" stroke="#095dc3" stroke-width="1.5"/><path d="M2.2 7.2h13.6M6 2.2v3M12 2.2v3" stroke="#095dc3" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><b>Calendars</b><span>read and write, to place appointments on open slots</span></div>
+        </div>
+        <div class="cperm-row">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.2 14.6 4.3v4.1c0 3.3-2.3 5.9-5.6 7.2-3.3-1.3-5.6-3.9-5.6-7.2V4.3L9 2.2Z" stroke="#095dc3" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 8.9l1.8 1.8 3.4-3.6" stroke="#095dc3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><b>Revocable</b><span>disconnect any time; the token is deleted at closeout</span></div>
+        </div>
+      </div>
       <button class="btn btn-primary" id="obConnectBtn">Connect your location</button>
       <span class="cs-state" id="obConnectState" style="margin-left:10px"></span>
     </div>
@@ -3197,6 +3216,14 @@ function applyFromData(d){
     }
     return;
   }
+  // CONNECT FLAG FIRST (Matt 11/8, live-caught: refreshing on the
+  // connect step let the client skip the connection). The wizard resume
+  // and the step-list sync below read PAGE.needsConnect; assigning it
+  // after them built the walk with the STALE default false - connect
+  // step omitted, every Continue ungated. Assign before, and the very
+  // first payload builds the true list.
+  PAGE.needsConnect = !!d.needs_location_connect;
+  PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trusted
   var _wasOb = (S === 'onboarding');
   apply(st, c && c.paused_until);
   // THE GATE IS DATA-DRIVEN (10/28 live bug): page-data saying
@@ -3235,8 +3262,6 @@ function applyFromData(d){
   PAGE.sched = d.sched_scan || null;
   PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
-  PAGE.needsConnect = !!d.needs_location_connect;
-  PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trusted
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
