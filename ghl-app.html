@@ -953,6 +953,7 @@ body{padding:0}
 <div class="overlay" id="calOverlay">
   <div class="dialog">
     <h3>Where appointments land</h3>
+    <p id="calOvLock" class="hide" style="margin:0 0 12px;font-size:13px;color:#b45309;font-weight:600">The booking setup is locked while a campaign is active. It unlocks when the campaign ends.</p>
     <div class="ob-fields" style="grid-template-columns:1fr">
       <div class="ob-field"><label for="calOvSurface">Appointments land on</label>
         <select id="calOvSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
@@ -2412,6 +2413,21 @@ function _loadCalOverlay(){
   sf.disabled = _lk;
   sel.disabled = _lk;
   $('calOvConnect').disabled = _lk;
+  // a silently disabled control reads as broken (Matt 11/7 live-caught:
+  // 'i picked a calendar and nothing happened') - the lock always says
+  // why, and never shows the selects at all in that state
+  var _lkNote = $('calOvLock');
+  if (_lkNote && !_lk) _lkNote.classList.add('hide');
+  if (!_lk) {
+    $('calOvSurface').closest('.ob-field').classList.remove('hide');
+    if (sf.value !== 'calendly') $('calOvCalField').classList.remove('hide');
+  }
+  if (_lkNote && _lk) {
+    _lkNote.classList.remove('hide');
+    $('calOvSurface').closest('.ob-field').classList.add('hide');
+    $('calOvCalField').classList.add('hide');
+    $('calOvClyField').classList.add('hide');
+  }
   var cal = (PAGE.data && PAGE.data.calendar) || {};
   var st = $('calOvState');
   if (st) st.textContent = cal.surface === 'calendly'
