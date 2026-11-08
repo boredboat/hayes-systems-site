@@ -596,7 +596,10 @@ body{padding:0}
     <div class="qs-row"><div class="qs-ic"><svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6.5v4l2.8 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
       <div><div class="qs-h">Connection and calendar <span class="qs-w">Settings</span></div>
       <p>If the connection ever drops, Reconnect fixes it in one click. Your calendar pick lives here too.</p></div></div>
-    <button class="btn btn-primary" id="obGo" style="margin-top:14px">Go to your campaign</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+      <button class="btn btn-primary" id="obGo">Set up a campaign</button>
+      <button class="btn btn-ghost" id="obDash">Go to the dashboard</button>
+    </div>
   </div>
 </div>
 
@@ -2386,7 +2389,12 @@ function _renderPending(){
   });
   var nums = $('pcNums');
   var _aud_n = PAGE.audCount || 0;
-  var _est_wks = Math.max(4, Math.ceil(_aud_n / 700));
+  // estimate from the SERVER's pacing constants (Matt 11/7: the 700/wk
+  // constant predated the funded ladder - 7k read as 10 weeks); the
+  // planner's entry rate + sequence tail are the single derivation
+  var _pac = (PAGE.data && PAGE.data.pacing) || {};
+  var _est_wks = Math.max(2, Math.ceil(_aud_n / (_pac.entry_per_week || 3000)
+                                       + (_pac.tail_weeks || 4.1)));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">'
@@ -3480,6 +3488,14 @@ function applyOb(s){
   });
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden && _signed && !_cardOk) _pollCard();
+  });
+  // the two doors (Matt 11/7): set up the campaign (the checklist) or
+  // jump straight to the dashboard tabs
+  $('obDash').addEventListener('click', function(){
+    S = 'none'; apply('none'); applyOb('done');
+    try { localStorage.setItem(_pcKey() + ':cancelled', '1'); } catch(e) {}
+    PAGE.pcDismissed = true;
+    if (PAGE.live) loadPageData();
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
