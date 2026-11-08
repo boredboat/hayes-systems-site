@@ -2402,10 +2402,12 @@ function _renderPending(){
   if (!_q) {
     var _fl = _pac.quota_floor || 1500, _ce = _pac.quota_ceiling || 8000;
     _q = Math.min(_ce, Math.max(_fl,
-      Math.ceil(_aud_n * _tch / (_pac.quota_window_days || 63))));
+      Math.ceil(_aud_n * _tch / (_pac.quota_window_days || 45))));
   }
+  // calendar weeks from SEND-days: weekends hold (5 sendable days per
+  // calendar week) - the /7 shape was the F-EST conflation
   var _est_wks = Math.max(5, Math.ceil(
-    (_aud_n * _tch / _q) / 7));
+    (_aud_n * _tch / _q) / 5));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">'
