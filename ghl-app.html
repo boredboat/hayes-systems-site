@@ -3212,7 +3212,7 @@ function applyFromData(d){
   PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
-  PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trustworthy
+  PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trusted
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
