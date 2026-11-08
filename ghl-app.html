@@ -211,6 +211,12 @@ td .when{color:var(--mut);font-size:13px}
 .pc-flow{display:flex;flex-direction:column;gap:8px;margin:20px 0 2px}
 .pc-rowc{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--bd);border-radius:10px}
 .pc-rowc .ck.warn{background:#fee2e2;color:#dc2626}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 2px;border-bottom:1px solid #f3f4f6}
+.set-row:last-of-type{border-bottom:none}
+.set-lab{font-size:13.5px;font-weight:600;color:var(--tx)}
+.set-lab small{display:block;font-weight:500;font-size:11.5px;color:var(--mut);margin-top:1px;white-space:normal}
+.set-ctl{flex:0 0 215px;display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.set-ctl .set-in,.set-ctl select{width:100%;padding:8px 10px;font-size:13px}
 .pc-rowc.crit{border-color:#fde68a;background:#fffbeb}
 .ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .pc-rowc .kv{flex:1;min-width:0}
@@ -870,28 +876,34 @@ body{padding:0}
 
 <div class="overlay" id="settingsOverlay">
   <div class="dialog">
-    <h3>Account settings</h3>
-    <div class="field"><label>Email for app notices</label>
-      <input id="setEmail" class="set-in" placeholder="you@brokerage.com" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
-    <div class="field"><label>Business name</label>
-      <input id="setBusiness" class="set-in" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
-    <div class="field"><label>Appointments land on</label>
-      <select id="setSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+    <h3>Settings</h3>
+    <div class="set-row">
+      <div class="set-lab">Business name</div>
+      <div class="set-ctl"><input id="setBusiness" class="set-in"></div>
+    </div>
+    <div class="set-row">
+      <div class="set-lab">Email for app notices<small>Campaign updates go here</small></div>
+      <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
+    </div>
+    <div class="set-row">
+      <div class="set-lab">Booking calendar<small id="setSurfaceState"></small></div>
+      <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
-      </select>
-      <p id="setSurfaceState" style="margin:6px 0 0;font-size:12px;color:var(--mut)"></p>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">This choice remains locked during a campaign.</p></div>
-    <div class="field"><label>Calendar for appointments</label>
-      <select id="setCalendar" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Calendar selection remains locked during a campaign. Only round-robin calendars are valid.</p></div>
-    <div class="field"><label>Payment method</label>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span id="setCardState" style="font-size:13.5px;color:var(--mut)">Payment method on file</span>
-        <button class="btn btn-ghost" id="setCardUpdate" style="padding:8px 14px">Update card</button>
-      </div></div>
-    <div class="field" id="setDataRow"><label>Your data</label>
-      <button class="btn btn-danger" id="setDeleteData" style="margin-top:8px;padding:8px 14px">Delete my data</button></div>
+      </select></div>
+    </div>
+    <div class="set-row">
+      <div class="set-lab">Calendar<small>Locked while a campaign runs</small></div>
+      <div class="set-ctl"><select id="setCalendar"></select></div>
+    </div>
+    <div class="set-row">
+      <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
+      <div class="set-ctl"><button class="btn btn-ghost" id="setCardUpdate">Update</button></div>
+    </div>
+    <div class="set-row" id="setDataRow">
+      <div class="set-lab" style="color:#c62828">Delete my data<small>Erases your data from our servers. This cancels any active campaigns and cannot be undone.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setDeleteData">Delete</button></div>
+    </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
       <button class="btn btn-primary" id="settingsSave">Save</button>
