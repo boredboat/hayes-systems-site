@@ -887,7 +887,7 @@ body{padding:0}
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
     <div class="set-row">
-      <div class="set-lab">Calendar app<small id="setSurfaceState"></small></div>
+      <div class="set-lab">Calendar app<small>Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
@@ -2011,6 +2011,9 @@ function _storedSurface(){
           === 'calendly') ? 'calendly' : 'ghl';
 }
 function _surfStateLine(){
+  // retired (Matt 11/8: 'Books to hayes systems - remove'): the row's
+  // explainer is the static locked note; nothing renders dynamically
+  return; /* eslint-disable no-unreachable */
   var el = $('setSurfaceState'); if (!el) return;
   var cal = (PAGE.data && PAGE.data.calendar) || {};
   if (!PAGE.live) { el.textContent = ''; return; }
