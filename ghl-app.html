@@ -169,6 +169,7 @@ td .when{color:var(--mut);font-size:13px}
 .cx-list li{display:flex;gap:11px;padding:11px 2px;border-bottom:1px solid var(--bg);font-size:13.5px;line-height:1.5;color:var(--tx)}
 .cx-list li:last-child{border-bottom:none}
 .cx-x{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:#fde8e8;border:1px solid #f5b5b5;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cx-ok{background:#e8f9ee;border:1px solid #bbe7c9}
 .cx-x svg{display:block}
 .cx-help{font-size:12.5px;color:var(--mut);margin:16px 0 18px;padding-top:12px;border-top:1px solid var(--bg)}
 .cx-help a{color:var(--acc);font-weight:500}
@@ -902,10 +903,10 @@ body{padding:0}
     <h3>Delete your data?</h3>
     <p style="font-size:13px;color:var(--mut);margin-bottom:2px">This cannot be undone. Here is exactly what happens:</p>
     <ul class="cx-list">
-      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Any running campaign <b>ends today</b>: outreach stops, and appointments that landed are billed on your final invoice</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Any running campaign <b>ends immediately</b>: leads who respond after cancellation do not receive any outreach from us. A final invoice covering any pending charges will be issued.</span></li>
       <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Lead data for your campaigns is <b>deleted</b>: names, emails, phone numbers, message history, and your imported lead list are removed from our systems</span></li>
       <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>The connection to your GoHighLevel location is <b>revoked</b>. We can no longer see your contacts</span></li>
-      <li><span class='cx-x'><svg width="16" height="16" viewBox="0 0 16 16" style="width:10px;height:10px"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>What stays: opt-out and consent records, so contacts who asked to stop contact stay suppressed, and your invoices and payment records, which accounting requires. <a href="https://www.hayessystems.com/privacy.html" target="_blank" rel="noopener">Privacy policy</a></span></li>
+      <li><span class='cx-ok'><svg width="16" height="16" viewBox="0 0 16 16" style="width:10px;height:10px"><circle cx="8" cy="8" r="8" fill="#17d94b" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="#17d94b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>What stays: opt-out and consent records, so contacts who asked to stop contact stay suppressed, and your invoices and payment records, which accounting requires. <a href="https://www.hayessystems.com/privacy.html" target="_blank" rel="noopener">Privacy policy</a></span></li>
     </ul>
     <div class="field"><label for="delConfirm">Type <b id="delName"></b> to confirm</label>
       <input id="delConfirm" class="set-in" autocomplete="off" spellcheck="false" placeholder="Business name" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px"></div>
