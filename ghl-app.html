@@ -2389,12 +2389,13 @@ function _renderPending(){
   });
   var nums = $('pcNums');
   var _aud_n = PAGE.audCount || 0;
-  // estimate from the SERVER's pacing constants (Matt 11/7: the 700/wk
-  // constant predated the funded ladder - 7k read as 10 weeks); the
-  // planner's entry rate + sequence tail are the single derivation
+  // estimate from the SEND BUDGET (corrected 11/7: the binding
+  // constraint is the per-campaign daily SEND quota across all ladder
+  // touches - leads x 6 / quota; 7k reads ~10 weeks and that is true)
   var _pac = (PAGE.data && PAGE.data.pacing) || {};
-  var _est_wks = Math.max(2, Math.ceil(_aud_n / (_pac.entry_per_week || 3000)
-                                       + (_pac.tail_weeks || 4.1)));
+  var _spd = _pac.sends_per_day || 600, _tch = _pac.touches || 6;
+  var _est_wks = Math.max(2, Math.ceil(
+    (_aud_n * _tch / _spd) / 7));
   nums.innerHTML =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">'
