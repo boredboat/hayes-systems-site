@@ -3284,16 +3284,37 @@ function applyFromData(d){
 }
 (function(){
   if (window.__BILLING_DONE) return;
-  var loc = new URLSearchParams(location.search).get('locationId');
+  // W4-17: the frame's identity can arrive by three routes, in order:
+  // 1. GHL's URL-variable substitution in the CONFIGURED custom-page
+  //    URL (portal value ...?locationId={{location.id}} - the official
+  //    Custom Pages doc, "Passing User and Location Context"), which
+  //    puts the id straight in the iframe query;
+  // 2. the referrer (GHL's parent URL carries the location as
+  //    ?locationId= and /location/{id}/ - origin-only under the
+  //    browser default policy, so this is a belt, not a primary);
+  // 3. the DOCUMENTED user-context handshake: postMessage
+  //    REQUEST_USER_DATA to the parent, the parent answers an
+  //    AES-encrypted payload, /api/ghl/sso decrypts it server-side
+  //    (the Shared Secret never ships to the page).
+  // Every extracted value passes ONE shape gate so an UNSUBSTITUTED
+  // merge tag ('{{location.id}}' - the GHL ideas board shows URL
+  // variables are not universally applied) can never boot as an
+  // identity and lock a real client on the retry screen.
+  var _locOk = function(s){
+    return /^[A-Za-z0-9_-]{6,64}$/.test(s || '') ? s : ''; };
+  var loc = _locOk(
+    new URLSearchParams(location.search).get('locationId') || '');
+  var _inFrame = false;
+  try { _inFrame = !!(window.parent && window.parent !== window); } catch(e) {}
   if (!loc) {
-    // GHL custom-page fallback (Matt 11/8: the sidebar iframe arrived
-    // with NO query of its own - demo painted): GHL's parent URL
-    // carries the location as ?locationId= and as /location/{id}/
+    // route 2 (Matt 11/8: the sidebar iframe arrived with NO query of
+    // its own - demo painted): GHL's parent URL carries the location
+    // as ?locationId= and as /location/{id}/
     try {
       var rf = document.referrer || '';
       var mq = rf.match(/[?&]locationId=([A-Za-z0-9_-]+)/);
       var mp = rf.match(/\/location\/([A-Za-z0-9_-]{10,})\//);
-      loc = (mq && mq[1]) || (mp && mp[1]) || '';
+      loc = _locOk((mq && mq[1]) || (mp && mp[1]) || '');
       if (loc) {
         // normalize so the rest of the page (resume keys, session
         // mint) sees ONE canonical param shape
@@ -3305,52 +3326,78 @@ function applyFromData(d){
       }
     } catch (e) {}
   }
-  if (loc) { window.__LIVE_BOOT = true; }
-  // one-shot diagnostic (10/27): report what GHL passes to the frame
-  function _beacon(){
+  // one-shot diagnostic (10/27, W4-17: fires at t=0 with keepalive -
+  // the first live attempt's evidence was eaten by the pre-11/8 404
+  // and by the beacon riding the 25s boot jitter past a fast tab
+  // close): reports what GHL actually passes to the frame. A plain
+  // marketing-preview tab (no frame, no identity) stays network-silent.
+  function _beacon(extra){
     try {
       fetch('https://ops.hayessystems.com/api/ghl/beacon', {
-        method: 'POST',
+        method: 'POST', keepalive: true,
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
+        body: JSON.stringify(Object.assign({
           q: location.search, ref: document.referrer,
-          href: location.href.slice(0, 300), ts: Date.now()})
+          href: location.href.slice(0, 300), ts: Date.now()}, extra || {}))
       }).catch(function(){});
     } catch(e) {}
   }
-  if (!loc) { _beacon(); return; }
-  // POLL JITTER, boot leg (W4-6, ghl-stress-2026-11): the live boot
-  // fires NOTHING at t=0. Every load draws its own offset inside the
-  // 30s cadence window (uniform [0, 25s)) and the whole boot chain -
-  // beacon, session exchange, page-data - starts there, so a GHL
-  // panel relaunch wave (every open panel reloading in the same
-  // instant after an app update) arrives as a spread over 25 seconds,
-  // never a synchronized herd. The boot spinner's timeout covers the
-  // offset (see its comment below), so the deliberate wait reads as
-  // loading, never as the wrong zeroed state.
-  window.__POLL_PHASE_MS = Math.floor(Math.random() * _PJ_SPREAD_MS);
-  setTimeout(function(){
-    _beacon();
-    try {
-      fetch(API + '/api/ghl/session', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({locationId: loc})
-      }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
-        if (d && d.ok) {
-          PAGE.token = d.token; PAGE.name = d.name; PAGE.live = true;
-          loadPageData().then(_steadyStart);
-          return;
-        }
-        // LIVE BOOT FAILED with a real location in the URL (Matt 11/8:
-        // a changed tab showed a phantom RUNNING CAMPAIGN - the demo
-        // fixtures rendered because nothing stopped them). A real
-        // client NEVER sees demo content: park on an honest retry
-        // screen instead, demo stays for the marketing preview only.
-        _liveBootFailed();
-      }).catch(function(){ _liveBootFailed(); });
-    } catch (e) { _liveBootFailed(); }
-  }, window.__POLL_PHASE_MS);
+  if (_inFrame || loc) _beacon();
+  // spinner fallback: armed for the CURRENT wait (the SSO handshake
+  // window, or this load's poll offset) and re-armed whenever a boot
+  // leg redraws one. Fires only when nothing landed, and paints the
+  // honest zeroed state - never demo content.
+  var _fbTimer = null;
+  function _armFallback(){
+    if (_fbTimer) { clearTimeout(_fbTimer); }
+    _fbTimer = setTimeout(function(){
+      if (window.__LIVE_BOOT === 'pending') { _ssoFallBack(); return; }
+      if (window.__LIVE_BOOT === true) {
+        window.__LIVE_BOOT = false;
+        try {
+          document.body.classList.remove('boot-loading');
+          document.getElementById('bootSpinner').classList.add('hide');
+        } catch (e) {}
+        apply('none');
+      }
+    }, 7000 + (window.__POLL_PHASE_MS || 4000));
+  }
+  window.__bootFallbackArm = _armFallback;
+  // the live boot leg. POLL JITTER, boot leg (W4-6, ghl-stress-2026-11):
+  // the live boot fires NOTHING but the t=0 beacon. Every load draws
+  // its own offset inside the 30s cadence window (uniform [0, 25s))
+  // and the boot chain - session exchange, page-data - starts there,
+  // so a GHL panel relaunch wave (every open panel reloading in the
+  // same instant after an app update) arrives as a spread over 25
+  // seconds, never a synchronized herd. The boot spinner's fallback
+  // covers the offset (see _armFallback), so the deliberate wait
+  // reads as loading, never as the wrong zeroed state.
+  function _startLiveBoot(){
+    window.__LIVE_BOOT = true;
+    window.__POLL_PHASE_MS = Math.floor(Math.random() * _PJ_SPREAD_MS);
+    _armFallback();
+    setTimeout(function(){
+      try {
+        fetch(API + '/api/ghl/session', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({locationId: loc})
+        }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
+          if (d && d.ok) {
+            PAGE.token = d.token; PAGE.name = d.name; PAGE.live = true;
+            loadPageData().then(_steadyStart);
+            return;
+          }
+          // LIVE BOOT FAILED with a real location in the URL (Matt 11/8:
+          // a changed tab showed a phantom RUNNING CAMPAIGN - the demo
+          // fixtures rendered because nothing stopped them). A real
+          // client NEVER sees demo content: park on an honest retry
+          // screen instead, demo stays for the marketing preview only.
+          _liveBootFailed();
+        }).catch(function(){ _liveBootFailed(); });
+      } catch (e) { _liveBootFailed(); }
+    }, window.__POLL_PHASE_MS);
+  }
   function _liveBootFailed(){
     if (window.__LIVE_BOOT === false) return;   // already booted live
     window.__LIVE_BOOT = 'failed';
@@ -3368,6 +3415,78 @@ function applyFromData(d){
       try { location.reload(); } catch (e) {}
     }, 30000);
   }
+  // route 3: GHL's documented user-context handshake. Runs only when
+  // the page is inside a wrapper and neither URL nor referrer carried
+  // an identity. While it is in flight __LIVE_BOOT is 'pending'
+  // (truthy): the initial paint parks on the spinner - the 220c6e4
+  // lock extended to this window, a frame that may still prove a real
+  // identity never renders demo. Deny/timeout falls back to the
+  // marketing preview exactly as a bare tab load does today.
+  var _ssoDone = false;
+  function _ssoFinish(granted, locId, note){
+    if (_ssoDone) return; _ssoDone = true;
+    try { window.removeEventListener('message', _ssoOnMsg); } catch(e) {}
+    if (granted && _locOk(locId)) {
+      try {
+        var u = new URL(location.href);
+        u.searchParams.set('locationId', _locOk(locId));
+        history.replaceState(null, '', u.toString());
+      } catch(e) {}
+      loc = _locOk(locId);
+      _beacon({sso: 'granted'});
+      _startLiveBoot();
+    } else {
+      _beacon({sso: note || 'none'});
+      _ssoFallBack();
+    }
+  }
+  function _ssoOnMsg(ev){
+    try {
+      if (!ev || !ev.data || ev.data.message !== 'REQUEST_USER_DATA_RESPONSE') return;
+      var payload = ev.data.payload || '';
+      fetch(API + '/api/ghl/sso', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({encryptedData: payload})
+      }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){
+          if (d && d.ok && d.locationId) _ssoFinish(true, d.locationId);
+          else if (d && d.ok) _ssoFinish(false, '', 'agency-context');
+          else if (d && d.error === 'sso-not-configured')
+            _ssoFinish(false, '', 'unconfigured');
+          else _ssoFinish(false, '', 'denied');
+        }).catch(function(){ _ssoFinish(false, '', 'net'); });
+    } catch (e) { _ssoFinish(false, '', 'err'); }
+  }
+  function _ssoFallBack(){
+    if (window.__LIVE_BOOT !== 'pending') return;
+    window.__LIVE_BOOT = false;
+    if (_fbTimer) { clearTimeout(_fbTimer); _fbTimer = null; }
+    try {
+      document.getElementById('bootSpinner').classList.add('hide');
+      document.body.classList.remove('boot-loading');
+    } catch (e) {}
+    try {
+      // the same initial-paint shape a bare (out-of-frame) demo load
+      // takes - the preview flow, unchanged
+      var st = new URLSearchParams(location.search).get('state') || 'running';
+      var init = (['running','paused','cancelled','none','completed',
+                   'onboarding','retainer'].indexOf(st) > -1 ? st : 'running');
+      if (init === 'onboarding' && !location.search.includes('locationId=')) {
+        PAGE.needsConnect = true;   // demo the gate's Step 1 for review
+      }
+      S = init; apply(init); applyOb(init);
+    } catch (e) {}
+  }
+  function _ghlSso(){
+    window.addEventListener('message', _ssoOnMsg);
+    setTimeout(function(){ _ssoFinish(false, '', 'none'); }, 4000);
+    try {
+      window.parent.postMessage({message: 'REQUEST_USER_DATA'}, '*');
+    } catch (e) { _ssoFinish(false, '', 'noparent'); }
+  }
+  if (loc) { _startLiveBoot(); return; }
+  if (_inFrame) { window.__LIVE_BOOT = 'pending'; _armFallback(); _ghlSso(); }
 })();
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
@@ -3685,21 +3804,16 @@ function applyOb(s){
 var q = new URLSearchParams(location.search).get('state') || 'running';
 if (!window.__BILLING_DONE) {
 if (window.__LIVE_BOOT) {
-  // live boot: no demo flash - the page waits for page-data. W4-6: the
-  // wait now includes this load's poll offset (up to 25s, the jitter
-  // that desynchronizes the fleet), so the fallback timeout runs 7s
-  // AFTER the offset and still falls back to the honest zeroed state
-  // so it can never hang
+  // live boot: no demo flash - the page waits for page-data. W4-17:
+  // the fallback arm (7s past the CURRENT wait - the poll offset, or
+  // the SSO handshake window while 'pending') is owned by the boot
+  // IIFE so a boot leg that re-draws its offset (an SSO grant at
+  // +2s starting a fresh jittered chain) re-arms it; it fires only
+  // when nothing landed and paints the honest zeroed state, never
+  // demo content
   document.body.classList.add('boot-loading');
   document.getElementById('bootSpinner').classList.remove('hide');
-  setTimeout(function(){
-    if (window.__LIVE_BOOT) {
-      window.__LIVE_BOOT = false;
-      document.body.classList.remove('boot-loading');
-      document.getElementById('bootSpinner').classList.add('hide');
-      apply('none');
-    }
-  }, 7000 + (window.__POLL_PHASE_MS || 0));
+  try { window.__bootFallbackArm(); } catch (e) {}
 } else {
 var init = (['running','paused','cancelled','none','completed','onboarding','retainer'].indexOf(q) > -1 ? q : 'running');
 if (init === 'onboarding' && !location.search.includes('locationId=')) {
