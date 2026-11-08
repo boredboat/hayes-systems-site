@@ -1180,6 +1180,7 @@ function _pcCancelled(){
   catch(e) { return !!PAGE.pcDismissed; }
 }
 function apply(s, until){
+  if (window.__DEMO_LOCKED) return;   // failed live boot: no demo, ever
   S = s;
   var ob = (s === 'onboarding');
   // PENDING CARD OWNS THE PAGE (Matt 11/3, live-caught split-brain): the
@@ -3315,10 +3316,34 @@ function applyFromData(d){
         if (d && d.ok) {
           PAGE.token = d.token; PAGE.name = d.name; PAGE.live = true;
           loadPageData().then(_steadyStart);
+          return;
         }
-      }).catch(function(){});
-    } catch (e) {}
+        // LIVE BOOT FAILED with a real location in the URL (Matt 11/8:
+        // a changed tab showed a phantom RUNNING CAMPAIGN - the demo
+        // fixtures rendered because nothing stopped them). A real
+        // client NEVER sees demo content: park on an honest retry
+        // screen instead, demo stays for the marketing preview only.
+        _liveBootFailed();
+      }).catch(function(){ _liveBootFailed(); });
+    } catch (e) { _liveBootFailed(); }
   }, window.__POLL_PHASE_MS);
+  function _liveBootFailed(){
+    if (window.__LIVE_BOOT === false) return;   // already booted live
+    window.__LIVE_BOOT = 'failed';
+    try {
+      var sp = document.getElementById('bootSpinner');
+      sp.classList.remove('hide');
+      sp.innerHTML = '<div class="spin"></div>'
+        + '<p>We could not reach your Hayes Systems app just now.</p>'
+        + '<p style="margin-top:10px"><button class="btn btn-primary" '
+        + 'onclick="location.reload()" style="padding:9px 18px">Try again</button></p>';
+      document.body.classList.add('boot-loading');
+      window.__DEMO_LOCKED = true;   // demo renderers must respect this
+    } catch (e) {}
+    setTimeout(function(){   // one silent retry before the user does it
+      try { location.reload(); } catch (e) {}
+    }, 30000);
+  }
 })();
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
