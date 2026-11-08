@@ -2689,10 +2689,19 @@ function _loadObCals(){
   var sel = $('obCal'), relink = $('obCalRelink');
   if (sel) sel.addEventListener('change', function(){
     var c = _obCals[sel.selectedIndex];
-    if (!c || !c.id) return;
+    if (!c || !c.id) {
+      // a pick that cannot save is never silent (Matt 11/7: the ask
+      // "happened twice" because a failed list made the first one a
+      // no-op the client never saw)
+      toast('That calendar could not be saved. Refresh the list and pick again.');
+      return;
+    }
     api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
-      .then(function(j){ if (j && j.ok) { _obCalCur = c.id; toast('Calendar saved: ' + c.name); } })
-      .catch(function(){});
+      .then(function(j){
+        if (j && j.ok) { _obCalCur = c.id; toast('Calendar saved: ' + c.name); }
+        else { toast('Could not save that calendar. Try again.'); sel.value = ''; }
+      })
+      .catch(function(){ toast('Could not save that calendar. Try again.'); sel.value = ''; });
   });
   if (relink) relink.addEventListener('click', _loadObCals);
 })();
@@ -3313,6 +3322,15 @@ function applyOb(s){
   // WIZARD: one step at a time, progress bar, back/continue injected.
   // The welcome screen opens first (obStart); gate entry resets there.
   var _obSteps = [], _obCur = -1;
+  // CALENDAR GATE (Matt 11/7: 'it should only ask once'): the wizard's
+  // calendar step never advances without a SAVED pick (or the Calendly
+  // path, whose connect flow gates itself) - a failed list can no
+  // longer slide an empty pick to the checklist
+  window._obCalOk = function(){
+    var sf = $('obSurface');
+    if (sf && sf.value === 'calendly') return true;
+    return !!(_obCalCur || ((PAGE.data || {}).calendar || {}).name);
+  };
   function _obInit() {
     _obSteps = Array.prototype.slice.call(
       document.querySelectorAll('#obForm .ob-step')).filter(function(el){
@@ -3345,7 +3363,13 @@ function applyOb(s){
         var c = document.createElement('button');
         c.className = 'btn btn-primary'; c.textContent = 'Continue';
         if (el.id === 'obConnectStep') { c.id = 'obNextConnect'; }
-        c.addEventListener('click', function(){ _obGo(i + 1); });
+        c.addEventListener('click', function(){
+          if (el.id === 'obCalStep' && !_obCalOk()) {
+            toast('Pick a calendar before continuing (or refresh the list).');
+            return;
+          }
+          _obGo(i + 1);
+        });
         row.appendChild(c);
       }
       el.appendChild(row);
