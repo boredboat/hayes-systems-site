@@ -210,8 +210,7 @@ td .when{color:var(--mut);font-size:13px}
 .pc-flow{display:flex;flex-direction:column;gap:8px;margin:20px 0 2px}
 .pc-rowc{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--bd);border-radius:10px}
 .pc-rowc .ck.warn{background:#fee2e2;color:#dc2626}
-.pcard.pc-crit{border-color:#fde68a;background:#fffbeb}
-.pcard.pc-crit .pc-head .pill.ready{background:#fef3c7;color:#b45309}
+.pc-rowc.crit{border-color:#fde68a;background:#fffbeb}
 .ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .pc-rowc .kv{flex:1;min-width:0}
 .pc-k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
@@ -2333,8 +2332,8 @@ function _renderPending(){
     // amber mark, never a green check - 'Not picked yet' carried a
     // decorative check before
     var _ok = (s.length > 3) ? !!s[3] : true;
-    if (!_ok && (s[0] === 'Calendar' || s[0] === 'Payment method'))
-      _crit = true;
+    var _critRow = !_ok && (s[0] === 'Calendar' || s[0] === 'Payment method');
+    if (_critRow) { _crit = true; row.classList.add('crit'); }
     ck.className = _ok ? 'ck' : 'ck warn';
     ck.textContent = _ok ? '\u2713' : '\u2715';
     var kv = document.createElement('span');
@@ -2401,7 +2400,6 @@ function _renderPending(){
   $('pcStart').style.display = b.card_invalid ? 'none' : '';
   // critical missing info (Matt 11/7): no calendar / no working card
   // means no Start - the card itself goes amber so the gap is unmissable
-  $('pendingCard').classList.toggle('pc-crit', _crit);
   $('pcStart').disabled = _crit;
 
 }
