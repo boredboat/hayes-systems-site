@@ -3281,6 +3281,26 @@ function applyFromData(d){
 (function(){
   if (window.__BILLING_DONE) return;
   var loc = new URLSearchParams(location.search).get('locationId');
+  if (!loc) {
+    // GHL custom-page fallback (Matt 11/8: the sidebar iframe arrived
+    // with NO query of its own - demo painted): GHL's parent URL
+    // carries the location as ?locationId= and as /location/{id}/
+    try {
+      var rf = document.referrer || '';
+      var mq = rf.match(/[?&]locationId=([A-Za-z0-9_-]+)/);
+      var mp = rf.match(/\/location\/([A-Za-z0-9_-]{10,})\/);
+      loc = (mq && mq[1]) || (mp && mp[1]) || '';
+      if (loc) {
+        // normalize so the rest of the page (resume keys, session
+        // mint) sees ONE canonical param shape
+        try {
+          var u = new URL(location.href);
+          u.searchParams.set('locationId', loc);
+          history.replaceState(null, '', u.toString());
+        } catch (e) {}
+      }
+    } catch (e) {}
+  }
   if (loc) { window.__LIVE_BOOT = true; }
   // one-shot diagnostic (10/27): report what GHL passes to the frame
   function _beacon(){
