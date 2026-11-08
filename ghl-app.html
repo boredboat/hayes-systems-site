@@ -1494,7 +1494,7 @@ function openCardUpdate(){
 // PAGE state lives ABOVE the demo renders: renderPast stamps PAGE.pastN
 // at load, so declaring it lower (as history had it) threw on the
 // hoisted-undefined and killed every binding after it (found live 10/29)
-var PAGE = {token: null, name: null, data: null, dataAt: 0, live: false, cooldownClosed: false, needsConnect: false, pastN: 0, lastPast: null};
+var PAGE = {token: null, name: null, data: null, dataAt: 0, bootOk: false, live: false, cooldownClosed: false, needsConnect: false, pastN: 0, lastPast: null};
 renderAppts(DEMO_APPTS);
 renderPast(DEMO_PAST);
 
@@ -3191,6 +3191,7 @@ function applyFromData(d){
   PAGE.schedVerified = d.scheduling_surface || '';
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
+  PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trustworthy
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
@@ -3477,7 +3478,13 @@ function applyOb(s){
   // STEP 1: location connect (only shown when the credential is
   // company-scoped; hidden entirely for location-connected clients)
   var _connectDone = false, _connectPoll = null;
-  function _connectOk() { return _connectDone || !PAGE.needsConnect; }
+  // FAIL CLOSED (Matt 11/8, live-caught: lingering past the page
+  // token's life left needsConnect at its DEFAULT false after every
+  // poll 401'd - the wizard read that as 'already connected', skipped
+  // the step on refresh, and the dead-token steps locked the flow)
+  function _connectOk() {
+    return _connectDone || (PAGE.bootOk && !PAGE.needsConnect);
+  }
   function _updateConnectStep() {
     var st = $('obConnectStep');
     if (!st) return;
@@ -3511,7 +3518,7 @@ function applyOb(s){
     _connectPoll = setInterval(function(){
       if (_connectDone) { clearInterval(_connectPoll); _connectPoll = null; return; }
       loadPageData().then(function(){
-        if (!_connectDone && !PAGE.needsConnect) {
+        if (!_connectDone && PAGE.bootOk && !PAGE.needsConnect) {
           _connectDone = true; clearInterval(_connectPoll); _connectPoll = null;
           _updateConnectStep(); toast('Location connected.');
           if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); }
@@ -3522,7 +3529,7 @@ function applyOb(s){
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden && PAGE.needsConnect && !_connectDone
       && S === 'onboarding') { loadPageData().then(function(){
-          if (!PAGE.needsConnect) {
+          if (PAGE.bootOk && !PAGE.needsConnect) {
             _connectDone = true; _updateConnectStep();
             toast('Location connected.');
             if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); }
