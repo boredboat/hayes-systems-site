@@ -3192,6 +3192,21 @@ function applyFromData(d){
   PAGE.cooldownClosed = !!(d.cooldown && d.cooldown.open_now === false);
   PAGE.needsConnect = !!d.needs_location_connect;
   PAGE.bootOk = true;   // a real payload landed - only NOW is !needsConnect trustworthy
+  // STEP-LIST SYNC (Matt 11/8, the hard-refresh lock): the wizard can
+  // build its steps BEFORE this payload lands (needsConnect defaults
+  // false), which silently OMITTED the connect step - the client
+  // walked into calendar selection unconnected and locked. When the
+  // payload disagrees with what the list was built for, REBUILD, and
+  // if the connect step just became required, land on it.
+  (function(){
+    if (_obNeedConnBuilt === null || _obNeedConnBuilt === !!PAGE.needsConnect)
+      return;
+    var gate = document.getElementById('obGate');
+    if (!gate || gate.classList.contains('hide')) return;
+    if (typeof _obInit !== 'function') return;
+    _obInit();
+    if (PAGE.needsConnect && !_connectDone) _obGo(0);
+  })();
   PAGE.preparing = !!d.preparing;
   PAGE.launchFailed = !!d.launch_failed;
   PAGE.launchError = d.launch_error || '';
@@ -3395,12 +3410,17 @@ function applyOb(s){
     if (sf && sf.value === 'calendly') return true;
     return !!(_obCalCur || ((PAGE.data || {}).calendar || {}).name);
   };
+  var _obNeedConnBuilt = null;
   function _obInit() {
+    // idempotent: a rebuild strips the previous footer rows first
+    document.querySelectorAll('#obForm .ob-step .ob-walk')
+      .forEach(function(w){ w.remove(); });
     _obSteps = Array.prototype.slice.call(
       document.querySelectorAll('#obForm .ob-step')).filter(function(el){
         return el.id !== 'obConnectStep'
           || (PAGE.needsConnect && !_connectDone);
       });
+    _obNeedConnBuilt = !!PAGE.needsConnect;
     // W4-10: a fresh engagement (the client id switched mid-sitting)
     // rebuilds the walk - drop any previously built footer rows first
     _obSteps.forEach(function(el){
@@ -3443,6 +3463,9 @@ function applyOb(s){
     return 'ghlob:' + (new URLSearchParams(location.search)
                        .get('locationId') || 'x');
   }
+  // exposed for the applyFromData step-list sync (the sync lives outside
+  // this closure; without these it throws and breaks the render)
+  window._obInit = _obInit; window._obGo = _obGo;
   function _obGo(i) {
     if (i < 0 || i >= _obSteps.length) return;
     _obCur = i;
