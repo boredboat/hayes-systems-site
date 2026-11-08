@@ -216,7 +216,7 @@ td .when{color:var(--mut);font-size:13px}
 .set-lab{font-size:13.5px;font-weight:600;color:var(--tx)}
 .set-lab small{display:block;font-weight:500;font-size:11.5px;color:var(--mut);margin-top:1px;white-space:normal}
 .set-ctl{flex:0 0 215px;display:flex;justify-content:flex-end;gap:8px;align-items:center}
-.set-ctl .set-in,.set-ctl select{width:100%;padding:8px 10px;font-size:13px}
+.set-ctl .set-in,.set-ctl select{width:100%;padding:8px 10px;font-size:13px;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fff}
 .pc-rowc.crit{border-color:#fde68a;background:#fffbeb}
 .ck{width:22px;height:22px;border-radius:50%;background:#e8f9ee;color:#15803d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .pc-rowc .kv{flex:1;min-width:0}
@@ -886,7 +886,7 @@ body{padding:0}
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
     <div class="set-row">
-      <div class="set-lab">Booking calendar<small id="setSurfaceState"></small></div>
+      <div class="set-lab">Calendar app<small id="setSurfaceState"></small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
@@ -1964,7 +1964,8 @@ $('retainerStart').addEventListener('click', function(){
 var _calOptions = [], _calCurrent = '';
 function _loadCalPicker(){
   var sel = $('setCalendar');
-  var locked = (S === 'running' || S === 'paused');
+  var _stC = (PAGE.data && PAGE.data.client && PAGE.data.client.state) || S;
+  var locked = (_stC === 'running' || _stC === 'paused');
   // W4-15: the GHL pick sits DORMANT while appointments land on
   // Calendly - kept, never deleted, just not the active surface
   sel.disabled = locked || _storedSurface() === 'calendly';
@@ -2025,7 +2026,11 @@ function _surfStateLine(){
 function _loadSurfaceRow(){
   var sf = $('setSurface'); if (!sf) return;
   sf.value = _storedSurface();
-  sf.disabled = !PAGE.live || (S === 'running' || S === 'paused');
+  // LOCK READS THE SERVER STATE (Matt 11/8: fields greyed with no
+  // campaign - S initializes to the demo 'running' before the first
+  // live payload lands and an early Settings open read that default)
+  var _st = (PAGE.data && PAGE.data.client && PAGE.data.client.state) || S;
+  sf.disabled = !PAGE.live || (_st === 'running' || _st === 'paused');
   _surfStateLine();
 }
 function _saveSurface(v){
