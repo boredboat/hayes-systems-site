@@ -258,6 +258,13 @@ td .when{color:var(--mut);font-size:13px}
 .pc-ov-foot{border-top:1px solid var(--bd);background:#fafbfc;padding:10px 16px;font-size:12px;color:var(--mut);text-align:center}
 .pc-acts{margin-top:22px}
 
+.wel-kick{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+#obWelcome h2{font-size:25px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+.wel-lead{font-size:15px;color:#374151;margin-bottom:22px}
+.wel-lead b{color:var(--tx)}
+.wel-steps{display:flex;flex-direction:column;gap:8px}
+.wel-st{display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid var(--bd);border-radius:9px;padding:11px 16px;font-size:14px;font-weight:600;color:var(--tx)}
+.wel-st .ic{flex:none;width:30px;height:30px;border-radius:7px;background:#e8f2fe;color:#095dc3;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
 .qs-row{display:flex;gap:13px;padding:13px 0;border-top:1px solid #f3f4f6;text-align:left}
 .qs-row:first-of-type{border-top:none}
 .qs-ic{flex:0 0 34px;height:34px;border-radius:8px;background:#e8f2fe;color:#095dc3;display:flex;align-items:center;justify-content:center}
@@ -437,19 +444,21 @@ body{padding:0}
 <div id="bootSpinner" class="hide"><div class="spin"></div><p>Loading</p></div>
 <div id="obGate" class="hide">
   <div class="ob-card" id="obWelcome">
+    <div class="wel-kick">Lead reactivation</div>
     <h2>Welcome to Hayes Systems</h2>
-    <p>We reactivate the aged leads already sitting in your CRM with
-    personalized email outreach and an AI booking agent that puts
-    appointments straight on your calendar. You pay only for appointments
-    that land.</p>
-    <p style="margin-bottom:6px"><b>Setup takes about two minutes:</b></p>
-    <ul class="ob-setup">
-      <li><b>Connect</b> your location</li>
-      <li><b>Review</b> how the service works</li>
-      <li><b>Confirm</b> your business details</li>
-      <li><b>Agree</b> to the terms and set up payment details with Stripe</li>
-    </ul>
-    <button class="btn btn-primary" id="obStart" style="margin-top:6px">Get started</button>
+    <p class="wel-lead">We reactivate the aged leads already sitting in your
+    CRM with personalized email outreach and an AI booking agent that puts
+    appointments straight on your calendar. <b>You pay only for appointments
+    that land.</b></p>
+    <div class="wel-steps">
+      <div class="wel-st"><span class="ic">1</span>Connect your location</div>
+      <div class="wel-st"><span class="ic">2</span>Review how it works</div>
+      <div class="wel-st"><span class="ic">3</span>Confirm your details</div>
+      <div class="wel-st"><span class="ic">4</span>Agree + payment</div>
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn btn-primary" id="obStart">Get started</button>
+    </div>
   </div>
   <div class="ob-card hide" id="obForm">
     <div class="ob-progress" id="obProgress"></div>
