@@ -3427,7 +3427,8 @@ function applyFromData(d){
   // (state now 'none' because the card registered server-side) must
   // NOT apply - the guide flashed for a second and the main page
   // stomped it. Only the 'Go to your campaign' click transitions.
-  if (st === 'none' && !$('obDone').classList.contains('hide')) {
+  if (st === 'none' && !$('obDone').classList.contains('hide')
+      && !$('obGate').classList.contains('hide')) {
     if (window.__LIVE_BOOT) {
       window.__LIVE_BOOT = false;
       document.body.classList.remove('boot-loading');
@@ -4078,12 +4079,18 @@ function applyOb(s){
   // jump straight to the dashboard tabs
   $('obDash').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
+    // CLOSE THE DOOR BEHIND (Matt 11/8: 'goes to a blank page'): the
+    // done card itself must take the hide class or the poll's done-card
+    // hold keeps returning early on every later payload - the page
+    // froze in whatever state a stale poll left it
+    $('obDone').classList.add('hide');
     try { localStorage.setItem(_pcKey() + ':cancelled', '1'); } catch(e) {}
     PAGE.pcDismissed = true;
     if (PAGE.live) loadPageData();
   });
   $('obGo').addEventListener('click', function(){
     S = 'none'; apply('none'); applyOb('done');
+    $('obDone').classList.add('hide');   // same door-close as obDash
     // live mode: skip the demo none-state and boot from real data
     // instead - and clear the checklist dismissal so the pending
     // campaign card (the start surface) shows, not the bare main page
