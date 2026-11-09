@@ -3881,6 +3881,15 @@ function applyOb(s){
         b.className = 'btn btn-ghost'; b.textContent = 'Back';
         b.addEventListener('click', function(){ _obGo(i - 1); });
         row.appendChild(b);
+      } else {
+        // first step: Back returns to the welcome card
+        var b0 = document.createElement('button');
+        b0.className = 'btn btn-ghost'; b0.textContent = 'Back';
+        b0.addEventListener('click', function(){
+          $('obForm').classList.add('hide');
+          $('obWelcome').classList.remove('hide');
+        });
+        row.appendChild(b0);
       }
       var sp = document.createElement('div'); sp.className = 'spacer';
       row.appendChild(sp);
