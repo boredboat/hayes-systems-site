@@ -2978,7 +2978,30 @@ function audInit(){
   if (AUD_TAGS === null) {
     AUD_TAGS = [];
     api('/api/ghl/tags').then(function(j){
-      if (j && j.ok) { AUD_TAGS = j.tags || []; audRender(); }
+      if (j && j.ok) {
+        AUD_TAGS = j.tags || [];
+        audRender();
+        // FULL CHIP COUNTS (Matt 11/8): one background call fills every
+        // chip's count (server caches per location) - the chips paint
+        // with numbers and zero-contact tags disable themselves
+        if (AUD_TAGS.length && PAGE.token) {
+          api('/api/ghl/audience-preview',
+              {include_tags: [], count_tags: AUD_TAGS.slice(0, 60)})
+            .then(function(p){
+              if (p && p.ok && p.tag_counts) {
+                AUD_COUNTS = p.tag_counts;
+                if (!AUD_WHOLE && p.whole) AUD_WHOLE = p.whole;
+                if (!AUD_OPEN_OPP && p.open_opp) AUD_OPEN_OPP = p.open_opp;
+                ['audWizard', 'audReq', 'audPc'].forEach(function(id){
+                  audChips($(id + '_tags'));
+                  var w = $(id + '_warn');
+                  if (w) w.classList.toggle('show', !audValid());
+                });
+                audPaint(audValid() ? audCountNow() : null);
+              }
+            }).catch(function(){});
+        }
+      }
     }).catch(function(){});
   }
   audRender();
