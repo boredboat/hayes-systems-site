@@ -318,8 +318,7 @@ td .when{color:var(--mut);font-size:13px}
 .aud-mod .tt span{font-size:12.5px;color:#37617f}
 .aud-mod .rfbtn{display:inline-flex;align-items:center;gap:7px;background:var(--acc);border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;flex:none}
 .aud-mod .rfbtn:hover{background:#095dc3}
-.aud-mod .rfbtn.spin svg{animation:audspin .8s linear infinite}
-@keyframes audspin{to{transform:rotate(360deg)}}
+.aud-mod .rfbtn:disabled{background:#93c5fd;cursor:default}
 .aud-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;color:#4b5563;cursor:pointer;font-family:'Inter',sans-serif}
 .aud-chip:hover{border-color:#93c5fd}
 .aud-chip .cnt{font-size:11px;font-weight:500;color:#9ca3af}
@@ -2405,7 +2404,7 @@ function audRender(){
       '<div class="aud-mod">' +
       '<div class="ic"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M14.8 9a5.8 5.8 0 1 1-1.7-4.1" stroke="#095dc3" stroke-width="1.6" stroke-linecap="round"/><path d="M14.9 1.8v3.4h-3.4" stroke="#095dc3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
       '<div class="tt"><b>Need to modify your list?</b><span>Make the changes, return here and then click the refresh button to update the tags.</span></div>' +
-      '<button type="button" class="rfbtn" id="' + id + '_rf"><svg width="13" height="13" viewBox="0 0 18 18" fill="none"><path d="M14.8 9a5.8 5.8 0 1 1-1.7-4.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14.9 1.8v3.4h-3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh tags</button>' +
+      '<button type="button" class="rfbtn" id="' + id + '_rf">Refresh tags</button>' +
       '</div>' +
       '</div>';
     var o = $(id + '_open'), l = $(id + '_lost');
@@ -2414,8 +2413,8 @@ function audRender(){
     l.addEventListener('change', function(){ AUD.include_lost_opp = l.checked; audChanged(); });
     var rf = $(id + '_rf');
     if (rf) rf.addEventListener('click', function(){
-      rf.classList.add('spin');
-      audFill(true, function(){ rf.classList.remove('spin'); });
+      rf.disabled = true; rf.classList.add('spin');
+      audFill(true, function(){ rf.disabled = false; rf.classList.remove('spin'); });
     });
     audChips($(id + '_tags'));
     var w = $(id + '_warn');
