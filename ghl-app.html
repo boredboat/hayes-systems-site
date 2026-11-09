@@ -323,6 +323,7 @@ td .when{color:var(--mut);font-size:13px}
 .aud-chip.zero:hover{border-color:var(--bd)}
 .aud-chip.inc .cnt{color:#60a5fa}
 .aud-foot{margin-top:12px;font-size:13px;font-weight:500;color:#374151}
+.aud-foot2{margin-top:6px;font-size:12.5px;color:#4b5563}
 .aud-warn{display:none;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:600;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:9px 13px}
 .aud-warn.show{display:flex}
 .chip{border:1px solid #d1d5db;border-radius:999px;background:#fff;padding:5px 12px;font-size:12.5px;font-family:'Inter',sans-serif;color:var(--tx);cursor:pointer}
@@ -2398,6 +2399,7 @@ function audRender(){
       '</div>' +
       '<div class="aud-chips" id="' + id + '_tags"></div>' +
       '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Tags with no contacts are not allowed.</div>' +
+      '<div class="aud-foot2">Need to modify your list? Make the changes, return here and then click the refresh button to update the tags.</div>' +
       '<div class="aud-warn" id="' + id + '_warn"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.8" stroke="#b45309" stroke-width="1.5"/><path d="M9 5.4v4.2M9 12.2v.6" stroke="#b45309" stroke-width="1.6" stroke-linecap="round"/></svg>Select at least one tag to continue.</div>' +
       '</div>';
     var o = $(id + '_open'), l = $(id + '_lost');
