@@ -2406,8 +2406,9 @@ function audPaint(n){
         if (sw) sw.style.display = '';
         var pct = AUD_WHOLE ? Math.round(n / AUD_WHOLE * 100) : 0;
         var bar = $(id + '_bar'), pt = $(id + '_pct');
-        if (bar) bar.style.width = pct + '%';
-        if (pt) pt.textContent = pct + '% of your ' + fmtNum(AUD_WHOLE) + ' contacts';
+        if (bar) bar.style.width = Math.max(pct, n > 0 ? 2 : 0) + '%';
+        if (pt) pt.textContent = (n > 0 && pct === 0 ? 'under 1%' : pct + '%')
+          + ' of your ' + fmtNum(AUD_WHOLE) + ' contacts';
       } else if (ne.textContent === '\u2014') {
         ne.textContent = '...';
       }
