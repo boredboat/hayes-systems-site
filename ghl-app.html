@@ -2486,8 +2486,11 @@ function audPreview(){
         var w = $(id + '_warn');
         if (w) w.classList.toggle('show', !audValid());
       });
-      var base = AUD.include_tags.reduce(function(n, t){
-        return n + (AUD_COUNTS[t] || 0); }, 0);
+      // none selected = everyone (same rule as audCountNow)
+      var base = AUD.include_tags.length
+        ? AUD.include_tags.reduce(function(n, t){
+            return n + (AUD_COUNTS[t] || 0); }, 0)
+        : (j.whole || AUD_WHOLE);
       var skip = AUD.skip_open_opp ? (j.open_opp || 0) : 0;
       var n = Math.max(0, base - skip);
       PAGE.audCount = n;
