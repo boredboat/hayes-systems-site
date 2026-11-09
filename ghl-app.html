@@ -2454,7 +2454,11 @@ function audPreview(){
     if (!PAGE.token) return;
     api('/api/ghl/audience-preview', {include_tags: AUD.include_tags}).then(function(j){
       if (!j || !j.ok) return;
-      AUD_COUNTS = j.tag_counts || {};
+      // MERGE, never replace: this interaction call carries counts only
+      // for the selected tags; replacing would wipe the boot fill's
+      // whole-inventory counts (the two calls land in either order)
+      var _tc = j.tag_counts || {};
+      for (var _t in _tc) AUD_COUNTS[_t] = _tc[_t];
       AUD_WHOLE = j.whole || 0;
       AUD_OPEN_OPP = j.open_opp || 0;
       // chips pick up their counts now that the preview landed
