@@ -856,7 +856,7 @@ body{padding:0}
       </div>
       <div class="dialog-actions">
         <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
-        <button class="btn btn-primary" id="ordGo">Place campaign order</button>
+        <button class="btn btn-primary" id="ordGo">Place order</button>
       </div>
     </div>
   </div>
@@ -3021,7 +3021,7 @@ $('pcCancel').addEventListener('click', function(){
   _renderPending();   // card hides
 });
 // (Matt 11/9, checkout V1) the card's Start opens the order review;
-// the review's Place campaign order is the only fire path
+// the review's Place order is the only fire path
 $('pcStart').addEventListener('click', _openOrderReview);
 // ONBOARDING CALENDAR STEP (Matt 11/3: the pick lost its home when the
 // GHL-or-Calendly card retired - now it is a wizard step, saved on
