@@ -2522,6 +2522,23 @@ function _audSummary(){
   if (AUD.include_tags.length)
     bits.push('Tags: ' + AUD.include_tags.join(', '));
   return bits.join(' \u00b7 ');
+}
+// (_renderPending restored 11/9: the O3-v2 audience rebuild (9cd6e4f)
+// deleted this function's head and left its body orphaned as dead code
+// inside _audSummary - the page still parsed clean, but every
+// _renderPending() call site threw ReferenceError, so Start campaign
+// stood the page down via apply() and painted nothing: blank page)
+function _renderPending(){
+  var card = $('pendingCard'); if (!card) return;
+  var on = _pcEligible();
+  if (!on) {
+    card.classList.add('hide');
+    return;   // apply() owns section visibility in every path
+  }
+  card.classList.remove('hide');
+  var b = PAGE.data.billing || {};
+  var flow = $('pcFlow');
+  flow.innerHTML = '';
   // titles only (Matt 11/3: the second detail lines were pointless -
   // the audience count lives in the big number) and every step is
   // EDITABLE so mistakes get fixed before starting
