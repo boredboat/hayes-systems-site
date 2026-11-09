@@ -286,7 +286,9 @@ td .when{color:var(--mut);font-size:13px}
 .qs-row p{font-size:13.5px;color:#374151;margin:2px 0 0}
 /* audience picker (11/3) */
 .aud-lab{font-size:12px;font-weight:600;color:var(--tx);margin:0 0 6px}
-.aud-chips{display:flex;flex-wrap:wrap;gap:6px}
+.aud-chips{display:flex;flex-wrap:wrap;gap:6px;max-height:180px;overflow-y:auto;padding:2px 2px 4px;scrollbar-width:thin}
+.aud-chips::-webkit-scrollbar{width:6px}
+.aud-chips::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
 /* AUDIENCE O3-v2 (Matt 11/8, mock-approved): toggles + count card top,
    include-only tags across the bottom; zero tags selected is invalid */
 .aud-top{display:grid;grid-template-columns:1fr 216px;gap:20px;margin-bottom:18px}
