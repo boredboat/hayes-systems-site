@@ -264,6 +264,23 @@ td .when{color:var(--mut);font-size:13px}
 .ordr-row:last-child{border-bottom:none}
 .ordr-row .k{color:var(--mut);font-weight:600;flex-shrink:0}
 .ordr-row .v2{font-weight:700;text-align:right}
+/* CHECKOUT SHEET (Matt 11/9, C1 from the look round): brand header
+   with a hairline, the campaign as a priced line item, payment
+   method + start date, due-today zero */
+.ord-dlg{padding:0;max-width:440px}
+.ord-head{display:flex;align-items:center;gap:10px;padding:16px 22px 13px;border-bottom:1px solid var(--bd)}
+.ord-head .bn{font-size:13px;font-weight:700}
+.ord-head .st{margin-left:auto;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.ord-body{padding:4px 22px 20px}
+.ordmark{width:28px;height:28px;flex-shrink:0;display:block}
+.ordli{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #f3f4f6;font-size:14px}
+.ordli .nm{font-weight:700}
+.ordli .sub{font-size:12px;color:var(--mut);font-weight:500;margin-top:2px}
+.ordli .amt{font-weight:700;text-align:right;white-space:nowrap}
+.ordtot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:14px 0 2px;border-top:1px solid var(--bd);margin-top:2px}
+.ordtot .t{font-size:15px;font-weight:800}
+.ordtot .z{font-size:20px;font-weight:800}
+.ordfoot{font-size:12px;color:var(--mut);margin-top:6px}
 /* the review dialog has no <p> before its actions, so the shared
    .dialog-actions (no margin of its own) sat 2px under the line-item
    box (Matt 11/9: "touching the box") */
@@ -803,22 +820,36 @@ body{padding:0}
   </div>
 </div>
 
-<!-- ORDER REVIEW (Matt 11/9 rework: "our checklist is already like a
-     checkout review so its kinda redundant"). The card IS the review;
-     this dialog is only the PAY step - the card being charged, how
-     billing runs, when outreach starts. No audience, no counts, no
-     price-echo rows: everything else lives on the checklist.) -->
+<!-- CHECKOUT SHEET (Matt 11/9, C1 from the look round: "needs to look
+     like a checkout with maybe a company logo. have the campaign as a
+     line item"). The brand header carries the mark and a hairline; the
+     campaign is the priced line item (no lead count subtext, his cut);
+     Payment method (renamed from Card, his pick) and the Start date
+     (reworded from First emails); Due today $0.00 is engine-true -
+     nothing charges at start, weekly invoices bill as appointments
+     land.) -->
 <div class="overlay" id="pcOrderOverlay">
-  <div class="dialog">
-    <h3>Checkout</h3>
-    <div class="ordr">
-      <div class="ordr-row"><span class="k">Card</span><span class="v2" id="ordPay"></span></div>
-      <div class="ordr-row"><span class="k">Billing</span><span class="v2">$60 per booked appointment, invoiced weekly</span></div>
-      <div class="ordr-row"><span class="k">First emails</span><span class="v2">The next weekday send window, 8am to 8pm your time</span></div>
+  <div class="dialog ord-dlg">
+    <div class="ord-head">
+      <svg class="ordmark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#111827"/><rect x="17" y="13" width="9" height="38" rx="2" fill="#ffffff"/><rect x="38" y="13" width="9" height="38" rx="2" fill="#ffffff"/><rect x="17" y="28" width="30" height="8" rx="2" fill="#188bf6"/></svg>
+      <span class="bn">Hayes Systems</span>
+      <span class="st">Checkout</span>
     </div>
-    <div class="dialog-actions">
-      <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
-      <button class="btn btn-primary" id="ordGo">Place campaign order</button>
+    <div class="ord-body">
+      <div class="ordli">
+        <div><div class="nm">Campaign 1</div><div class="sub">Lead reactivation</div></div>
+        <div class="amt">$60 / appt</div>
+      </div>
+      <div class="ordr" style="border:none;margin:0">
+        <div class="ordr-row"><span class="k">Payment method</span><span class="v2" id="ordPay"></span></div>
+        <div class="ordr-row"><span class="k">Start date</span><span class="v2" id="ordStart"></span></div>
+      </div>
+      <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
+      <div class="ordfoot">Invoiced weekly as appointments land. No-shows refunded on your report.</div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
+        <button class="btn btn-primary" id="ordGo">Place campaign order</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1841,14 +1872,37 @@ function _pcEstimate(){
 // live campaign, its too easy"). Checkout opens this; only Place
 // campaign order fires. The calendar gate still runs at fire time,
 // unchanged.
+// START DATE (Matt 11/9: "first emails should be reworded into the
+// start date"): the next weekday in the LOCATION's timezone (the
+// engine's send window is 8am-8pm weekdays there). A weekday before
+// 8pm starts today; weekends and late evenings roll to the next
+// weekday. Mirrors the planner's own window rule client-side.
+function _pcStartDate(){
+  var tz = (typeof LOC_TZ !== 'undefined' && LOC_TZ) || 'America/Chicago';
+  try {
+    var day = new Intl.DateTimeFormat('en-US',
+      {timeZone: tz, weekday: 'short', month: 'short', day: 'numeric'});
+    var wd = new Intl.DateTimeFormat('en-US',
+      {timeZone: tz, weekday: 'short'});
+    var hr = new Intl.DateTimeFormat('en-US',
+      {timeZone: tz, hour: 'numeric', hour12: false});
+    var d = new Date();
+    for (var i = 0; i < 8; i++) {
+      var w = wd.format(d);
+      if (w !== 'Sat' && w !== 'Sun'
+          && (i > 0 || parseInt(hr.format(d), 10) < 20)) {
+        return day.format(d);
+      }
+      d = new Date(d.getTime() + 86400000);
+    }
+  } catch (e) {}
+  return 'The next weekday';
+}
 function _openOrderReview(){
   var b = (PAGE.data && PAGE.data.billing) || {};
-  // the PAY step only: the card being charged (brand, last4, expiry
-  // from Stripe via page-data's card_summary cache). Billing cadence
-  // and start timing are static facts; everything else is the
-  // checklist's job.
   $('ordPay').textContent = b.card_summary
     || (b.card_invalid ? 'Card needs attention' : 'Saved during setup');
+  $('ordStart').textContent = _pcStartDate();
   open_('pcOrderOverlay');
 }
 $('ordGo').addEventListener('click', function(){
