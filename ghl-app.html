@@ -264,34 +264,34 @@ td .when{color:var(--mut);font-size:13px}
 .ordr-row:last-child{border-bottom:none}
 .ordr-row .k{color:var(--mut);font-weight:600;flex-shrink:0}
 .ordr-row .v2{font-weight:700;text-align:right}
-/* CHECKOUT SHEET (Matt 11/9, C1 from the look round): brand header
-   with a hairline, the campaign as a priced line item, payment
-   method + start date, due-today zero */
-.ord-dlg{padding:0;max-width:440px}
-.ord-head{display:flex;align-items:center;gap:10px;padding:16px 22px 13px;border-bottom:1px solid var(--bd)}
-.ord-head .bn{font-size:13px;font-weight:700}
-.ord-head .st{margin-left:auto;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
-.ord-body{padding:4px 22px 20px}
-.ordli{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #f3f4f6;font-size:14px}
-.ordli .nm{font-weight:700}
-.ordli .sub{font-size:12px;color:var(--mut);font-weight:500;margin-top:2px}
-.ordli .amt{font-weight:700;text-align:right;white-space:nowrap}
-.ordtot .t{font-size:15px;font-weight:800}
-.ordtot .z{font-size:20px;font-weight:800}
-/* FACTS SECTION (Matt 11/9: payment and start date live in their own
-   section, and his final order: campaign FIRST, then payment and
-   start date, then Due today LAST - the total closes the sheet like a
-   receipt) */
-.ordfacts{padding-top:2px}
-.ordfact{display:flex;justify-content:space-between;gap:14px;padding:11px 0;font-size:13.5px;border-bottom:1px solid #f3f4f6}
+/* CHECKOUT SHEET (Matt 11/9 visual pass: "keep the copy the same but
+   clean it up and make it look nice") - even rhythm, tabular amounts,
+   checklist-style uppercase fact labels, the zero in the app's
+   number-green; order fixed by his 11/9 pass: campaign FIRST, then
+   payment and start date, then Due today LAST, the total closes the
+   sheet like a receipt */
+.ord-dlg{padding:0;max-width:440px;box-shadow:0 24px 70px rgba(17,24,39,.38)}
+.ord-head{display:flex;align-items:center;gap:11px;padding:18px 24px 15px;border-bottom:1px solid var(--bd)}
+.ord-head .bn{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.ord-head .st{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.12em}
+.ord-body{padding:16px 24px 22px}
+.ordli{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:2px 0 14px;border-bottom:1px solid #f3f4f6}
+.ordli .nm{font-size:15px;font-weight:700}
+.ordli .sub{font-size:12.5px;color:var(--mut);font-weight:500;margin-top:3px}
+.ordli .amt{font-size:15px;font-weight:800;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ordfacts{padding-top:4px}
+.ordfact{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;font-size:13px;border-bottom:1px solid #f3f4f6}
 .ordfact:last-child{border-bottom:none}
-.ordfact .k{color:var(--mut);font-weight:600;flex-shrink:0}
+.ordfact .k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);flex-shrink:0}
 .ordfact .v{font-weight:600;text-align:right}
-.ordtot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:12px 0 4px;border-top:1px solid var(--bd)}
-/* the review dialog has no <p> before its actions, so the shared
-   .dialog-actions (no margin of its own) sat 2px under the line-item
-   box (Matt 11/9: "touching the box") */
-#pcOrderOverlay .dialog-actions{margin-top:18px}
+.ordtot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:14px 0 2px;border-top:1px solid var(--bd)}
+.ordtot .t{font-size:14.5px;font-weight:700}
+.ordtot .z{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--grnd);font-variant-numeric:tabular-nums}
+#pcOrderOverlay .dialog-actions{margin-top:14px}
+#pcOrderOverlay .btn-primary{padding:12px 22px;font-size:14px}
+/* one CTA per checkout: the ghost Back goes quiet gray so Place order
+   owns the sheet (visual-pass review 11/9) */
+#pcOrderOverlay .btn-ghost{color:var(--mut)}
 
 /* WELCOME (variant F, Matt 11/8): centered mark, welcome line names
    the SERVICE not the company, timeline rail, centered button */
