@@ -1831,9 +1831,7 @@ $('reqBtn').addEventListener('click', function(){
 
 $('confirmReq').addEventListener('click', function(){
   if (!audValid()) {
-    toast(AUD.include_tags.length
-      ? 'This selection reaches no contacts.'
-      : 'Select at least one tag to continue.');
+    toast('This selection reaches no contacts.');
     open_('reqOverlay');
     return;
   }
@@ -2376,12 +2374,17 @@ function audChips(el){
 // net contacts for the CURRENT selection, computed synchronously from
 // the last preview's numbers (same math audPreview reports)
 function audCountNow(){
-  var base = AUD.include_tags.reduce(function(n, t){
-    return n + (AUD_COUNTS[t] || 0); }, 0);
+  // NO TAGS SELECTED = EVERYONE (Matt 11/8 revision: the min-one-tag
+  // rule made untagged contacts unreachable - with none picked the
+  // audience is the whole list minus the opportunity skips)
+  var base = AUD.include_tags.length
+    ? AUD.include_tags.reduce(function(n, t){
+        return n + (AUD_COUNTS[t] || 0); }, 0)
+    : AUD_WHOLE;
   var skip = AUD.skip_open_opp ? AUD_OPEN_OPP : 0;
   return Math.max(0, base - skip);
 }
-function audValid(){ return AUD.include_tags.length > 0 && audCountNow() > 0; }
+function audValid(){ return audCountNow() > 0; }
 function audRender(){
   ['audWizard', 'audReq', 'audPc'].forEach(function(id){
     var box = $(id); if (!box) return;
@@ -2399,7 +2402,7 @@ function audRender(){
       '</div>' +
       '<div class="aud-tagsec">' +
       '<div class="aud-taghead"><span class="t">Tags to include</span></div>' +
-      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Tags with no contacts are not allowed.</div>' +
+      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Tags with no contacts are not allowed. Leave all tags unselected to contact everyone.</div>' +
       '<div class="aud-chips" id="' + id + '_tags"></div>' +
       '<div class="aud-warn" id="' + id + '_warn"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.8" stroke="#b45309" stroke-width="1.5"/><path d="M9 5.4v4.2M9 12.2v.6" stroke="#b45309" stroke-width="1.6" stroke-linecap="round"/></svg>Select at least one tag to continue.</div>' +
       '<div class="aud-mod">' +
@@ -2430,16 +2433,14 @@ function audPaint(n){
     var ne = $(id + '_n'), sw = $(id + '_share'), w = $(id + '_warn');
     if (!ne) return;
     if (!audValid()) {
-      ne.textContent = AUD.include_tags.length ? '0' : '\u2014';
+      ne.textContent = '0';
       if (sw) sw.style.display = 'none';
       if (w) {
         w.classList.add('show');
         var last = w.lastChild;   // the text node after the svg
         while (last && last.nodeType === 3 && !last.textContent.trim()) last = last.previousSibling;
         if (last && last.nodeType === 3)
-          last.textContent = AUD.include_tags.length
-            ? ' This selection reaches no contacts.'
-            : ' Select at least one tag to continue.';
+          last.textContent = ' This selection reaches no contacts.';
       }
     } else {
       if (w) w.classList.remove('show');
@@ -2489,8 +2490,8 @@ function audPreview(){
         return n + (AUD_COUNTS[t] || 0); }, 0);
       var skip = AUD.skip_open_opp ? (j.open_opp || 0) : 0;
       var n = Math.max(0, base - skip);
-      PAGE.audCount = audValid() ? n : 0;
-      audPaint(audValid() ? n : null);
+      PAGE.audCount = n;
+      audPaint(n);
       _renderPending();
     }).catch(function(){});
   }, 250);
@@ -3861,9 +3862,7 @@ function applyOb(s){
             return;
           }
           if (el.id === 'obAudienceStep' && !audValid()) {
-            toast(AUD.include_tags.length
-              ? 'This selection reaches no contacts.'
-              : 'Select at least one tag to continue.');
+            toast('This selection reaches no contacts.');
             return;
           }
           _obGo(i + 1);
