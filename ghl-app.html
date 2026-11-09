@@ -2917,6 +2917,29 @@ function _loadObCals(){
     _obCalCur = j.current || '';
     sel.innerHTML = '';
     if (!_obCals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
+    // HONEST DISPLAY (Matt 11/8, live-caught: 'it shows the calendar I
+    // want but it says i must select one'): with no SAVED pick the
+    // browser auto-displays the first option - the box showed a
+    // calendar the gate refused. One RR calendar auto-saves (the shown
+    // pick becomes real); several get an explicit placeholder so the
+    // box never pretends a choice was made.
+    var _savedInList = _obCals.some(function(c){ return c.id === _obCalCur; });
+    if (!_savedInList && _obCals.length === 1) {
+      var only = _obCals[0];
+      var oo = document.createElement('option');
+      oo.value = only.id; oo.textContent = only.name;
+      sel.appendChild(oo);
+      api('/api/ghl/settings', {calendarId: only.id, calendarName: only.name})
+        .then(function(jj){ if (jj && jj.ok) _obCalCur = only.id; })
+        .catch(function(){});
+      return;
+    }
+    if (!_savedInList) {
+      var ph = document.createElement('option');
+      ph.value = ''; ph.textContent = 'Select a calendar';
+      ph.disabled = true; ph.selected = true;
+      sel.appendChild(ph);
+    }
     _obCals.forEach(function(c){
       var o = document.createElement('option');
       o.value = c.id; o.textContent = c.name;
@@ -2944,7 +2967,9 @@ function _loadObCals(){
   }
   var sel = $('obCal'), relink = $('obCalRelink');
   if (sel) sel.addEventListener('change', function(){
-    var c = _obCals[sel.selectedIndex];
+    var c = null;
+    for (var k = 0; k < _obCals.length; k++)
+      if (_obCals[k].id === sel.value) { c = _obCals[k]; break; }
     if (!c || !c.id) {
       // a pick that cannot save is never silent (Matt 11/7: the ask
       // "happened twice" because a failed list made the first one a
