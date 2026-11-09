@@ -798,22 +798,21 @@ body{padding:0}
   <div class="pc-acts">
     <div style="display:flex;gap:10px;align-items:center;justify-content:center">
       <button class="btn btn-ghost" id="pcCancel">Cancel</button>
-      <button class="btn btn-primary" id="pcStart">Start new campaign</button>
+      <button class="btn btn-primary" id="pcStart">Checkout</button>
     </div>
   </div>
 </div>
 
-<!-- ORDER REVIEW (Matt 11/9, checkout V1: two clicks fired a live
-     campaign - Start new campaign now opens this review, and only
-     Place campaign order fires. Values only, no subtext lines.) -->
+<!-- ORDER REVIEW (Matt 11/9: the checklist button is Checkout. The
+     popup carries ONLY what the checklist does not already say - the
+     email promise and the payment details (Matt: "the popup reiterates
+     things we already say in the checklist"); audience, length, and
+     price live on the card's own strip.) -->
 <div class="overlay" id="pcOrderOverlay">
   <div class="dialog">
     <h3>Review your order</h3>
     <div class="ordr">
-      <div class="ordr-row"><span class="k">Audience</span><span class="v2" id="ordAud"></span></div>
       <div class="ordr-row"><span class="k">Emails</span><span class="v2" id="ordEml"></span></div>
-      <div class="ordr-row"><span class="k">Est. length</span><span class="v2" id="ordLen"></span></div>
-      <div class="ordr-row"><span class="k">Price</span><span class="v2">$60 per booked appointment</span></div>
       <div class="ordr-row"><span class="k">Payment</span><span class="v2" id="ordPay"></span></div>
     </div>
     <div class="dialog-actions">
@@ -1138,7 +1137,7 @@ body{padding:0}
 
 <div class="overlay" id="reqOverlay">
   <div class="dialog">
-    <h3>Checkout</h3>
+    <h3>Start your campaign</h3>
     <p>Your campaign is set up and ready. Starting begins the paid
     service per the terms you agreed to: we read your list now (a minute
     or two), then your audience receives their emails and interested
@@ -1844,9 +1843,10 @@ function _pcEstimate(){
 function _openOrderReview(){
   var est = _pcEstimate();
   var b = (PAGE.data && PAGE.data.billing) || {};
-  $('ordAud').textContent = fmtNum(est.leads) + ' leads';
+  // ONLY what the checklist does not already say: the email promise
+  // and the card's real details (brand, last4, expiry from Stripe via
+  // page-data's card_summary cache)
   $('ordEml').textContent = 'Up to ' + est.touches + ' per lead';
-  $('ordLen').textContent = 'About ' + est.weeks + ' weeks';
   $('ordPay').textContent = b.card_summary
     || (b.card_invalid ? 'Card needs attention' : 'Saved during setup');
   open_('pcOrderOverlay');
@@ -2915,7 +2915,7 @@ document.addEventListener('click', function(ev){
 function _fileCampaignRequest(){
   var btn = $('pcStart') || $('confirmReq');
   function _resetReq(){ 
-    if (btn) { btn.disabled = false; btn.textContent = 'Start new campaign'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Checkout'; }
   }
   if (PAGE.live) {
     if (btn) {
