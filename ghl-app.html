@@ -264,6 +264,10 @@ td .when{color:var(--mut);font-size:13px}
 .ordr-row:last-child{border-bottom:none}
 .ordr-row .k{color:var(--mut);font-weight:600;flex-shrink:0}
 .ordr-row .v2{font-weight:700;text-align:right}
+/* the review dialog has no <p> before its actions, so the shared
+   .dialog-actions (no margin of its own) sat 2px under the line-item
+   box (Matt 11/9: "touching the box") */
+#pcOrderOverlay .dialog-actions{margin-top:18px}
 
 /* WELCOME (variant F, Matt 11/8): centered mark, welcome line names
    the SERVICE not the company, timeline rail, centered button */
