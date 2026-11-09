@@ -1134,6 +1134,17 @@ body{padding:0}
   </div>
 </div>
 
+<div class="overlay" id="audEveryoneOverlay">
+  <div class="dialog">
+    <h3>Send to your entire list?</h3>
+    <p style="font-size:13px;color:var(--mut)">No tags are selected, so this will send campaign emails to your entire contact list. Are you sure?</p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" data-close="audEveryoneOverlay">No, let me pick tags</button>
+      <button class="btn btn-danger" id="audEveryoneYes">Yes, contact everyone</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="mailOverlay">
   <div class="dialog">
     <h3>A sample email your leads receive</h3>
@@ -1829,12 +1840,28 @@ $('reqBtn').addEventListener('click', function(){
   _runCfgCheck(_openReqDialog);
 });
 
+// EVERYONE-CONFIRM GATE (Matt 11/8: 'people dont read and they see a
+// big number... that will hit everyone which they probably dont want'):
+// advancing or starting with ZERO tags selected demands an explicit
+// yes; picking tags never asks
+var _audEveryoneOk = null;
+function _audEveryoneGate(onOk){
+  if (AUD.include_tags.length || !audValid()) { onOk(); return; }
+  _audEveryoneOk = onOk;
+  open_('audEveryoneOverlay');
+}
+$('audEveryoneYes').addEventListener('click', function(){
+  close_('audEveryoneOverlay');
+  var f = _audEveryoneOk; _audEveryoneOk = null;
+  if (f) f();
+});
 $('confirmReq').addEventListener('click', function(){
   if (!audValid()) {
     toast('This selection reaches no contacts.');
     open_('reqOverlay');
     return;
   }
+  _audEveryoneGate(function(){
   close_('reqOverlay');
   var btn = $('reqBtn');
   function _resetReq(){ btn.disabled = false; btn.textContent = 'Start a new campaign'; }
@@ -1861,6 +1888,7 @@ $('confirmReq').addEventListener('click', function(){
     return;
   }
   toast('Request received. We will follow up by email.');
+  });
 });
 // PREPARING STATE: persistent card + progress bar + live poller
 // (Matt 10/31: a loading bar showing what's happening and % remaining)
@@ -2395,14 +2423,14 @@ function audRender(){
       '<label class="aud-tg"><input type="checkbox" id="' + id + '_lost"><span class="tt"><b>Include lost opportunities</b><span>often worth another touch</span></span><span class="sw"></span></label>' +
       '</div>' +
       '<div class="aud-count">' +
-      '<div><div class="n" id="' + id + '_n">\u2014</div><div class="l">contacts in this audience</div></div>' +
+      '<div><div class="n" id="' + id + '_n">\u2014</div><div class="l">contacts included in this campaign</div></div>' +
       '<div class="sharewrap" id="' + id + '_share" style="display:none"><div class="share"><i id="' + id + '_bar"></i></div><div class="pct" id="' + id + '_pct"></div></div>' +
       '<div class="disc">Approximate. Your final count is provided once your list is processed.</div>' +
       '</div>' +
       '</div>' +
       '<div class="aud-tagsec">' +
       '<div class="aud-taghead"><span class="t">Tags to include</span></div>' +
-      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Tags with no contacts are not allowed. Leave all tags unselected to contact everyone.</div>' +
+      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Leave all tags unselected to contact everyone.</div>' +
       '<div class="aud-chips" id="' + id + '_tags"></div>' +
       '<div class="aud-warn" id="' + id + '_warn"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.8" stroke="#b45309" stroke-width="1.5"/><path d="M9 5.4v4.2M9 12.2v.6" stroke="#b45309" stroke-width="1.6" stroke-linecap="round"/></svg>Select at least one tag to continue.</div>' +
       '<div class="aud-mod">' +
@@ -3866,6 +3894,10 @@ function applyOb(s){
           }
           if (el.id === 'obAudienceStep' && !audValid()) {
             toast('This selection reaches no contacts.');
+            return;
+          }
+          if (el.id === 'obAudienceStep') {
+            _audEveryoneGate(function(){ _obGo(i + 1); });
             return;
           }
           _obGo(i + 1);
