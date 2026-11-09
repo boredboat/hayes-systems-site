@@ -311,6 +311,10 @@ td .when{color:var(--mut);font-size:13px}
 .aud-tagsec{border-top:1px solid #eef1f4;padding-top:14px}
 .aud-taghead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .aud-taghead .t{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b7280}
+.aud-rf{margin-left:auto;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600;color:#4b5563;cursor:pointer;font-family:'Inter',sans-serif}
+.aud-rf:hover{border-color:var(--acc);color:var(--acc)}
+.aud-rf.spin svg{animation:audspin .8s linear infinite}
+@keyframes audspin{to{transform:rotate(360deg)}}
 .aud-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;color:#4b5563;cursor:pointer;font-family:'Inter',sans-serif}
 .aud-chip:hover{border-color:#93c5fd}
 .aud-chip .cnt{font-size:11px;font-weight:500;color:#9ca3af}
@@ -2389,15 +2393,22 @@ function audRender(){
       '</div>' +
       '</div>' +
       '<div class="aud-tagsec">' +
-      '<div class="aud-taghead"><span class="t">Tags to include</span></div>' +
+      '<div class="aud-taghead"><span class="t">Tags to include</span>' +
+      '<button type="button" class="aud-rf" id="' + id + '_rf" title="Refresh counts"><svg width="13" height="13" viewBox="0 0 18 18" fill="none"><path d="M14.8 9a5.8 5.8 0 1 1-1.7-4.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14.9 1.8v3.4h-3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+      '</div>' +
       '<div class="aud-chips" id="' + id + '_tags"></div>' +
-      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Unselected tags are left out.</div>' +
+      '<div class="aud-foot">Tap the tags whose contacts you want in the campaign. Tags with no contacts are not allowed.</div>' +
       '<div class="aud-warn" id="' + id + '_warn"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.8" stroke="#b45309" stroke-width="1.5"/><path d="M9 5.4v4.2M9 12.2v.6" stroke="#b45309" stroke-width="1.6" stroke-linecap="round"/></svg>Select at least one tag to continue.</div>' +
       '</div>';
     var o = $(id + '_open'), l = $(id + '_lost');
     o.checked = AUD.skip_open_opp; l.checked = AUD.include_lost_opp;
     o.addEventListener('change', function(){ AUD.skip_open_opp = o.checked; audChanged(); });
     l.addEventListener('change', function(){ AUD.include_lost_opp = l.checked; audChanged(); });
+    var rf = $(id + '_rf');
+    if (rf) rf.addEventListener('click', function(){
+      rf.classList.add('spin');
+      audFill(true, function(){ rf.classList.remove('spin'); });
+    });
     audChips($(id + '_tags'));
     var w = $(id + '_warn');
     if (w) w.classList.toggle('show', !audValid());
@@ -2985,31 +2996,46 @@ function audInit(){
       if (j && j.ok) {
         AUD_TAGS = j.tags || [];
         audRender();
-        // FULL CHIP COUNTS (Matt 11/8): one background call fills every
-        // chip's count (server caches per location) - the chips paint
-        // with numbers and zero-contact tags disable themselves
-        if (AUD_TAGS.length && PAGE.token) {
-          api('/api/ghl/audience-preview',
-              {include_tags: [], count_tags: AUD_TAGS.slice(0, 60)})
-            .then(function(p){
-              if (p && p.ok && p.tag_counts) {
-                AUD_COUNTS = p.tag_counts;
-                if (!AUD_WHOLE && p.whole) AUD_WHOLE = p.whole;
-                if (!AUD_OPEN_OPP && p.open_opp) AUD_OPEN_OPP = p.open_opp;
-                ['audWizard', 'audReq', 'audPc'].forEach(function(id){
-                  audChips($(id + '_tags'));
-                  var w = $(id + '_warn');
-                  if (w) w.classList.toggle('show', !audValid());
-                });
-                audPaint(audValid() ? audCountNow() : null);
-              }
-            }).catch(function(){});
-        }
+        if (AUD_TAGS.length && PAGE.token) audFill(false);
       }
     }).catch(function(){});
   }
   audRender();
 }
+// FULL CHIP COUNTS (Matt 11/8): one call fills every chip's count;
+// the server caches per location, so fresh=true (the refresh button,
+// or returning to the app after a CRM change - Matt 11/8 live-caught)
+// is what bypasses the cache and re-reads the CRM
+var AUD_FILL_AT = 0;
+function audFill(fresh, done){
+  if (!PAGE.token || !(AUD_TAGS || []).length) { if (done) done(); return; }
+  AUD_FILL_AT = Date.now();
+  api('/api/ghl/audience-preview',
+      {include_tags: [], count_tags: AUD_TAGS.slice(0, 60), fresh: !!fresh})
+    .then(function(p){
+      if (p && p.ok && p.tag_counts) {
+        // a fill replaces wholesale; the interaction preview merges
+        AUD_COUNTS = p.tag_counts;
+        if (p.whole) AUD_WHOLE = p.whole;
+        if (p.open_opp !== undefined) AUD_OPEN_OPP = p.open_opp;
+        ['audWizard', 'audReq', 'audPc'].forEach(function(id){
+          audChips($(id + '_tags'));
+          var w = $(id + '_warn');
+          if (w) w.classList.toggle('show', !audValid());
+        });
+        audPaint(audValid() ? audCountNow() : null);
+      }
+      if (done) done();
+    }).catch(function(){ if (done) done(); });
+}
+// RETURN-TO-APP AUTO-REFRESH: coming back from GHL (tab or frame
+// visibility) re-reads the CRM at most once a minute - CRM edits show
+// up on return without a manual click (Matt 11/8)
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden || !PAGE.token) return;
+  if (Date.now() - AUD_FILL_AT < 60000) return;
+  audFill(true);
+});
 $('settingsSave').addEventListener('click', function(){
   var em = $('setEmail').value.trim();
   if (em && em.indexOf('@') < 1) { toast('Enter a valid email address.'); return; }
