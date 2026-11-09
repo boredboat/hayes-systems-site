@@ -803,17 +803,18 @@ body{padding:0}
   </div>
 </div>
 
-<!-- ORDER REVIEW (Matt 11/9: the checklist button is Checkout. The
-     popup carries ONLY what the checklist does not already say - the
-     email promise and the payment details (Matt: "the popup reiterates
-     things we already say in the checklist"); audience, length, and
-     price live on the card's own strip.) -->
+<!-- ORDER REVIEW (Matt 11/9 rework: "our checklist is already like a
+     checkout review so its kinda redundant"). The card IS the review;
+     this dialog is only the PAY step - the card being charged, how
+     billing runs, when outreach starts. No audience, no counts, no
+     price-echo rows: everything else lives on the checklist.) -->
 <div class="overlay" id="pcOrderOverlay">
   <div class="dialog">
-    <h3>Review your order</h3>
+    <h3>Checkout</h3>
     <div class="ordr">
-      <div class="ordr-row"><span class="k">Emails</span><span class="v2" id="ordEml"></span></div>
-      <div class="ordr-row"><span class="k">Payment</span><span class="v2" id="ordPay"></span></div>
+      <div class="ordr-row"><span class="k">Card</span><span class="v2" id="ordPay"></span></div>
+      <div class="ordr-row"><span class="k">Billing</span><span class="v2">$60 per booked appointment, invoiced weekly</span></div>
+      <div class="ordr-row"><span class="k">First emails</span><span class="v2">The next weekday send window, 8am to 8pm your time</span></div>
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
@@ -1837,16 +1838,15 @@ function _pcEstimate(){
   return {leads: _aud_n, touches: _tch, weeks: _est_wks};
 }
 // ORDER REVIEW (Matt 11/9, checkout V1: "two clicks and you fire a
-// live campaign, its too easy"). Start new campaign opens this; only
-// Place campaign order fires. Values only - he cut the subtext lines
-// as clutter. The calendar gate still runs at fire time, unchanged.
+// live campaign, its too easy"). Checkout opens this; only Place
+// campaign order fires. The calendar gate still runs at fire time,
+// unchanged.
 function _openOrderReview(){
-  var est = _pcEstimate();
   var b = (PAGE.data && PAGE.data.billing) || {};
-  // ONLY what the checklist does not already say: the email promise
-  // and the card's real details (brand, last4, expiry from Stripe via
-  // page-data's card_summary cache)
-  $('ordEml').textContent = 'Up to ' + est.touches + ' per lead';
+  // the PAY step only: the card being charged (brand, last4, expiry
+  // from Stripe via page-data's card_summary cache). Billing cadence
+  // and start timing are static facts; everything else is the
+  // checklist's job.
   $('ordPay').textContent = b.card_summary
     || (b.card_invalid ? 'Card needs attention' : 'Saved during setup');
   open_('pcOrderOverlay');
