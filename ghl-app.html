@@ -276,19 +276,18 @@ td .when{color:var(--mut);font-size:13px}
 .ordli .nm{font-weight:700}
 .ordli .sub{font-size:12px;color:var(--mut);font-weight:500;margin-top:2px}
 .ordli .amt{font-weight:700;text-align:right;white-space:nowrap}
-.ordtot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:12px 0 4px}
 .ordtot .t{font-size:15px;font-weight:800}
 .ordtot .z{font-size:20px;font-weight:800}
-/* FACTS SECTION (Matt 11/9: payment and start date "need to be
-   seperate sections as now it looks like they are buying a payment
-   and start date") - the order block ends at Due today; a hairline
-   opens the facts block, plain rows that can never read as line
-   items */
-.ordfacts{border-top:1px solid var(--bd);margin-top:12px;padding-top:2px}
+/* FACTS SECTION (Matt 11/9: payment and start date live in their own
+   section, and his final order: campaign FIRST, then payment and
+   start date, then Due today LAST - the total closes the sheet like a
+   receipt) */
+.ordfacts{padding-top:2px}
 .ordfact{display:flex;justify-content:space-between;gap:14px;padding:11px 0;font-size:13.5px;border-bottom:1px solid #f3f4f6}
 .ordfact:last-child{border-bottom:none}
 .ordfact .k{color:var(--mut);font-weight:600;flex-shrink:0}
 .ordfact .v{font-weight:600;text-align:right}
+.ordtot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:12px 0 4px;border-top:1px solid var(--bd)}
 /* the review dialog has no <p> before its actions, so the shared
    .dialog-actions (no margin of its own) sat 2px under the line-item
    box (Matt 11/9: "touching the box") */
@@ -848,11 +847,11 @@ body{padding:0}
         <div><div class="nm">Campaign 1</div><div class="sub">Lead reactivation</div></div>
         <div class="amt">$60 / appt</div>
       </div>
-      <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
       <div class="ordfacts">
         <div class="ordfact"><span class="k">Payment method</span><span class="v" id="ordPay"></span></div>
         <div class="ordfact"><span class="k">Start date</span><span class="v" id="ordStart"></span></div>
       </div>
+      <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
       <div class="dialog-actions">
         <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
         <button class="btn btn-primary" id="ordGo">Place order</button>
