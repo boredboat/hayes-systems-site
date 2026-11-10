@@ -2559,7 +2559,9 @@ function audRender(){
     var rf = $(id + '_rf');
     if (rf) rf.addEventListener('click', function(){
       rf.disabled = true; rf.classList.add('spin');
-      audFill(true, function(){ rf.disabled = false; rf.classList.remove('spin'); });
+      audRefetchTags(function(){
+        audFill(true, function(){ rf.disabled = false; rf.classList.remove('spin'); });
+      });
     });
     audChips($(id + '_tags'));
     var w = $(id + '_warn');
@@ -3166,8 +3168,10 @@ function audInit(){
         AUD_TAGS = j.tags || [];
         audRender();
         if (AUD_TAGS.length && PAGE.token) audFill(false);
+      } else {
+        AUD_TAGS = null;   // retryable: a failed fetch must not latch empty
       }
-    }).catch(function(){});
+    }).catch(function(){ AUD_TAGS = null; });
   }
   audRender();
 }
@@ -3176,6 +3180,20 @@ function audInit(){
 // or returning to the app after a CRM change - Matt 11/8 live-caught)
 // is what bypasses the cache and re-reads the CRM
 var AUD_FILL_AT = 0;
+// REFRESH THE TAG LIST (Matt 11/10, live-caught: the one-shot tag fetch
+// could latch EMPTY forever - a failed fetch left AUD_TAGS=[] and the
+// refresh button only refreshed counts, so 'no tags in this location'
+// stuck). The refresh button re-reads the tag LIST first, then counts.
+function audRefetchTags(done){
+  if (!(AUD_TAGS || []).length && PAGE.token) {
+    AUD_TAGS = null;
+    api('/api/ghl/tags').then(function(j){
+      if (j && j.ok) { AUD_TAGS = j.tags || []; audRender(); }
+      else { AUD_TAGS = null; }
+    }).catch(function(){ AUD_TAGS = null; })
+      .then(function(){ if (done) done(); });
+  } else { if (done) done(); }
+}
 function audFill(fresh, done){
   if (!PAGE.token || !(AUD_TAGS || []).length) { if (done) done(); return; }
   AUD_FILL_AT = Date.now();
