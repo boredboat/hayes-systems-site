@@ -974,6 +974,7 @@ body{padding:0}
   <div class="dialog">
     <h3>Pause this campaign</h3>
     <p><strong>Pausing stops new outreach only.</strong> Leads who reply during the pause are still answered and can still book appointments according to your calendar settings. Set out-of-office times in your calendar to avoid booking during bad times.</p>
+    <p id="pauseRetNote" class="hide" style="font-size:13px;color:#b45309;margin:2px 0 0">Pausing does not stop the monthly fee. Retainer pauses are capped at one month - need longer? Cancel your retainer instead.</p>
     <div class="field">
       <label for="pauseStart">Pause starts</label>
       <input type="date" id="pauseStart" value="2026-10-24">
@@ -1772,6 +1773,17 @@ $('pauseBtn').addEventListener('click', function(){
     $('pauseStart').value = today;
     $('pauseEnd').value = isoDay(new Date(Date.now() + 7 * 86400000));
     $('pauseEnd').min = today;
+    // RETAINER (Matt 11/11): the fee disclaimer + the one-month cap -
+    // the picker stops a month out and the server refuses past it
+    var _isRetP = ((((PAGE.data || {}).client) || {}).state || S)
+                  === 'retainer';
+    var _pn = $('pauseRetNote');
+    if (_pn) _pn.classList.toggle('hide', !_isRetP);
+    if (_isRetP) {
+      $('pauseEnd').max = isoDay(new Date(Date.now() + 31 * 86400000));
+    } else {
+      $('pauseEnd').removeAttribute('max');
+    }
     open_('pauseOverlay');
   }
 });
