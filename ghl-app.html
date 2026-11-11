@@ -799,8 +799,8 @@ body{padding:0}
       <span class="pill run" id="pill"><span class="dot"></span><span id="pillTxt">Running</span></span>
       <div class="ret-card on hide" id="retCard"><span class="dot"></span><span id="retCardTxt">Retainer</span></div>
     </div>
-    <h1 id="stateH1">Campaign 3</h1>
-    <div class="sub" id="pillSub">Week 3 &middot; Projected end ~Oct 30 &middot; Updated Oct 18</div>
+    <h1 id="stateH1"></h1>
+    <div class="sub" id="pillSub"></div>
   </div>
   <div class="nums" id="stats">
     <div class="hnum"><div class="num" id="numW">1,847</div><div class="lbl">Leads</div></div>
@@ -1377,15 +1377,23 @@ function apply(s, until){
   // always-on red "Retainer off" read like an error)
   $('retCardTxt').textContent = 'Retainer';
   $('retCard').classList.toggle('hide', s !== 'retainer');
-  // hero title: campaign numbering follows real history when present
+  // hero title: a running campaign is ALWAYS numbered - history + 1
+  // (the first campaign is Campaign 1, never a numberless label; Matt
+  // 11/10: "now it just says your campaign with no number")
   var n = (PAGE && PAGE.pastN) || 0;
-  if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = n ? 'Campaign ' + (n + 1) : 'Your campaign'; setSpine(3); }
-  if (s === 'completed') { $('stateH1').textContent = n ? 'Campaign ' + n : 'Campaign'; setSpine(4); }
+  if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = 'Campaign ' + (n + 1); setSpine(3); }
+  if (s === 'completed') { $('stateH1').textContent = 'Campaign ' + (n || 1); setSpine(4); }
   if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
   if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); setStats(0, 0, 0, 0, 0, 0); }
-  if (s === 'running') { pill('run', 'Running', 'Week 3 \u00b7 Projected end ~Oct 30 \u00b7 Updated Oct 18'); $('pauseBtn').textContent = 'Pause campaign'; }
-  if (s === 'paused') { pill('pausepill', 'Paused', PAUSEWHY === 'billing' ? 'Paused until the invoice is paid \u00b7 replies still answered \u00b7 appointments still book' : until ? 'Paused until ' + fmtDay(until) + ' \u00b7 replies still answered \u00b7 appointments still book' : 'Paused until Oct 31 \u00b7 replies still answered \u00b7 appointments still book'); $('pauseBtn').textContent = 'Resume campaign'; }
-  if (s === 'cancelled') { pill('stoppill', 'Cancelled', 'Ended Oct 24 \u00b7 appointments on your calendar are unaffected'); }
+  // PILL FIXTURES ARE DEMO-ONLY (Matt 11/10: "the dates are all wrong"):
+  // apply() can run AFTER applyFromData painted the real campaign dates
+  // (the renderPast re-apply), and these hardcoded dates would stomp
+  // them. Paint fixture dates only when NO live campaign payload has
+  // landed; the live branch in applyFromData owns the real text.
+  var _liveCamp = !!(PAGE && PAGE.data && PAGE.data.campaign);
+  if (s === 'running') { if (!_liveCamp) pill('run', 'Running', ''); $('pauseBtn').textContent = 'Pause campaign'; }
+  if (s === 'paused') { if (!_liveCamp) pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) : ''); $('pauseBtn').textContent = 'Resume campaign'; }
+  if (s === 'cancelled') { if (!_liveCamp) pill('stoppill', 'Cancelled', ''); }
   if (s === 'completed') {
     var lp = (PAGE && PAGE.lastPast) || null;
     pill('donepill', 'Completed', lp ? lp.period + ' \u00b7 ' + fmtNum(lp.appointments) + ' appointments' : 'Your campaign has finished');
