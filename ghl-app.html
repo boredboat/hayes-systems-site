@@ -945,7 +945,6 @@ body{padding:0}
     <button class="btn btn-primary" id="reqBtn" disabled>Start a new campaign</button>
     <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
     <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
-    <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
   </div>
   <span class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</span>
 </div>
@@ -1029,7 +1028,7 @@ body{padding:0}
   <div class="dialog">
     <h3>Cancel your retainer?</h3>
     <p>Cancelling retainer service stops the monthly fee. Your current
-    campaign chapter runs to its finish and appointments that land during
+    current campaign runs to its finish and appointments that land during
     it are billed at the retainer rate. After that, your account reverts
     to regular campaign terms. Monthly fees are non-refundable and there
     are no cancellation fees.</p>
@@ -1071,7 +1070,7 @@ body{padding:0}
          (same toggles as the campaign ask), and the queue is stated ON
          the screen - no saved popup. -->
     <div class="ob-field" id="retSetupTags" style="margin:14px 0 4px">
-      <label>Leads to include (your chapter's pool)</label>
+      <label>Leads to include (your next campaign's pool)</label>
       <div class="aud-tgs" style="margin-top:8px">
         <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
         <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
@@ -1085,6 +1084,9 @@ body{padding:0}
       <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
     <div id="retSetupNote" style="font-size:12.5px;color:var(--mut);margin:2px 0 14px">Changes take effect on your next campaign.</div>
+    <div id="retCancelRow" style="text-align:right;margin:-6px 0 10px">
+      <span id="retCancelLink" style="font-size:13px;color:#b91c1c;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Cancel retainer</span>
+    </div>
     <div id="retSignup">
     <label class="ad-check" style="margin:0 0 18px"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after placing your order.</span></label>
@@ -1424,9 +1426,8 @@ function apply(s, until){
   $('apptSec').classList.toggle('hide', s === 'none');
   $('pastSec').classList.toggle('hide', s === 'none');
   syncTabs();
-  $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
+  $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
-  $('cancelRetBtn').classList.toggle('hide', s !== 'retainer');
   $('reqBtn').classList.toggle('hide', s === 'retainer');
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   var _rl = $('retainerLine'); if (_rl) _rl.classList.toggle('hide', s === 'none' || s === 'retainer');
@@ -1459,6 +1460,18 @@ function apply(s, until){
   var _liveCamp = !!(PAGE && PAGE.data && PAGE.data.campaign);
   if (s === 'running') { if (!_liveCamp) pill('run', 'Running', ''); $('pauseBtn').textContent = 'Pause campaign'; }
   if (s === 'paused') { if (!_liveCamp) pill('pausepill', 'Paused', until ? 'Paused until ' + fmtDay(until) : ''); $('pauseBtn').textContent = 'Resume campaign'; }
+  if (s === 'retainer') {
+    // Matt 11/11: pause is present and functional for retainers too -
+    // the label follows the live campaign's paused flag
+    $('pauseBtn').textContent = (PAGE.data && PAGE.data.campaign
+                                 && PAGE.data.campaign.paused)
+      ? 'Resume campaign' : 'Pause campaign';
+  }
+  // the header link serves the state: the pitch before signup, the
+  // settings surface once they are on retainer (Matt 11/11)
+  var _ral = $('retainerAdLink');
+  if (_ral) _ral.textContent = s === 'retainer' ? 'Retainer settings'
+                                                : 'Retainer service';
   if (s === 'cancelled') { if (!_liveCamp) pill('stoppill', 'Cancelled', ''); }
   if (s === 'completed') {
     var lp = (PAGE && PAGE.lastPast) || null;
@@ -1744,7 +1757,9 @@ renderPast(DEMO_PAST);
 // Pause / resume
 function isoDay(d){ var x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
 $('pauseBtn').addEventListener('click', function(){
-  if (S === 'paused') { open_('resumeOverlay'); }
+  var _retPaused = (S === 'retainer' && PAGE.data && PAGE.data.campaign
+                    && PAGE.data.campaign.paused);
+  if (S === 'paused' || _retPaused) { open_('resumeOverlay'); }
   else {
     var today = isoDay(new Date());
     $('pauseStart').value = today;
@@ -1757,10 +1772,28 @@ $('confirmPause').addEventListener('click', function(){
   var end = $('pauseEnd').value;
   if (!end) { toast('Pick the date outreach resumes.'); return; }
   close_('pauseOverlay');
+  var _wasRet = (PAGE.data && PAGE.data.client
+                 && PAGE.data.client.state === 'retainer');
+  var _land = function(until){
+    if (_wasRet) {
+      // a retainer pauses their CAMPAIGN without leaving retainer
+      // state: badge stays, pill + button say paused (Matt 11/11)
+      if (PAGE.data && PAGE.data.campaign) {
+        PAGE.data.campaign.paused = true;
+        PAGE.data.campaign.paused_until = until;
+      }
+      apply('retainer');
+      pill('pausepill', 'Paused',
+           'Paused until ' + fmtDay(until)
+           + ' - replies still answered - appointments still book');
+    } else {
+      apply('paused', until);
+    }
+  };
   if (PAGE.live) {
     api('/api/ghl/pause', {resume_on: end}).then(function(j){
       if (j.ok) {
-        apply('paused', j.paused_until || end);
+        _land(j.paused_until || end);
         toast('Paused until ' + fmtLongDate(j.paused_until || end) + '. Replies are still answered and appointments still book.');
       } else {
         toast(j.message || j.error || 'The pause did not go through. Try again in a moment.');
@@ -1768,15 +1801,25 @@ $('confirmPause').addEventListener('click', function(){
     }).catch(function(){ toast('The pause did not go through. Try again in a moment.'); });
     return;
   }
-  apply('paused', end);
+  _land(end);
   toast('Paused. Replies are still answered and appointments still book.');
 });
 $('confirmResume').addEventListener('click', function(){
   close_('resumeOverlay');
+  var _wasRet = (PAGE.data && PAGE.data.client
+                 && PAGE.data.client.state === 'retainer');
   if (PAGE.live) {
     api('/api/ghl/resume', {}).then(function(j){
       if (j.ok) {
-        apply('running');
+        // a retainer's campaign resumes back INTO retainer state
+        if (PAGE.data && PAGE.data.campaign) {
+          PAGE.data.campaign.paused = false;
+          PAGE.data.campaign.paused_until = null;
+        }
+        apply(_wasRet ? 'retainer' : 'running');
+        if (_wasRet && PAGE.data && PAGE.data.campaign) {
+          pill('run', 'Active', 'Campaign ' + PAGE.data.campaign.week);
+        }
         toast('Campaign resumed. Outreach starts again.');
       } else {
         toast(j.message || j.error || 'The resume did not go through. Try again in a moment.');
@@ -1784,7 +1827,7 @@ $('confirmResume').addEventListener('click', function(){
     }).catch(function(){ toast('The resume did not go through. Try again in a moment.'); });
     return;
   }
-  apply('running');
+  apply(_wasRet ? 'retainer' : 'running');
   toast('Campaign resumed. Outreach starts again.');
 });
 
@@ -2421,12 +2464,13 @@ function _retOverlayMode(){
            || S === 'retainer';
   var pit = $('retPitch'), sig = $('retSignup'), hd = $('retHead'),
       tb = $('retSetupTags'), cb = $('retSetupCal'), nt = $('retSetupNote'),
-      st = $('retainerStart'), cl = $('retCloseBtn');
+      cr = $('retCancelRow'), st = $('retainerStart'), cl = $('retCloseBtn');
   if (pit) pit.style.display = on ? 'none' : '';
   if (sig) sig.style.display = on ? 'none' : '';
   if (tb) tb.style.display = on ? '' : 'none';
   if (cb) cb.style.display = on ? '' : 'none';
   if (nt) nt.style.display = on ? '' : 'none';
+  if (cr) cr.style.display = on ? '' : 'none';
   if (st) st.style.display = on ? 'none' : '';
   if (hd) hd.textContent = on ? 'Your retainer setup'
                               : 'Work your cold leads, automatically';
@@ -2444,7 +2488,9 @@ document.addEventListener('change', function(ev){
     if (opt && opt.value) _retSaveCal({id: opt.value, name: opt.textContent}, sel);
   }
 });
-$('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
+$('retCancelLink').addEventListener('click', function(){
+  open_('cancelRetOverlay');
+});
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
   if (PAGE.live) {
@@ -3938,12 +3984,20 @@ function applyFromData(d){
              c.conversion_pct, c.cost_to_date);
   } else if (st === 'retainer') {
     if (c) {
-      pill('run', 'Active', 'Chapter ' + c.week
-           + (c.updated ? ' \u00b7 Updated ' + fmtDay(c.updated) : ''));
+      if (c.paused) {
+        // a paused campaign under retainer: the badge stays, the pill
+        // and the button say paused/resume (Matt 11/11)
+        pill('pausepill', 'Paused',
+             (c.paused_until ? 'Paused until ' + fmtDay(c.paused_until)
+              : '') + ' - replies still answered - appointments still book');
+      } else {
+        pill('run', 'Active', 'Campaign ' + c.week
+             + (c.updated ? ' \u00b7 Updated ' + fmtDay(c.updated) : ''));
+      }
       setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
                c.conversion_pct, c.cost_to_date);
     } else {
-      pill('run', 'Active', 'Continual coverage \u00b7 the next chapter starts automatically');
+      pill('run', 'Active', 'Continual coverage \u00b7 the next campaign starts automatically');
       setStats(0, 0, 0, 0, 0, 0);
     }
   }
@@ -4205,7 +4259,6 @@ function applyOb(s){
       var el = $(id); if (el) el.classList.add('hide');
     });
     $('cancelBtn').classList.add('hide');
-    $('cancelRetBtn').classList.add('hide');
     $('reqBtn').classList.add('hide');
   }
   if (typeof _updateConnectStep === 'function') { _updateConnectStep(); }
