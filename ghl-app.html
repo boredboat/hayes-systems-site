@@ -522,6 +522,7 @@ body{padding:0}
     </div>
   </div>
   <span class="barlink" id="settingsLink">Settings</span>
+  <span class="barlink" id="retainerAdLink">Retainer service</span>
   <span class="barlink" id="contactLink">Contact us</span>
 </div></div>
 
@@ -921,7 +922,6 @@ body{padding:0}
     <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
   </div>
   <span class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</span>
-  <span class="retainer-line" id="retainerLine">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</span>
 </div>
 
 <div class="foot">Hayes Systems &middot; <a href="https://www.hayessystems.com" target="_blank" rel="noopener">hayessystems.com</a></div>
@@ -1379,7 +1379,7 @@ function apply(s, until){
   $('cancelRetBtn').classList.toggle('hide', s !== 'retainer');
   $('reqBtn').classList.toggle('hide', s === 'retainer');
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
-  $('retainerLine').classList.toggle('hide', s === 'none' || s === 'retainer');
+  var _rl = $('retainerLine'); if (_rl) _rl.classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
   req.textContent = 'Start new campaign';
   req.disabled = !(s === 'none' || s === 'completed');
@@ -2209,7 +2209,9 @@ function _prepPoll(){
 }
 
 // Retainer
-$('retainerLink').addEventListener('click', function(){ open_('retainerOverlay'); });
+// RETAINER AD (Matt 11/10): the action-row pitch line is gone; the ad
+// lives behind a top-bar link instead
+$('retainerAdLink').addEventListener('click', function(){ open_('retainerOverlay'); });
 $('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
@@ -3718,7 +3720,7 @@ function applyFromData(d){
   // hides them for the fresh-install screen, real data brings them back
   if ((d.past_campaigns || []).length) {
     $('pastSec').classList.remove('hide');
-    $('retainerLine').classList.remove('hide');
+    var _rl2 = $('retainerLine'); if (_rl2) _rl2.classList.remove('hide');
     syncTabs();
   }
 }
