@@ -1017,7 +1017,8 @@ body{padding:0}
 <div class="overlay" id="retainerOverlay">
   <div class="dialog ret-ad">
     <div class="ad-kicker">Retainer service</div>
-    <h3>Work your cold leads, automatically</h3>
+    <h3 id="retHead">Work your cold leads, automatically</h3>
+    <div id="retPitch">
     <p style="font-size:14px;line-height:1.6;color:#4b5563;margin:12px 0 0">
       Retainer service is designed for operations that regularly produce a
       large volume of leads and would benefit from the continual working
@@ -1035,25 +1036,30 @@ body{padding:0}
         No new setup</li>
     </ul>
     <div class="ad-price">$250 per month + $40 per appointment</div>
+    </div>
     <!-- RETAINER SETUP (Matt 11/10: "the client should be able to select
          tags and calendars like they can on a regular campaign") - the
          audience IS the next chapter's pool; the calendar books the
-         calls. Both save on selection, exactly like the campaign flow. -->
-    <div class="ob-field" style="margin:14px 0 4px">
+         calls. Both save on selection, exactly like the campaign flow.
+         D8 (judge RR-1): shown to EXISTING retainers (setup mode); a
+         non-retainer sees the pitch only - their saves are no-ops. -->
+    <div class="ob-field" id="retSetupTags" style="margin:14px 0 4px">
       <label>Tags to include (your chapter's pool)</label>
       <div id="retAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
       <div style="font-size:12px;color:var(--mut);margin-top:4px">No tags selected means your entire contact list. Leads with an open opportunity are always skipped.</div>
     </div>
-    <div class="ob-field" style="margin:4px 0 8px">
+    <div class="ob-field" id="retSetupCal" style="margin:4px 0 8px">
       <label for="retCal">Calendar for booked calls</label>
       <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
+    <div id="retSignup">
     <label class="ad-check"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after clicking "Start retainer service".</span></label>
     <div class="ob-field" style="margin:-6px 0 18px"><label for="retSign">Type your name to sign</label>
       <input id="retSign" placeholder="Your name" autocomplete="name"></div>
+    </div>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" data-close="retainerOverlay">Not now</button>
+      <button class="btn btn-ghost" data-close="retainerOverlay" id="retCloseBtn">Not now</button>
       <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
     </div>
   </div>
@@ -2231,13 +2237,20 @@ function _prepPoll(){
 var RET_AUD = null;
 function _retLoadSetup(){
   if (!PAGE.token) return;
+  // pitch mode (non-retainer): pickers hidden, so no loads - and no
+  // writes: the one-RR auto-save must never fire for a client who has
+  // not signed up (D8)
+  var _on = ((((PAGE.data || {}).client) || {}).state === 'retainer')
+            || S === 'retainer';
+  if (!_on) return;
   // tags (once per open; chips render with counts when preview lands)
   if (RET_AUD === null) {
     RET_AUD = [];
     api('/api/ghl/tags').then(function(j){
-      RET_AUD = (j && j.ok && j.tags) ? j.tags : [];
+      if (j && j.ok) { RET_AUD = (j.tags || []); }
+      else { RET_AUD = null; }  // outage, NOT an empty location (D9)
       _retPaintTags();
-    }).catch(function(){ RET_AUD = null; });
+    }).catch(function(){ RET_AUD = null; _retPaintTags(); });
   }
   // calendar list (round-robin only, like the wizard)
   var sel = $('retCal');
@@ -2255,8 +2268,9 @@ function _retLoadSetup(){
         if (c.id === cur) o.selected = true;
         sel.appendChild(o);
       });
+      if (cur) RET_CAL = cur;   // revert target for refused changes (D4)
       // one RR calendar auto-saves (the wizard's honest-display rule)
-      if (cals.length === 1) _retSaveCal(cals[0]);
+      if (cals.length === 1) _retSaveCal(cals[0], sel);
     }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
   }
 }
@@ -2264,7 +2278,14 @@ function _retPaintTags(){
   var box = $('retAudTags'); if (!box) return;
   var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
   box.innerHTML = '';
-  if (!(RET_AUD || []).length) {
+  if (RET_AUD === null) {
+    // D9: the tags call failed - say so, never dress an outage up as
+    // an empty location (null re-arms the retry on the next open)
+    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">' +
+      "Couldn't load tags right now. Close and reopen to retry.</span>";
+    return;
+  }
+  if (!RET_AUD.length) {
     box.innerHTML = '<span style="font-size:13px;color:var(--mut)">No tags in this location yet</span>';
     return;
   }
@@ -2275,32 +2296,82 @@ function _retPaintTags(){
     c.textContent = t;
     c.addEventListener('click', function(){
       var ix = cur.indexOf(t);
+      var nowInc = ix < 0;
       if (ix >= 0) cur.splice(ix, 1); else cur.push(t);
-      c.classList.toggle('inc', ix < 0);
-      _retSaveAud(cur.slice());
+      c.classList.toggle('inc', nowInc);
+      // D4: a refused save must not leave a phantom chip state - hand
+      // the painter a revert that puts the tag back exactly as it was
+      _retSaveAud(cur.slice(), function(){
+        var jx = cur.indexOf(t);
+        if (nowInc && jx >= 0) cur.splice(jx, 1);
+        if (!nowInc && jx < 0) cur.push(t);
+        c.classList.toggle('inc', !nowInc);
+      });
     });
     box.appendChild(c);
   });
 }
-function _retSaveAud(tags){
+function _retSaveAud(tags, revert){
   if (!PAGE.token) return;
   var a = ((PAGE.data || {}).audience) || {};
   api('/api/ghl/settings', {audience: {
     skip_open_opp: a.skip_open_opp !== false,
     include_lost_opp: a.include_lost_opp !== false,
     include_tags: tags}}).then(function(j){
-      if (j && j.ok && PAGE.data) {
+      // D4/D6: success is the explicit ack (audience_saved on the wire
+      // for retainer saves); anything else reverts the chip + toasts
+      if (j && j.ok && !j.audience_ignored && PAGE.data) {
         PAGE.data.audience = PAGE.data.audience || {};
         PAGE.data.audience.include_tags = tags.slice();
+      } else {
+        if (revert) revert();
+        toast('The tag change did not save. Try again in a moment.');
       }
-    }).catch(function(){});
+    }).catch(function(){
+      if (revert) revert();
+      toast('The tag change did not save. Try again in a moment.');
+    });
 }
-function _retSaveCal(c){
+// last calendar id known saved (or loaded as current) - the revert
+// target when the server refuses a mid-chapter change (D4)
+var RET_CAL = '';
+function _retCalRefused(sel, err){
+  if (sel && RET_CAL) {
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === RET_CAL) { sel.selectedIndex = i; break; }
+    }
+  }
+  toast(err || 'The calendar change did not save.');
+}
+function _retSaveCal(c, sel){
   if (!PAGE.token || !c) return;
   api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
-    .catch(function(){});
+    .then(function(j){
+      if (j && j.ok) { RET_CAL = c.id; return; }
+      _retCalRefused(sel, j && j.error);
+    }).catch(function(){ _retCalRefused(sel, null); });
+}
+function _retOverlayMode(){
+  // D8 (judge RR-1): an EXISTING retainer opens this overlay to adjust
+  // their setup - setup framing, not the sales pitch. A non-retainer
+  // sees the pitch; the pickers stay hidden there because their saves
+  // are server-side no-ops until the client is on retainer status.
+  var on = ((((PAGE.data || {}).client) || {}).state === 'retainer')
+           || S === 'retainer';
+  var pit = $('retPitch'), sig = $('retSignup'), hd = $('retHead'),
+      tb = $('retSetupTags'), cb = $('retSetupCal'),
+      st = $('retainerStart'), cl = $('retCloseBtn');
+  if (pit) pit.style.display = on ? 'none' : '';
+  if (sig) sig.style.display = on ? 'none' : '';
+  if (tb) tb.style.display = on ? '' : 'none';
+  if (cb) cb.style.display = on ? '' : 'none';
+  if (st) st.style.display = on ? 'none' : '';
+  if (hd) hd.textContent = on ? 'Your retainer setup'
+                              : 'Work your cold leads, automatically';
+  if (cl) cl.textContent = on ? 'Done' : 'Not now';
 }
 $('retainerAdLink').addEventListener('click', function(){
+  _retOverlayMode();
   _retLoadSetup();
   open_('retainerOverlay');
 });
@@ -2308,7 +2379,7 @@ document.addEventListener('change', function(ev){
   if (ev.target && ev.target.id === 'retCal') {
     var sel = ev.target;
     var opt = sel.options[sel.selectedIndex];
-    if (opt && opt.value) _retSaveCal({id: opt.value, name: opt.textContent});
+    if (opt && opt.value) _retSaveCal({id: opt.value, name: opt.textContent}, sel);
   }
 });
 $('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
