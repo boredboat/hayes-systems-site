@@ -2369,7 +2369,13 @@ function _retSaveCal(c, sel){
   if (!PAGE.token || !c) return;
   api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
     .then(function(j){
-      if (j && j.ok) { RET_CAL = c.id; return; }
+      if (j && j.ok) {
+        RET_CAL = c.id;
+        if (j.calendar_pending) {
+          toast('Saved. Applies to your next campaign.');
+        }
+        return;
+      }
       _retCalRefused(sel, j && j.error);
     }).catch(function(){ _retCalRefused(sel, null); });
 }
@@ -2538,6 +2544,13 @@ function _loadSurfaceRow(){
 function _saveSurface(v){
   api('/api/ghl/settings', {scheduling_surface: v}).then(function(j){
     if (j && j.ok) {
+      if (j.surface_pending) {
+        // the queue (Matt 11/11): the live chapter keeps its booking
+        // app; this pick lands with the next campaign
+        _surfStateLine();
+        toast('Saved. Your booking app changes with your next campaign.');
+        return;
+      }
       if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
       PAGE.data.calendar.surface = v;
       _surfStateLine();
@@ -3483,7 +3496,12 @@ $('settingsSave').addEventListener('click', function(){
     btn.disabled = false;
     if (j && j.ok) {
       close_('settingsOverlay');
-      toast('Settings saved.');
+      if (j.calendar_pending || j.surface_pending) {
+        toast('Settings saved. Calendar changes apply to your next'
+              + ' campaign.');
+      } else {
+        toast('Settings saved.');
+      }
       if (PAGE.data && PAGE.data.client) {
         PAGE.data.client.email = em;
         PAGE.data.client.name = $('setBusiness').value.trim();
