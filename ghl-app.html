@@ -1444,7 +1444,13 @@ function apply(s, until){
   if (s === 'running' || s === 'paused' || s === 'cancelled') { $('stateH1').textContent = 'Campaign ' + (n + 1); setSpine(3); }
   if (s === 'completed') { $('stateH1').textContent = 'Campaign ' + (n || 1); setSpine(4); }
   if (s === 'none') { $('stateH1').textContent = 'Lead reactivation'; setSpine(0); }
-  if (s === 'retainer') { $('stateH1').textContent = 'Retainer service'; setSpine(0); setStats(0, 0, 0, 0, 0, 0); }
+  if (s === 'retainer') {
+    $('stateH1').textContent = 'Retainer service'; setSpine(0);
+    // a LIVE chapter's numbers survive a static re-apply (the 11/10
+    // heading-truth pass re-runs apply() after the data paint and used
+    // to zero the chapter stats until the next 30s poll)
+    if (!(PAGE.data && PAGE.data.campaign)) setStats(0, 0, 0, 0, 0, 0);
+  }
   // PILL FIXTURES ARE DEMO-ONLY (Matt 11/10: "the dates are all wrong"):
   // apply() can run AFTER applyFromData painted the real campaign dates
   // (the renderPast re-apply), and these hardcoded dates would stomp
@@ -1463,7 +1469,7 @@ function apply(s, until){
     }
   }
   if (s === 'none') { pill('nonepill', 'No campaign yet', 'Your account is connected'); }
-  if (s === 'retainer') { pill('run', 'Active', ''); }
+  if (s === 'retainer' && !(PAGE.data && PAGE.data.campaign)) { pill('run', 'Active', ''); }
 }
 function open_(id){ $(id).classList.add('show'); }
 function close_(id){ $(id).classList.remove('show'); }
