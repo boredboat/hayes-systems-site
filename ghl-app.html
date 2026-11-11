@@ -1051,10 +1051,8 @@ body{padding:0}
       <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
     <div id="retSignup">
-    <label class="ad-check"><input type="checkbox" id="retainerAgree">
+    <label class="ad-check" style="margin:0 0 18px"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after clicking "Start retainer service".</span></label>
-    <div class="ob-field" style="margin:-6px 0 18px"><label for="retSign">Type your name to sign</label>
-      <input id="retSign" placeholder="Your name" autocomplete="name"></div>
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay" id="retCloseBtn">Not now</button>
@@ -2398,16 +2396,14 @@ $('confirmCancelRet').addEventListener('click', function(){
   toast('Retainer cancelled. Outreach stops today.');
 });
 function retGate(){
-  $('retainerStart').disabled = !($('retainerAgree').checked
-                                  && $('retSign').value.trim().length > 1);
+  $('retainerStart').disabled = !$('retainerAgree').checked;
 }
 $('retainerAgree').addEventListener('change', retGate);
-$('retSign').addEventListener('input', retGate);
 $('retainerStart').addEventListener('click', function(){
   close_('retainerOverlay');
   if (PAGE.live) {
     api('/api/ghl/start-retainer',
-        {agreed: $('retainerAgree').checked, signature: $('retSign').value.trim()})
+        {agreed: $('retainerAgree').checked})
       .then(function(j){
         if (j.ok) {
           S = 'retainer'; apply('retainer');
