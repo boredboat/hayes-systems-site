@@ -1075,7 +1075,10 @@ body{padding:0}
         <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
         <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
       </div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:.02em;color:#374151;margin-top:12px">Tags to include</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:.02em;color:#374151">Tags to include</div>
+        <span id="retTagAll" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
+      </div>
       <div id="retAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
     </div>
     <div class="ob-field" id="retSetupCal" style="margin:4px 0 8px">
@@ -1083,8 +1086,8 @@ body{padding:0}
       <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
     <div id="retSetupNote" style="font-size:12.5px;color:var(--mut);margin:2px 0 14px">Changes here only take effect on your next campaign.</div>
-    <div id="retCancelRow" style="text-align:right;margin:-6px 0 10px">
-      <span id="retCancelLink" style="font-size:13px;color:#b91c1c;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Cancel retainer</span>
+    <div id="retCancelRow" style="margin:-4px 0 14px;display:flex;justify-content:flex-end">
+      <button type="button" class="btn btn-danger" id="retCancelLink" style="padding:9px 16px;font-size:13.5px">Cancel retainer</button>
     </div>
     <div id="retSignup">
     <label class="ad-check" style="margin:0 0 18px"><input type="checkbox" id="retainerAgree">
@@ -2372,6 +2375,8 @@ function _retPaintTags(){
   var box = $('retAudTags'); if (!box) return;
   var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
   box.innerHTML = '';
+  var _ta = $('retTagAll');
+  if (_ta) _ta.style.display = 'none';
   if (RET_AUD === null) {
     // D9: the tags call failed - say so, never dress an outage up as
     // an empty location (null re-arms the retry on the next open)
@@ -2404,6 +2409,29 @@ function _retPaintTags(){
     });
     box.appendChild(c);
   });
+  // SELECT ALL / CLEAR ALL (Matt 11/11: "let them select all if they
+  // want all"): one control, state-driven label, same silent save with
+  // a full revert on failure
+  if (_ta) {
+    var _every = !!RET_AUD.length && cur.length >= RET_AUD.length;
+    _ta.style.display = '';
+    _ta.textContent = _every ? 'Clear all' : 'Select all';
+    _ta.onclick = function(){
+      // operate on PAGE.data itself - the paint reads it, and a prior
+      // save's tags.slice() DETACHES any closure-held array (the very
+      // bug this control shipped with: clear-all zeroed a stale copy)
+      var _before = (((PAGE.data || {}).audience || {})
+                     .include_tags || []).slice();
+      var _target = _every ? [] : RET_AUD.slice();
+      PAGE.data.audience = PAGE.data.audience || {};
+      PAGE.data.audience.include_tags = _target;
+      _retPaintTags();
+      _retSaveAud(_target.slice(), function(){
+        PAGE.data.audience.include_tags = _before;
+        _retPaintTags();
+      });
+    };
+  }
 }
 function _retSelTags(){
   return [...document.querySelectorAll('#retAudTags .aud-chip.inc')]
@@ -2473,7 +2501,7 @@ function _retOverlayMode(){
   if (st) st.style.display = on ? 'none' : '';
   if (hd) hd.textContent = on ? 'Your retainer setup'
                               : 'Work your cold leads, automatically';
-  if (cl) cl.textContent = on ? 'Done' : 'Not now';
+  if (cl) cl.textContent = on ? 'Back' : 'Not now';
 }
 $('retainerAdLink').addEventListener('click', function(){
   _retOverlayMode();
