@@ -844,15 +844,6 @@ body{padding:0}
      (reworded from First emails); Due today $0.00 is engine-true -
      nothing charges at start, weekly invoices bill as appointments
      land.) -->
-<!-- RETAINER CHECKOUT (Matt 11/11: "copy the checkout box from the
-     normal campaign and make it the final step to starting retainer
-     service. modify it to read true for retainers"): same sheet,
-     retainer truth - line item $250/month + $40/appt, Start date Today
-     (status + subscription begin at the click), Due today $250.00
-     engine-true (the subscription bills its first month at creation,
-     no trial; appointments bill $40 each as they land on weekly
-     invoices). Place order is the only fire path, same as the campaign
-     sheet.) -->
 <div class="overlay" id="pcOrderOverlay">
   <div class="dialog ord-dlg">
     <div class="ord-head">
@@ -865,8 +856,20 @@ body{padding:0}
         <div><div class="nm">Campaign 1</div></div>
         <div class="amt">$60 / appt</div>
       </div>
-      <di
+      <div class="ordfacts">
+        <div class="ordfact"><span class="k">Payment method</span><span class="v" id="ordPay"></span></div>
+        <div class="ordfact"><span class="k">Start date</span><span class="v" id="ordStart"></span></div>
+      </div>
+      <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
+        <button class="btn btn-primary" id="ordGo">Place order</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- RETAINER CHECKOUT (Matt 11/11: copy the campaign checkout box as the final step to starting retainer service, reading TRUE for retainers): line item $250/month + $40/appt, Start date Today (status + subscription begin at the click), Due today $250.00 engine-true (the subscription bills its first month at creation, no trial; appointments bill $40 each on weekly invoices). Place order is the only fire path. -->
 <div class="overlay" id="retOrderOverlay">
   <div class="dialog ord-dlg">
     <div class="ord-head">
@@ -887,17 +890,6 @@ body{padding:0}
       <div class="dialog-actions">
         <button class="btn btn-ghost" data-close="retOrderOverlay">Back</button>
         <button class="btn btn-primary" id="retOrdGo">Place order</button>
-      </div>
-    </div>
-  </div>
-</div>v class="ordfacts">
-        <div class="ordfact"><span class="k">Payment method</span><span class="v" id="ordPay"></span></div>
-        <div class="ordfact"><span class="k">Start date</span><span class="v" id="ordStart"></span></div>
-      </div>
-      <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
-      <div class="dialog-actions">
-        <button class="btn btn-ghost" data-close="pcOrderOverlay">Back</button>
-        <button class="btn btn-primary" id="ordGo">Place order</button>
       </div>
     </div>
   </div>
