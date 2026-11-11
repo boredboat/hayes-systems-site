@@ -1095,6 +1095,7 @@ body{padding:0}
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay" id="retCloseBtn">Not now</button>
+      <button class="btn btn-primary hide" id="retSaveBtn">Save</button>
       <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
     </div>
   </div>
@@ -1111,16 +1112,20 @@ body{padding:0}
       <div class="set-lab">Email for app notices<small>Campaign updates go here</small></div>
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
-    <div class="set-row">
+    <div class="set-row" id="setSurfaceRow">
       <div class="set-lab">Calendar app<small>Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
       </select></div>
     </div>
-    <div class="set-row">
+    <div class="set-row" id="setCalendarRow">
       <div class="set-lab">Calendar<small>Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
+    </div>
+    <div class="set-row" id="setRetCalPointer" style="display:none">
+      <div class="set-lab">Calendar<small>Managed in Retainer settings</small></div>
+      <div class="set-ctl"><span class="barlink" id="setGoRetainer">Open Retainer settings</span></div>
     </div>
     <div class="set-row">
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
@@ -2491,7 +2496,8 @@ function _retOverlayMode(){
            || S === 'retainer';
   var pit = $('retPitch'), sig = $('retSignup'), hd = $('retHead'),
       tb = $('retSetupTags'), cb = $('retSetupCal'), nt = $('retSetupNote'),
-      cr = $('retCancelRow'), st = $('retainerStart'), cl = $('retCloseBtn');
+      cr = $('retCancelRow'), st = $('retainerStart'), cl = $('retCloseBtn'),
+      sv = $('retSaveBtn');
   if (pit) pit.style.display = on ? 'none' : '';
   if (sig) sig.style.display = on ? 'none' : '';
   if (tb) tb.style.display = on ? '' : 'none';
@@ -2499,10 +2505,20 @@ function _retOverlayMode(){
   if (nt) nt.style.display = on ? '' : 'none';
   if (cr) cr.style.display = on ? '' : 'none';
   if (st) st.style.display = on ? 'none' : '';
+  if (sv) sv.classList.toggle('hide', !on);
   if (hd) hd.textContent = on ? 'Your retainer setup'
                               : 'Work your cold leads, automatically';
   if (cl) cl.textContent = on ? 'Back' : 'Not now';
 }
+$('setGoRetainer').addEventListener('click', function(){
+  close_('settingsOverlay');
+  _retOverlayMode();
+  _retLoadSetup();
+  open_('retainerOverlay');
+});
+$('retSaveBtn').addEventListener('click', function(){
+  close_('retainerOverlay');
+});
 $('retainerAdLink').addEventListener('click', function(){
   _retOverlayMode();
   _retLoadSetup();
@@ -2758,6 +2774,18 @@ $('settingsLink').addEventListener('click', function(){
   // start dialog's ask)
   _loadSurfaceRow();
   _loadCalPicker();
+  // ONE HOME (Matt 11/11: "two settings pages that do mostly the same
+  // thing"): the duplicated control is the CALENDAR pick - on retainer
+  // it lives only in Retainer settings. The booking-app row keeps its
+  // single home HERE (the retainer overlay has no surface control).
+  var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
+  var _calRowS = $('setCalendarRow');
+  if (_calRowS) _calRowS.style.display = _isRetS ? 'none' : '';
+  var _ptrS = $('setRetCalPointer');
+  if (_ptrS) _ptrS.style.display = _isRetS ? '' : 'none';
+  if (_isRetS) {
+    $('setCalendar').disabled = true;   // save builder skips it
+  }
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
   var dr = $('setDataRow');
