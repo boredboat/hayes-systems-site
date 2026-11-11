@@ -1061,42 +1061,12 @@ body{padding:0}
     </ul>
     <div class="ad-price">$250 per month + $40 per appointment</div>
     </div>
-    <!-- RETAINER SETUP (Matt 11/10: "the client should be able to select
-         tags and calendars like they can on a regular campaign") - the
-         audience IS the next chapter's pool; the calendar books the
-         calls. Both save on selection, exactly like the campaign flow.
-         D8 (judge RR-1): shown to EXISTING retainers (setup mode); a
-         non-retainer sees the pitch only - their saves are no-ops.
-         11/11 (Matt): the open/lost opportunity switches ride along
-         (same toggles as the campaign ask), and the queue is stated ON
-         the screen - no saved popup. -->
-    <div class="ob-field" id="retSetupTags" style="margin:14px 0 4px">
-      <label>Leads to include (your next campaign's pool)</label>
-      <div class="aud-tgs" style="margin-top:8px">
-        <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
-        <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
-        <div style="font-size:12px;font-weight:700;letter-spacing:.02em;color:#374151">Tags to include</div>
-        <span id="retTagAll" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
-      </div>
-      <div id="retAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
-    </div>
-    <div class="ob-field" id="retSetupCal" style="margin:4px 0 8px">
-      <label for="retCal">Calendar for booked calls</label>
-      <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
-    </div>
-    <div id="retSetupNote" style="font-size:12.5px;color:var(--mut);margin:2px 0 14px">Changes here only take effect on your next campaign.</div>
-    <div id="retCancelRow" style="margin:-4px 0 14px;display:flex;justify-content:flex-end">
-      <button type="button" class="btn btn-danger" id="retCancelLink" style="padding:9px 16px;font-size:13.5px">Cancel retainer</button>
-    </div>
     <div id="retSignup">
     <label class="ad-check" style="margin:0 0 18px"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after placing your order.</span></label>
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="retainerOverlay" id="retCloseBtn">Not now</button>
-      <button class="btn btn-primary hide" id="retSaveBtn">Save</button>
       <button class="btn btn-primary" id="retainerStart" disabled>Start retainer service</button>
     </div>
   </div>
@@ -1124,9 +1094,9 @@ body{padding:0}
       <div class="set-lab">Calendar<small>Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
     </div>
-    <div class="set-row" id="setRetCalPointer" style="display:none">
-      <div class="set-lab">Calendar<small>Managed in Retainer settings</small></div>
-      <div class="set-ctl"><span class="barlink" id="setGoRetainer">Open Retainer settings</span></div>
+    <div class="set-row" id="setCancelRetRow" style="display:none">
+      <div class="set-lab" style="color:#c62828">Cancel retainer<small>Stops the monthly fee. Your current campaign runs to its finish.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setCancelRet">Cancel retainer</button></div>
     </div>
     <div class="set-row">
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
@@ -1475,11 +1445,11 @@ function apply(s, until){
                                  && PAGE.data.campaign.paused)
       ? 'Resume campaign' : 'Pause campaign';
   }
-  // the header link serves the state: the pitch before signup, the
-  // settings surface once they are on retainer (Matt 11/11)
+  // the header link is the PITCH (Matt 11/11 final: no retainer
+  // settings tab - settings is one menu for everyone; retainers manage
+  // everything there and the signup ad disappears)
   var _ral = $('retainerAdLink');
-  if (_ral) _ral.textContent = s === 'retainer' ? 'Retainer settings'
-                                                : 'Retainer service';
+  if (_ral) _ral.style.display = s === 'retainer' ? 'none' : '';
   if (s === 'cancelled') { if (!_liveCamp) pill('stoppill', 'Cancelled', ''); }
   if (s === 'completed') {
     var lp = (PAGE && PAGE.lastPast) || null;
@@ -2327,223 +2297,14 @@ function _prepPoll(){
 }
 
 // Retainer
-// RETAINER AD (Matt 11/10): the action-row pitch line is gone; the ad
-// lives behind a top-bar link instead. The overlay carries SETUP
-// pickers (Matt 11/10: tags + calendar "like they can on a regular
-// campaign"): tags = the next chapter's pool (saved via settings on
-// selection - retainer clients have no Start click to carry them);
-// calendar = where booked calls land. Both reuse the campaign loaders.
-var RET_AUD = null;
-function _retLoadSetup(){
-  if (!PAGE.token) return;
-  // pitch mode (non-retainer): pickers hidden, so no loads - and no
-  // writes: the one-RR auto-save must never fire for a client who has
-  // not signed up (D8)
-  var _on = ((((PAGE.data || {}).client) || {}).state === 'retainer')
-            || S === 'retainer';
-  if (!_on) return;
-  // tags (once per open; chips render with counts when preview lands)
-  if (RET_AUD === null) {
-    RET_AUD = [];
-    api('/api/ghl/tags').then(function(j){
-      if (j && j.ok) { RET_AUD = (j.tags || []); }
-      else { RET_AUD = null; }  // outage, NOT an empty location (D9)
-      _retPaintTags();
-    }).catch(function(){ RET_AUD = null; _retPaintTags(); });
-  }
-  // opportunity switches (Matt 11/11: the setup must NOT strip them):
-  // prefill from the saved profile, save on flip - silently, the
-  // standing note on the screen carries the next-campaign timing
-  var a = ((PAGE.data || {}).audience) || {};
-  var swO = $('retAudOpen'), swL = $('retAudLost');
-  if (swO && swL) {
-    swO.checked = a.skip_open_opp !== false;
-    swL.checked = a.include_lost_opp !== false;
-    swO.onchange = function(){
-      _retSaveAud(_retSelTags(), function(){ swO.checked = !swO.checked; });
-    };
-    swL.onchange = function(){
-      _retSaveAud(_retSelTags(), function(){ swL.checked = !swL.checked; });
-    };
-  }
-  // calendar list (round-robin only, like the wizard)
-  var sel = $('retCal');
-  if (sel && !sel.options.length) {
-    sel.innerHTML = '<option>Loading calendars...</option>';
-    api('/api/ghl/calendars').then(function(j){
-      if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
-      var cals = (j.calendars || []).filter(function(c){ return c.rr; });
-      sel.innerHTML = '';
-      if (!cals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
-      var cur = ((PAGE.data || {}).calendar || {}).id || j.current || '';
-      cals.forEach(function(c){
-        var o = document.createElement('option');
-        o.value = c.id; o.textContent = c.name;
-        if (c.id === cur) o.selected = true;
-        sel.appendChild(o);
-      });
-      if (cur) RET_CAL = cur;   // revert target for refused changes (D4)
-      // one RR calendar auto-saves (the wizard's honest-display rule)
-      if (cals.length === 1) _retSaveCal(cals[0], sel);
-    }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
-  }
-}
-function _retPaintTags(){
-  var box = $('retAudTags'); if (!box) return;
-  var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
-  box.innerHTML = '';
-  var _ta = $('retTagAll');
-  if (_ta) _ta.style.display = 'none';
-  if (RET_AUD === null) {
-    // D9: the tags call failed - say so, never dress an outage up as
-    // an empty location (null re-arms the retry on the next open)
-    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">' +
-      "Couldn't load tags right now. Close and reopen to retry.</span>";
-    return;
-  }
-  if (!RET_AUD.length) {
-    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">No tags in this location yet</span>';
-    return;
-  }
-  RET_AUD.forEach(function(t){
-    var c = document.createElement('button');
-    c.type = 'button';
-    c.className = 'aud-chip' + (cur.indexOf(t) >= 0 ? ' inc' : '');
-    c.textContent = t;
-    c.addEventListener('click', function(){
-      var ix = cur.indexOf(t);
-      var nowInc = ix < 0;
-      if (ix >= 0) cur.splice(ix, 1); else cur.push(t);
-      c.classList.toggle('inc', nowInc);
-      // D4: a refused save must not leave a phantom chip state - hand
-      // the painter a revert that puts the tag back exactly as it was
-      _retSaveAud(cur.slice(), function(){
-        var jx = cur.indexOf(t);
-        if (nowInc && jx >= 0) cur.splice(jx, 1);
-        if (!nowInc && jx < 0) cur.push(t);
-        c.classList.toggle('inc', !nowInc);
-      });
-    });
-    box.appendChild(c);
-  });
-  // SELECT ALL / CLEAR ALL (Matt 11/11: "let them select all if they
-  // want all"): one control, state-driven label, same silent save with
-  // a full revert on failure
-  if (_ta) {
-    var _every = !!RET_AUD.length && cur.length >= RET_AUD.length;
-    _ta.style.display = '';
-    _ta.textContent = _every ? 'Clear all' : 'Select all';
-    _ta.onclick = function(){
-      // operate on PAGE.data itself - the paint reads it, and a prior
-      // save's tags.slice() DETACHES any closure-held array (the very
-      // bug this control shipped with: clear-all zeroed a stale copy)
-      var _before = (((PAGE.data || {}).audience || {})
-                     .include_tags || []).slice();
-      var _target = _every ? [] : RET_AUD.slice();
-      PAGE.data.audience = PAGE.data.audience || {};
-      PAGE.data.audience.include_tags = _target;
-      _retPaintTags();
-      _retSaveAud(_target.slice(), function(){
-        PAGE.data.audience.include_tags = _before;
-        _retPaintTags();
-      });
-    };
-  }
-}
-function _retSelTags(){
-  return [...document.querySelectorAll('#retAudTags .aud-chip.inc')]
-    .map(function(c){ return c.textContent; });
-}
-function _retSaveAud(tags, revert){
-  if (!PAGE.token) return;
-  var swO = $('retAudOpen'), swL = $('retAudLost');
-  api('/api/ghl/settings', {audience: {
-    skip_open_opp: swO ? swO.checked : true,
-    include_lost_opp: swL ? swL.checked : true,
-    include_tags: tags}}).then(function(j){
-      // D4/D6: success is the explicit ack (audience_saved on the wire
-      // for retainer saves); failures revert + toast - successes are
-      // SILENT (Matt 11/11: the standing note on the screen carries
-      // the next-campaign timing, no saved popup)
-      if (j && j.ok && !j.audience_ignored && PAGE.data) {
-        PAGE.data.audience = PAGE.data.audience || {};
-        PAGE.data.audience.include_tags = tags.slice();
-        if (swO) PAGE.data.audience.skip_open_opp = swO.checked;
-        if (swL) PAGE.data.audience.include_lost_opp = swL.checked;
-      } else {
-        if (revert) revert();
-        toast('The change did not save. Try again in a moment.');
-      }
-    }).catch(function(){
-      if (revert) revert();
-      toast('The change did not save. Try again in a moment.');
-    });
-}
-// last calendar id known saved (or loaded as current) - the revert
-// target when the server refuses a mid-chapter change (D4)
-var RET_CAL = '';
-function _retCalRefused(sel, err){
-  if (sel && RET_CAL) {
-    for (var i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === RET_CAL) { sel.selectedIndex = i; break; }
-    }
-  }
-  toast(err || 'The calendar change did not save.');
-}
-function _retSaveCal(c, sel){
-  if (!PAGE.token || !c) return;
-  api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
-    .then(function(j){
-      if (j && j.ok) { RET_CAL = c.id; return; }   // silent: the
-      // standing note on the screen carries the next-campaign timing
-      _retCalRefused(sel, j && j.error);
-    }).catch(function(){ _retCalRefused(sel, null); });
-}
-function _retOverlayMode(){
-  // D8 (judge RR-1): an EXISTING retainer opens this overlay to adjust
-  // their setup - setup framing, not the sales pitch. A non-retainer
-  // sees the pitch; the pickers stay hidden there because their saves
-  // are server-side no-ops until the client is on retainer status.
-  var on = ((((PAGE.data || {}).client) || {}).state === 'retainer')
-           || S === 'retainer';
-  var pit = $('retPitch'), sig = $('retSignup'), hd = $('retHead'),
-      tb = $('retSetupTags'), cb = $('retSetupCal'), nt = $('retSetupNote'),
-      cr = $('retCancelRow'), st = $('retainerStart'), cl = $('retCloseBtn'),
-      sv = $('retSaveBtn');
-  if (pit) pit.style.display = on ? 'none' : '';
-  if (sig) sig.style.display = on ? 'none' : '';
-  if (tb) tb.style.display = on ? '' : 'none';
-  if (cb) cb.style.display = on ? '' : 'none';
-  if (nt) nt.style.display = on ? '' : 'none';
-  if (cr) cr.style.display = on ? '' : 'none';
-  if (st) st.style.display = on ? 'none' : '';
-  if (sv) sv.classList.toggle('hide', !on);
-  if (hd) hd.textContent = on ? 'Your retainer setup'
-                              : 'Work your cold leads, automatically';
-  if (cl) cl.textContent = on ? 'Back' : 'Not now';
-}
-$('setGoRetainer').addEventListener('click', function(){
-  close_('settingsOverlay');
-  _retOverlayMode();
-  _retLoadSetup();
-  open_('retainerOverlay');
-});
-$('retSaveBtn').addEventListener('click', function(){
-  close_('retainerOverlay');
-});
+// RETAINER AD (Matt 11/10): the ad lives behind a top-bar link. The
+// overlay is PITCH-ONLY (Matt 11/11 final: no retainer settings tab -
+// one Settings menu for everyone; the signup link disappears once on
+// retainer and Settings gains the Cancel retainer row).
 $('retainerAdLink').addEventListener('click', function(){
-  _retOverlayMode();
-  _retLoadSetup();
   open_('retainerOverlay');
 });
-document.addEventListener('change', function(ev){
-  if (ev.target && ev.target.id === 'retCal') {
-    var sel = ev.target;
-    var opt = sel.options[sel.selectedIndex];
-    if (opt && opt.value) _retSaveCal({id: opt.value, name: opt.textContent}, sel);
-  }
-});
-$('retCancelLink').addEventListener('click', function(){
+$('setCancelRet').addEventListener('click', function(){
   open_('cancelRetOverlay');
 });
 $('confirmCancelRet').addEventListener('click', function(){
@@ -2786,18 +2547,11 @@ $('settingsLink').addEventListener('click', function(){
   // start dialog's ask)
   _loadSurfaceRow();
   _loadCalPicker();
-  // ONE HOME (Matt 11/11: "two settings pages that do mostly the same
-  // thing"): the duplicated control is the CALENDAR pick - on retainer
-  // it lives only in Retainer settings. The booking-app row keeps its
-  // single home HERE (the retainer overlay has no surface control).
+  // ONE SETTINGS MENU for everyone (Matt 11/11); the only state change
+  // on retainer is the Cancel retainer row appearing
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
-  var _calRowS = $('setCalendarRow');
-  if (_calRowS) _calRowS.style.display = _isRetS ? 'none' : '';
-  var _ptrS = $('setRetCalPointer');
-  if (_ptrS) _ptrS.style.display = _isRetS ? '' : 'none';
-  if (_isRetS) {
-    $('setCalendar').disabled = true;   // save builder skips it
-  }
+  var _crS = $('setCancelRetRow');
+  if (_crS) _crS.style.display = _isRetS ? '' : 'none';
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
   var dr = $('setDataRow');
