@@ -1564,8 +1564,18 @@ function renderInvoices(rows){
 }
 function renderPast(rows){
   var tb = $('pastBody'); if (!tb) return;
+  var _nWas = PAGE.pastN;
   PAGE.pastN = rows.length;
   PAGE.lastPast = rows.length ? rows[rows.length - 1] : null;
+  // HEADING TRUTH (Matt 11/10, live-caught: "the campaign tracker now
+  // says its campaign 3 but its only campaign 1"): apply() names the
+  // heading from pastN and can run BEFORE this reset (the demo paint
+  // stamps a fixture pastN at boot; the live payload's apply() then
+  // names the heading from the STALE number and nothing repainted it).
+  // Re-apply whenever the count actually changes - idempotent, cheap.
+  if (typeof S === 'string' && S && PAGE.pastN !== _nWas) {
+    try { apply(S); } catch (e) {}
+  }
   if (!rows.length) {
     tb.innerHTML = '<tr><td colspan="4" class="empty">Your campaign history appears here.</td></tr>';
     return;
