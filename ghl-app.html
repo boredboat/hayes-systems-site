@@ -1084,23 +1084,23 @@ body{padding:0}
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
     <div class="set-row" id="setSurfaceRow">
-      <div class="set-lab">Calendar app<small>Locked while a campaign runs</small></div>
+      <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
       </select></div>
     </div>
     <div class="set-row" id="setCalendarRow">
-      <div class="set-lab">Calendar<small>Locked while a campaign runs</small></div>
+      <div class="set-lab">Calendar<small id="setCalNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
-    </div>
-    <div class="set-row" id="setCancelRetRow" style="display:none">
-      <div class="set-lab" style="color:#c62828">Cancel retainer<small>Stops the monthly fee. Your current campaign runs to its finish.</small></div>
-      <div class="set-ctl"><button class="btn btn-danger" id="setCancelRet">Cancel retainer</button></div>
     </div>
     <div class="set-row">
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
       <div class="set-ctl"><button class="btn btn-ghost" id="setCardUpdate">Update</button></div>
+    </div>
+    <div class="set-row" id="setCancelRetRow" style="display:none">
+      <div class="set-lab" style="color:#c62828">Cancel retainer<small>Stops the monthly fee. Your current campaign runs to its finish.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setCancelRet">Cancel retainer</button></div>
     </div>
     <div class="set-row" id="setDataRow">
       <div class="set-lab" style="color:#c62828">Delete my data<small>Erases your data from our servers. This cancels any active campaigns and cannot be undone.</small></div>
@@ -2552,6 +2552,14 @@ $('settingsLink').addEventListener('click', function(){
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
   var _crS = $('setCancelRetRow');
   if (_crS) _crS.style.display = _isRetS ? '' : 'none';
+  // the lock note is campaign-client truth; a retainer changes these
+  // any time and the change rides the next campaign (Matt 11/11)
+  var _lockTxt = _isRetS
+    ? 'Changes take effect on your next campaign'
+    : 'Locked while a campaign runs';
+  var _sn = $('setSurfaceNote'), _cn = $('setCalNote');
+  if (_sn) _sn.textContent = _lockTxt;
+  if (_cn) _cn.textContent = _lockTxt;
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
   var dr = $('setDataRow');
