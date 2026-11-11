@@ -138,7 +138,9 @@ td .when{color:var(--mut);font-size:13px}
 .feedrow:first-child{border-top:none}
 .feedrow .fw{color:var(--mut);font-size:12.5px;white-space:nowrap}
 /* action row */
-.actrow{display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap}
+.actrow{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:24px}
+.actrow-btns{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.actrow .cooldown,.actrow .retainer-line{text-align:center;max-width:520px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:background .15s}
 .btn-primary{background:var(--acc);color:#fff}
 .btn-primary:hover{background:var(--acch)}
@@ -912,12 +914,14 @@ body{padding:0}
 </div>
 
 <div class="actrow" id="actRow">
-  <button class="btn btn-primary" id="reqBtn" disabled>Start a new campaign</button>
-  <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
-  <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
-  <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
+  <div class="actrow-btns">
+    <button class="btn btn-primary" id="reqBtn" disabled>Start a new campaign</button>
+    <button class="btn btn-ghost" id="pauseBtn">Pause campaign</button>
+    <button class="btn btn-danger" id="cancelBtn">Cancel campaign</button>
+    <button class="btn btn-danger hide" id="cancelRetBtn">Cancel retainer</button>
+  </div>
   <span class="cooldown" id="cooldown">Campaigns need at least 3 months between runs. Your next campaign opens January 28, 2027.</span>
-  <span class="cooldown" id="retainerLine">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</span>
+  <span class="retainer-line" id="retainerLine">Teams with large lists may want to <span class="retainer" id="retainerLink">check out our retainer service</span> for continual, automatic coverage.</span>
 </div>
 
 <div class="foot">Hayes Systems &middot; <a href="https://www.hayessystems.com" target="_blank" rel="noopener">hayessystems.com</a></div>
