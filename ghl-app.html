@@ -1035,6 +1035,19 @@ body{padding:0}
         No new setup</li>
     </ul>
     <div class="ad-price">$250 per month + $40 per appointment</div>
+    <!-- RETAINER SETUP (Matt 11/10: "the client should be able to select
+         tags and calendars like they can on a regular campaign") - the
+         audience IS the next chapter's pool; the calendar books the
+         calls. Both save on selection, exactly like the campaign flow. -->
+    <div class="ob-field" style="margin:14px 0 4px">
+      <label>Tags to include (your chapter's pool)</label>
+      <div id="retAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+      <div style="font-size:12px;color:var(--mut);margin-top:4px">No tags selected means your entire contact list. Leads with an open opportunity are always skipped.</div>
+    </div>
+    <div class="ob-field" style="margin:4px 0 8px">
+      <label for="retCal">Calendar for booked calls</label>
+      <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+    </div>
     <label class="ad-check"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after clicking "Start retainer service".</span></label>
     <div class="ob-field" style="margin:-6px 0 18px"><label for="retSign">Type your name to sign</label>
@@ -2210,8 +2223,94 @@ function _prepPoll(){
 
 // Retainer
 // RETAINER AD (Matt 11/10): the action-row pitch line is gone; the ad
-// lives behind a top-bar link instead
-$('retainerAdLink').addEventListener('click', function(){ open_('retainerOverlay'); });
+// lives behind a top-bar link instead. The overlay carries SETUP
+// pickers (Matt 11/10: tags + calendar "like they can on a regular
+// campaign"): tags = the next chapter's pool (saved via settings on
+// selection - retainer clients have no Start click to carry them);
+// calendar = where booked calls land. Both reuse the campaign loaders.
+var RET_AUD = null;
+function _retLoadSetup(){
+  if (!PAGE.token) return;
+  // tags (once per open; chips render with counts when preview lands)
+  if (RET_AUD === null) {
+    RET_AUD = [];
+    api('/api/ghl/tags').then(function(j){
+      RET_AUD = (j && j.ok && j.tags) ? j.tags : [];
+      _retPaintTags();
+    }).catch(function(){ RET_AUD = null; });
+  }
+  // calendar list (round-robin only, like the wizard)
+  var sel = $('retCal');
+  if (sel && !sel.options.length) {
+    sel.innerHTML = '<option>Loading calendars...</option>';
+    api('/api/ghl/calendars').then(function(j){
+      if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
+      var cals = (j.calendars || []).filter(function(c){ return c.rr; });
+      sel.innerHTML = '';
+      if (!cals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
+      var cur = ((PAGE.data || {}).calendar || {}).id || j.current || '';
+      cals.forEach(function(c){
+        var o = document.createElement('option');
+        o.value = c.id; o.textContent = c.name;
+        if (c.id === cur) o.selected = true;
+        sel.appendChild(o);
+      });
+      // one RR calendar auto-saves (the wizard's honest-display rule)
+      if (cals.length === 1) _retSaveCal(cals[0]);
+    }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
+  }
+}
+function _retPaintTags(){
+  var box = $('retAudTags'); if (!box) return;
+  var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
+  box.innerHTML = '';
+  if (!(RET_AUD || []).length) {
+    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">No tags in this location yet</span>';
+    return;
+  }
+  RET_AUD.forEach(function(t){
+    var c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'aud-chip' + (cur.indexOf(t) >= 0 ? ' inc' : '');
+    c.textContent = t;
+    c.addEventListener('click', function(){
+      var ix = cur.indexOf(t);
+      if (ix >= 0) cur.splice(ix, 1); else cur.push(t);
+      c.classList.toggle('inc', ix < 0);
+      _retSaveAud(cur.slice());
+    });
+    box.appendChild(c);
+  });
+}
+function _retSaveAud(tags){
+  if (!PAGE.token) return;
+  var a = ((PAGE.data || {}).audience) || {};
+  api('/api/ghl/settings', {audience: {
+    skip_open_opp: a.skip_open_opp !== false,
+    include_lost_opp: a.include_lost_opp !== false,
+    include_tags: tags}}).then(function(j){
+      if (j && j.ok && PAGE.data) {
+        PAGE.data.audience = PAGE.data.audience || {};
+        PAGE.data.audience.include_tags = tags.slice();
+      }
+    }).catch(function(){});
+}
+function _retSaveCal(c){
+  if (!PAGE.token || !c) return;
+  api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
+    .catch(function(){});
+}
+$('retainerAdLink').addEventListener('click', function(){
+  _retLoadSetup();
+  open_('retainerOverlay');
+});
+document.addEventListener('change', function(ev){
+  if (ev.target && ev.target.id === 'retCal') {
+    var sel = ev.target;
+    var opt = sel.options[sel.selectedIndex];
+    if (opt && opt.value) _retSaveCal({id: opt.value, name: opt.textContent});
+  }
+});
 $('cancelRetBtn').addEventListener('click', function(){ open_('cancelRetOverlay'); });
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
