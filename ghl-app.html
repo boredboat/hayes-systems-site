@@ -1028,14 +1028,17 @@ body{padding:0}
 <div class="overlay" id="cancelRetOverlay">
   <div class="dialog">
     <h3>Cancel your retainer?</h3>
-    <p>Cancelling retainer service stops the monthly fee. Your current
-    current campaign runs to its finish and appointments that land during
-    it are billed at the retainer rate. After that, your account reverts
-    to regular campaign terms. Monthly fees are non-refundable and there
-    are no cancellation fees.</p>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:2px">Here is what happens when the retainer stops:</p>
+    <ul class="cx-list">
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>The <b>monthly fee stops</b> - no further monthly charges</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Your <b>current campaign runs to its finish</b> - appointments that land during it bill at the retainer rate</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>After that, your account reverts to <b>regular campaign terms</b></span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Monthly fees already paid are <b>non-refundable</b> - there are no cancellation fees</span></li>
+    </ul>
+    <p class="cx-help">Need help? Something not working as expected? <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a></p>
     <div class="dialog-actions">
       <button class="btn btn-danger" id="confirmCancelRet">Yes, cancel retainer</button>
-      <button class="btn btn-primary" data-close="cancelRetOverlay">Keep retainer</button>
+      <button class="btn btn-primary" data-close="cancelRetOverlay" id="keepRetBtn">Keep retainer</button>
     </div>
   </div>
 </div>
@@ -2305,7 +2308,11 @@ $('retainerAdLink').addEventListener('click', function(){
   open_('retainerOverlay');
 });
 $('setCancelRet').addEventListener('click', function(){
+  close_('settingsOverlay');   // never stacked underneath (Matt 11/11)
   open_('cancelRetOverlay');
+});
+$('keepRetBtn').addEventListener('click', function(){
+  open_('settingsOverlay');    // Keep returns you where you were
 });
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
