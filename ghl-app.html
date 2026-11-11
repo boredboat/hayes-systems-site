@@ -1066,16 +1066,25 @@ body{padding:0}
          audience IS the next chapter's pool; the calendar books the
          calls. Both save on selection, exactly like the campaign flow.
          D8 (judge RR-1): shown to EXISTING retainers (setup mode); a
-         non-retainer sees the pitch only - their saves are no-ops. -->
+         non-retainer sees the pitch only - their saves are no-ops.
+         11/11 (Matt): the open/lost opportunity switches ride along
+         (same toggles as the campaign ask), and the queue is stated ON
+         the screen - no saved popup. -->
     <div class="ob-field" id="retSetupTags" style="margin:14px 0 4px">
-      <label>Tags to include (your chapter's pool)</label>
+      <label>Leads to include (your chapter's pool)</label>
+      <div class="aud-tgs" style="margin-top:8px">
+        <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
+        <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
+      </div>
+      <div style="font-size:12px;font-weight:700;letter-spacing:.02em;color:#374151;margin-top:12px">Tags to include</div>
       <div id="retAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
-      <div style="font-size:12px;color:var(--mut);margin-top:4px">No tags selected means your entire contact list. Leads with an open opportunity are always skipped.</div>
+      <div style="font-size:12px;color:var(--mut);margin-top:4px">No tags selected means your entire contact list.</div>
     </div>
     <div class="ob-field" id="retSetupCal" style="margin:4px 0 8px">
       <label for="retCal">Calendar for booked calls</label>
       <select id="retCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
+    <div id="retSetupNote" style="font-size:12.5px;color:var(--mut);margin:2px 0 14px">Changes take effect on your next campaign.</div>
     <div id="retSignup">
     <label class="ad-check" style="margin:0 0 18px"><input type="checkbox" id="retainerAgree">
       <span>By checking this box you agree to the <a href="https://www.hayessystems.com/retainer-terms.html" target="_blank">retainer terms</a> and understand that service and billing begins immediately after placing your order.</span></label>
@@ -2274,6 +2283,21 @@ function _retLoadSetup(){
       _retPaintTags();
     }).catch(function(){ RET_AUD = null; _retPaintTags(); });
   }
+  // opportunity switches (Matt 11/11: the setup must NOT strip them):
+  // prefill from the saved profile, save on flip - silently, the
+  // standing note on the screen carries the next-campaign timing
+  var a = ((PAGE.data || {}).audience) || {};
+  var swO = $('retAudOpen'), swL = $('retAudLost');
+  if (swO && swL) {
+    swO.checked = a.skip_open_opp !== false;
+    swL.checked = a.include_lost_opp !== false;
+    swO.onchange = function(){
+      _retSaveAud(_retSelTags(), function(){ swO.checked = !swO.checked; });
+    };
+    swL.onchange = function(){
+      _retSaveAud(_retSelTags(), function(){ swL.checked = !swL.checked; });
+    };
+  }
   // calendar list (round-robin only, like the wizard)
   var sel = $('retCal');
   if (sel && !sel.options.length) {
@@ -2333,25 +2357,33 @@ function _retPaintTags(){
     box.appendChild(c);
   });
 }
+function _retSelTags(){
+  return [...document.querySelectorAll('#retAudTags .aud-chip.inc')]
+    .map(function(c){ return c.textContent; });
+}
 function _retSaveAud(tags, revert){
   if (!PAGE.token) return;
-  var a = ((PAGE.data || {}).audience) || {};
+  var swO = $('retAudOpen'), swL = $('retAudLost');
   api('/api/ghl/settings', {audience: {
-    skip_open_opp: a.skip_open_opp !== false,
-    include_lost_opp: a.include_lost_opp !== false,
+    skip_open_opp: swO ? swO.checked : true,
+    include_lost_opp: swL ? swL.checked : true,
     include_tags: tags}}).then(function(j){
       // D4/D6: success is the explicit ack (audience_saved on the wire
-      // for retainer saves); anything else reverts the chip + toasts
+      // for retainer saves); failures revert + toast - successes are
+      // SILENT (Matt 11/11: the standing note on the screen carries
+      // the next-campaign timing, no saved popup)
       if (j && j.ok && !j.audience_ignored && PAGE.data) {
         PAGE.data.audience = PAGE.data.audience || {};
         PAGE.data.audience.include_tags = tags.slice();
+        if (swO) PAGE.data.audience.skip_open_opp = swO.checked;
+        if (swL) PAGE.data.audience.include_lost_opp = swL.checked;
       } else {
         if (revert) revert();
-        toast('The tag change did not save. Try again in a moment.');
+        toast('The change did not save. Try again in a moment.');
       }
     }).catch(function(){
       if (revert) revert();
-      toast('The tag change did not save. Try again in a moment.');
+      toast('The change did not save. Try again in a moment.');
     });
 }
 // last calendar id known saved (or loaded as current) - the revert
@@ -2369,13 +2401,8 @@ function _retSaveCal(c, sel){
   if (!PAGE.token || !c) return;
   api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
     .then(function(j){
-      if (j && j.ok) {
-        RET_CAL = c.id;
-        if (j.calendar_pending) {
-          toast('Saved. Applies to your next campaign.');
-        }
-        return;
-      }
+      if (j && j.ok) { RET_CAL = c.id; return; }   // silent: the
+      // standing note on the screen carries the next-campaign timing
       _retCalRefused(sel, j && j.error);
     }).catch(function(){ _retCalRefused(sel, null); });
 }
@@ -2387,12 +2414,13 @@ function _retOverlayMode(){
   var on = ((((PAGE.data || {}).client) || {}).state === 'retainer')
            || S === 'retainer';
   var pit = $('retPitch'), sig = $('retSignup'), hd = $('retHead'),
-      tb = $('retSetupTags'), cb = $('retSetupCal'),
+      tb = $('retSetupTags'), cb = $('retSetupCal'), nt = $('retSetupNote'),
       st = $('retainerStart'), cl = $('retCloseBtn');
   if (pit) pit.style.display = on ? 'none' : '';
   if (sig) sig.style.display = on ? 'none' : '';
   if (tb) tb.style.display = on ? '' : 'none';
   if (cb) cb.style.display = on ? '' : 'none';
+  if (nt) nt.style.display = on ? '' : 'none';
   if (st) st.style.display = on ? 'none' : '';
   if (hd) hd.textContent = on ? 'Your retainer setup'
                               : 'Work your cold leads, automatically';
@@ -2545,10 +2573,9 @@ function _saveSurface(v){
   api('/api/ghl/settings', {scheduling_surface: v}).then(function(j){
     if (j && j.ok) {
       if (j.surface_pending) {
-        // the queue (Matt 11/11): the live chapter keeps its booking
-        // app; this pick lands with the next campaign
+        // the queue (Matt 11/11): silent save - the live chapter keeps
+        // its booking app; the pick lands with the next campaign
         _surfStateLine();
-        toast('Saved. Your booking app changes with your next campaign.');
         return;
       }
       if (PAGE.data) PAGE.data.calendar = PAGE.data.calendar || {};
@@ -3496,12 +3523,7 @@ $('settingsSave').addEventListener('click', function(){
     btn.disabled = false;
     if (j && j.ok) {
       close_('settingsOverlay');
-      if (j.calendar_pending || j.surface_pending) {
-        toast('Settings saved. Calendar changes apply to your next'
-              + ' campaign.');
-      } else {
-        toast('Settings saved.');
-      }
+      toast('Settings saved.');
       if (PAGE.data && PAGE.data.client) {
         PAGE.data.client.email = em;
         PAGE.data.client.name = $('setBusiness').value.trim();
