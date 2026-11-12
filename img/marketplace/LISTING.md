@@ -19,7 +19,7 @@ Turn the contacts already in your CRM into booked appointments.
 
 Every real estate team has a database full of past clients and old inquiries who went quiet. Hayes Systems turns them into appointments. Install the app, connect your account, and we get to work: your inactive contacts get a personalized email, and the moment someone replies, our AI booking assistant calls them back and books them straight into an open slot on your calendar, while the lead is still warm.
 
-You only pay when an appointment lands. Campaigns are $60 per booked appointment and nothing else. No setup fees, no per-minute charges, no surcharges. Retainer service keeps campaigns running back to back for $250 a month plus $40 per booked appointment. No-shows you report are refunded, weekly reports keep you posted, and lead burn protection means each contact hears from you at most once every 180 days.
+You only pay when an appointment lands. Campaigns are $60 per booked appointment and nothing else. No setup fees, no per-minute charges, no surcharges. Retainer service keeps campaigns running back to back for $250 a month plus $40 per booked appointment. No-shows you report are refunded, your recent numbers live in the app, and lead burn protection means each contact hears from you at most once every 180 days.
 
 Stop paying for new leads. Start reviving the ones you have.
 
