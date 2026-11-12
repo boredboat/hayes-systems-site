@@ -335,8 +335,11 @@ td .when{color:var(--mut);font-size:13px}
 .aud-chips::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
 /* AUDIENCE O3-v2 (Matt 11/8, mock-approved): toggles + count card top,
    include-only tags across the bottom; zero tags selected is invalid */
-.aud-top{display:grid;grid-template-columns:1fr 216px;gap:20px;margin-bottom:18px}
-.aud-tgs .aud-tg{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;cursor:pointer}
+.aud-top{display:grid;grid-template-columns:1fr 168px;gap:16px;margin-bottom:14px}
+#reqOverlay .dialog{padding:20px 24px}
+#reqOverlay .dialog h3{margin-bottom:8px}
+#reqOverlay .aud-foot{display:none}
+.aud-tgs .aud-tg{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:11px 12px;cursor:pointer}
 .aud-tgs .aud-tg:hover{border-color:var(--acc)}
 .aud-tgs .aud-tg + .aud-tg{margin-top:8px}
 .aud-tg input{position:absolute;opacity:0;pointer-events:none}
@@ -347,13 +350,13 @@ td .when{color:var(--mut);font-size:13px}
 .aud-tg .sw:after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .aud-tg input:checked ~ .sw{background:var(--acc)}
 .aud-tg input:checked ~ .sw:after{left:18px}
-.aud-count{background:#f0f7fe;border:1px solid #dbeafe;border-radius:10px;padding:16px 16px;display:flex;flex-direction:column;gap:6px;justify-content:center;text-align:center}
-.aud-count .n{font-size:31px;font-weight:800;color:#15803d;line-height:1;letter-spacing:-.01em}
+.aud-count{background:#f0f7fe;border:1px solid #dbeafe;border-radius:10px;padding:12px 12px;display:flex;flex-direction:column;gap:6px;justify-content:center;text-align:center}
+.aud-count .n{font-size:26px;font-weight:800;color:#15803d;line-height:1;letter-spacing:-.01em}
 .aud-count .l{font-size:12px;color:#37617f}
-.aud-tagsec{border-top:1px solid #eef1f4;padding-top:14px}
+.aud-tagsec{border-top:1px solid #eef1f4;padding-top:11px}
 .aud-taghead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .aud-taghead .t{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b7280}
-.aud-mod{margin-top:16px;background:#f0f7fe;border:1px solid #dbeafe;border-radius:10px;padding:13px 15px;display:flex;align-items:center;gap:13px}
+.aud-mod{margin-top:12px;background:#f0f7fe;border:1px solid #dbeafe;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:12px}
 .aud-mod .tt{flex:1}
 .aud-mod .tt b{display:block;font-size:13px;font-weight:700;color:#0b2a44}
 .aud-mod .tt span{font-size:12.5px;color:#37617f}
@@ -1275,14 +1278,10 @@ body{padding:0}
 <div class="overlay" id="reqOverlay">
   <div class="dialog">
     <h3>Start your campaign</h3>
-    <p>Your campaign is set up and ready. Starting begins the paid
-    service per the terms you agreed to: we read your list now (a minute
-    or two), then your audience receives their emails and interested
-    leads book straight onto your calendar.</p>
+    <p>Please review the following campaign settings for accuracy and make any necessary changes.</p>
     <div class="field"><label>Who this campaign contacts</label>
       <div id="audReq"></div>
-      <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Your choice applies to this campaign and locks in when it starts. Duplicates, opted-out contacts, and contacts with no email are always removed.
-      <br><a id="reqMailLink" href="#" style="color:var(--mut);text-decoration:underline;text-underline-offset:3px">See a sample email</a></p></div>
+    </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
       <button class="btn btn-primary" id="confirmReq">Start new campaign</button>
@@ -1988,11 +1987,6 @@ function _openReqDialog(){
   // About-N count, and the sample-email link that used to ride in
   // Settings. Submitted WITH the request; frozen from launch.
   if (PAGE.token) { audFromData(); audRender(); }
-  var rml = $('reqMailLink');
-  if (rml) rml.onclick = function(ev){
-    ev.preventDefault();
-    _openMailPreview();
-  };
   open_('reqOverlay');
 }
 function _renderCfgCheck(d){
