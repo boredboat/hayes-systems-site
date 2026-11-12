@@ -1075,6 +1075,43 @@ body{padding:0}
   </div>
 </div>
 
+<div class="overlay" id="chgOverlay">
+  <div class="dialog">
+    <h3>Change campaign settings</h3>
+    <p style="font-size:12.5px;color:var(--mut);margin:2px 0 14px">Changes here take effect on your next campaign.</p>
+    <div class="ob-field" style="margin:0 0 10px">
+      <label for="chgSurface">Calendar app</label>
+      <select id="chgSurface" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+        <option value="ghl">Your GoHighLevel calendar</option>
+        <option value="calendly">Calendly</option>
+      </select>
+    </div>
+    <div class="ob-field" style="margin:0 0 14px">
+      <label for="chgCal">Calendar</label>
+      <select id="chgCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
+    </div>
+    <div class="ob-field" style="margin:0 0 6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <label style="margin:0">Leads to include</label>
+        <span id="retTagAll2" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
+      </div>
+      <div class="aud-tgs" style="margin-top:8px">
+        <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
+        <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
+      </div>
+      <div id="setAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+    </div>
+    <div class="set-row" id="setStopRow" style="display:flex;margin:10px 0 0;padding-top:12px;border-top:1px solid var(--bd)">
+      <div class="set-lab" style="color:#c62828;padding:0;border:none">Stop campaign<small>Ends this campaign now. Make your changes, then start the next one from the main page.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setStopBtn">Stop campaign</button></div>
+    </div>
+    <div class="dialog-actions" style="margin-top:16px">
+      <button class="btn btn-ghost" data-close="chgOverlay">Back</button>
+      <button class="btn btn-primary" id="chgDone">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="settingsOverlay">
   <div class="dialog">
     <h3>Settings</h3>
@@ -1089,6 +1126,10 @@ body{padding:0}
     <div id="setRetHeader" style="display:none;border-top:1px solid var(--bd);margin:4px 0 -6px;padding-top:14px">
       <div style="font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)">Retainer</div>
     </div>
+    <div class="set-row" id="setChgRow" style="display:none">
+      <div class="set-lab">Campaign settings<small>Calendar, booking app and lead tags for your next campaign</small></div>
+      <div class="set-ctl"><button class="btn btn-ghost" id="setChgBtn">Change</button></div>
+    </div>
     <div class="set-row" id="setSurfaceRow">
       <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
@@ -1099,25 +1140,6 @@ body{padding:0}
     <div class="set-row" id="setCalendarRow">
       <div class="set-lab">Calendar<small id="setCalNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
-    </div>
-    <div class="set-row" id="setAudRow" style="display:none">
-      <div class="set-lab">Leads to include<small>Changes take effect on your next campaign</small></div>
-      <div class="set-ctl" style="text-align:right">
-        <span id="setTagAll" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
-      </div>
-    </div>
-    <div class="set-row" id="setAudTagsRow" style="display:none">
-      <div class="set-lab" style="flex:0 0 100%;max-width:none">
-        <div class="aud-tgs" style="margin:0">
-          <label class="aud-tg"><input type="checkbox" id="setAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
-          <label class="aud-tg"><input type="checkbox" id="setAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
-        </div>
-        <div id="setAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
-      </div>
-    </div>
-    <div class="set-row" id="setStopRow" style="display:none">
-      <div class="set-lab" style="color:#c62828">Stop campaign<small>Ends this campaign now. Make your changes, then start the next one from the main page.</small></div>
-      <div class="set-ctl"><button class="btn btn-danger" id="setStopBtn">Stop campaign</button></div>
     </div>
     <div class="set-row">
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
@@ -1850,7 +1872,8 @@ $('confirmResume').addEventListener('click', function(){
 $('cancelBtn').addEventListener('click', function(){ open_('confirmOverlay'); });
 $('confirmCancel').addEventListener('click', function(){
   close_('confirmOverlay');
-  close_('settingsOverlay');   // stopping from the section closes both
+  close_('settingsOverlay');   // stopping closes the whole flow
+  close_('chgOverlay');
   if (PAGE.live) {
     api('/api/ghl/cancel-campaign', {}).then(function(j){
       if (j.ok) {
@@ -2387,7 +2410,7 @@ function _retPaintTags(){
   var box = $('setAudTags'); if (!box) return;
   var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
   box.innerHTML = '';
-  var _ta = $('setTagAll');
+  var _ta = $('retTagAll2');
   if (_ta) _ta.style.display = 'none';
   if (RET_AUD === null) {
     box.innerHTML = '<span style="font-size:13px;color:var(--mut)">' +
@@ -2460,8 +2483,63 @@ function _retLoadAud(){
     _retPaintTags();
   }
 }
+$('setChgBtn').addEventListener('click', function(){
+  close_('settingsOverlay');
+  _openChg();
+});
+function _openChg(){
+  var a = ((PAGE.data || {}).calendar || {});
+  var sf = $('chgSurface');
+  sf.value = (a.surface === 'calendly') ? 'calendly' : 'ghl';
+  sf.disabled = !PAGE.live;
+  sf.onchange = function(){
+    var v = sf.value === 'calendly' ? 'calendly' : 'ghl';
+    _saveSurface(v);
+    setTimeout(function(){
+      sf.value = (((PAGE.data || {}).calendar || {}).surface
+                  === 'calendly') ? 'calendly' : 'ghl';
+    }, 600);
+  };
+  // the calendar list mirrors the settings loader
+  var sel = $('chgCal');
+  sel.innerHTML = '<option>Loading calendars...</option>';
+  sel.disabled = false;
+  api('/api/ghl/calendars').then(function(j){
+    if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
+    var cals = (j.calendars || []).filter(function(c){ return c.rr; });
+    sel.innerHTML = '';
+    if (!cals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
+    var cur = a.live && a.live.calendar ? a.live.calendar
+      : (((PAGE.data || {}).calendar || {}).id) || j.current || '';
+    cals.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      if (c.id === cur) o.selected = true;
+      sel.appendChild(o);
+    });
+    CHG_CUR_CAL = cur;
+    sel.onchange = function(){
+      var opt = sel.options[sel.selectedIndex];
+      if (opt && opt.value) {
+        api('/api/ghl/settings', {calendarId: opt.value,
+                                  calendarName: opt.textContent})
+          .then(function(){ CHG_CUR_CAL = opt.value; })
+          .catch(function(){ sel.value = CHG_CUR_CAL; });
+      }
+    };
+  }).catch(function(){ sel.innerHTML = '<option>Unavailable right now</option>'; });
+  var _stopR = $('setStopRow');
+  if (_stopR) _stopR.style.display =
+    (PAGE.data && PAGE.data.campaign) ? 'flex' : 'none';
+  _retLoadAud();
+  open_('chgOverlay');
+}
+var CHG_CUR_CAL = '';
 $('setStopBtn').addEventListener('click', function(){
   open_('confirmOverlay');
+});
+$('chgDone').addEventListener('click', function(){
+  close_('chgOverlay');
 });
 $('setCancelRet').addEventListener('click', function(){
   close_('settingsOverlay');   // never stacked underneath (Matt 11/11)
@@ -2724,14 +2802,18 @@ $('settingsLink').addEventListener('click', function(){
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
   var _crS = $('setCancelRetRow');
   if (_crS) _crS.style.display = _isRetS ? '' : 'none';
-  // the retainer section (Matt 11/11): header + tag pool + stop row
-  ['setRetHeader', 'setAudRow', 'setAudTagsRow'].forEach(function(id){
-    var el = $(id); if (el) el.style.display = _isRetS ? '' : 'none';
+  // the retainer section (Matt 11/11 final): ONE button opens the
+  // change-workflow popup; the inline calendar rows hide for retainers
+  // (their home is the popup)
+  var _chgR = $('setChgRow');
+  if (_chgR) _chgR.style.display = _isRetS ? '' : 'none';
+  ['setSurfaceRow', 'setCalendarRow'].forEach(function(id){
+    var el = $(id); if (el) el.style.display = _isRetS ? 'none' : '';
   });
-  var _stopR = $('setStopRow');
-  if (_stopR) _stopR.style.display =
-    (_isRetS && PAGE.data && PAGE.data.campaign) ? '' : 'none';
-  if (_isRetS) _retLoadAud();
+  if (_isRetS) {
+    $('setSurface').disabled = true;   // save builder skips them
+    $('setCalendar').disabled = true;
+  }
   // the lock is campaign-client truth; a retainer queues for the
   // next campaign (Matt 11/11)
   var _lockTxt = _isRetS
