@@ -1113,6 +1113,18 @@ body{padding:0}
   </div>
 </div>
 
+<div class="overlay" id="chgCalConfirm">
+  <div class="dialog">
+    <h3>Switch to Calendly?</h3>
+    <p style="font-size:13px;color:var(--mut);line-height:1.6;margin:2px 0 0">Switching changes where future campaigns book appointments. Your current campaign keeps booking on your GoHighLevel calendar until it ends - the switch applies starting with your next campaign. Appointments already booked stay where they are.</p>
+    <p style="font-size:13px;color:var(--mut);line-height:1.6;margin:10px 0 0">To continue you'll connect your Calendly account. A Calendly authorization page opens in a new tab.</p>
+    <div class="dialog-actions" style="margin-top:16px">
+      <button class="btn btn-ghost" id="chgCalNo">Cancel</button>
+      <button class="btn btn-primary" id="chgCalYes">Continue</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="settingsOverlay">
   <div class="dialog">
     <h3>Settings</h3>
@@ -2499,45 +2511,15 @@ function _openChg(){
     if (v === 'ghl') {
       if (st) st.textContent = '';
       _saveSurface(v);
+    } else if ((((PAGE.data || {}).calendar) || {}).connected) {
+      // already connected: the pick queues directly
+      _saveSurface(v);
     } else {
-      // Calendly needs its OAuth connection first: connect, then the
-      // pick queues (the live campaign never moves)
-      api('/api/ghl/settings', {scheduling_surface: v}).then(function(j){
-        if (j && j.ok && !j.needs_connect) { _saveSurface(v); return; }
-        if (st) {
-          st.textContent = 'Connect Calendly in the tab that opened.'
-            + ' Your pick applies once connected.';
-          st.style.color = '#b45309';
-        }
-        api('/api/ghl/calendly-connect-url').then(function(cj){
-          if (!(cj && cj.ok && cj.url)) {
-            toast((cj && cj.error) || 'Could not start Calendly connect.');
-            return;
-          }
-          window.open(cj.url, '_blank');
-          if (window._chgPoll) clearInterval(window._chgPoll);
-          window._chgPoll = setInterval(function(){
-            var ov = document.getElementById('chgOverlay');
-            if (!ov || !ov.classList.contains('show')) {
-              clearInterval(window._chgPoll); window._chgPoll = null;
-              sf.value = 'ghl';
-              if (st) st.textContent = '';
-              return;
-            }
-            api('/api/ghl/page-data').then(function(d){
-              if (d && d.ok && (d.calendar || {}).connected) {
-                clearInterval(window._chgPoll); window._chgPoll = null;
-                if (st) { st.textContent = 'Calendly connected.'
-                           + ' Your next campaign books there.';
-                         st.style.color = 'var(--grnd,#15803d)'; }
-                _saveSurface('calendly');
-              }
-            }).catch(function(){});
-          }, 3000);
-        }).catch(function(){
-          toast('Could not start Calendly connect.');
-        });
-      });
+      // are-you-sure FIRST (Matt 11/11): how/when it applies + the
+      // consequences, nothing auto-fires
+      open_('chgCalConfirm');
+      sf.value = (((PAGE.data || {}).calendar || {}).surface
+                  === 'calendly') ? 'calendly' : 'ghl';
     }
     setTimeout(function(){
       sf.value = (((PAGE.data || {}).calendar || {}).surface
@@ -2581,6 +2563,45 @@ function _openChg(){
 var CHG_CUR_CAL = '';
 $('setStopBtn').addEventListener('click', function(){
   open_('confirmOverlay');
+});
+$('chgCalNo').addEventListener('click', function(){
+  close_('chgCalConfirm');
+});
+$('chgCalYes').addEventListener('click', function(){
+  close_('chgCalConfirm');
+  var st = $('chgSurfaceState');
+  if (st) {
+    st.textContent = 'Connect Calendly in the tab that opened.'
+      + ' Your pick applies once connected.';
+    st.style.color = '#b45309';
+  }
+  api('/api/ghl/calendly-connect-url').then(function(cj){
+    if (!(cj && cj.ok && cj.url)) {
+      toast((cj && cj.error) || 'Could not start Calendly connect.');
+      return;
+    }
+    window.open(cj.url, '_blank');
+    if (window._chgPoll) clearInterval(window._chgPoll);
+    window._chgPoll = setInterval(function(){
+      var ov = document.getElementById('chgOverlay');
+      if (!ov || !ov.classList.contains('show')) {
+        clearInterval(window._chgPoll); window._chgPoll = null;
+        if (st) st.textContent = '';
+        return;
+      }
+      api('/api/ghl/page-data').then(function(d){
+        if (d && d.ok && (d.calendar || {}).connected) {
+          clearInterval(window._chgPoll); window._chgPoll = null;
+          if (st) { st.textContent = 'Calendly connected.'
+                      + ' Your next campaign books there.';
+                    st.style.color = 'var(--grnd,#15803d)'; }
+          _saveSurface('calendly');
+        }
+      }).catch(function(){});
+    }, 3000);
+  }).catch(function(){
+    toast('Could not start Calendly connect.');
+  });
 });
 $('chgDone').addEventListener('click', function(){
   close_('chgOverlay');
