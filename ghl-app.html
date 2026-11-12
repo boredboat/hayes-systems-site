@@ -1409,7 +1409,8 @@ function apply(s, until){
   syncTabs();
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
   $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
-  $('reqBtn').classList.toggle('hide', s === 'retainer');
+  $('reqBtn').classList.toggle('hide', s === 'retainer'
+    && !(PAGE.data && PAGE.data.stopped));
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   var _rl = $('retainerLine'); if (_rl) _rl.classList.toggle('hide', s === 'none' || s === 'retainer');
   var req = $('reqBtn');
@@ -1835,6 +1836,15 @@ $('confirmCancel').addEventListener('click', function(){
         var _wasRetC = (((PAGE.data || {}).client || {}).state
                         === 'retainer') || S === 'retainer';
         apply(_wasRetC ? 'retainer' : 'cancelled');
+        if (_wasRetC) {
+          // land straight in the changes workflow (Matt 11/11)
+          if (PAGE.data) { PAGE.data.stopped = true;
+                           PAGE.data.campaign = null; }
+          pill('pausepill', 'Stopped',
+               'Make your changes in Settings, then start your next campaign');
+          $('reqBtn').classList.remove('hide');
+          $('reqBtn').disabled = false;
+        }
         toast('Campaign cancelled. Appointments already on your calendar are unaffected.');
       } else {
         toast(j.error || 'The cancel did not go through. Try again or write Matt@hayessystems.com.');
@@ -2032,6 +2042,14 @@ function _openOrderReview(){
   $('ordPay').textContent = b.card_summary
     || (b.card_invalid ? 'Card needs attention' : 'Saved during setup');
   $('ordStart').textContent = _pcStartDate();
+  // a retainer's campaign checkout reads TRUE (Matt 11/11): the
+  // reduced appointment rate, nothing due at start (the subscription
+  // already bills monthly)
+  var _retO = ((((PAGE.data || {}).client) || {}).state || S) === 'retainer';
+  var _amt = document.querySelector('#pcOrderOverlay .ordli .amt');
+  var _due = document.querySelector('#pcOrderOverlay .ordtot .z');
+  if (_amt) _amt.textContent = _retO ? '$40 / appt' : '$60 / appt';
+  if (_due) _due.textContent = '$0.00';
   open_('pcOrderOverlay');
 }
 $('ordGo').addEventListener('click', function(){
@@ -3846,7 +3864,18 @@ function applyFromData(d){
       setStats(c.workable, c.list_worked_pct, c.emails_sent, c.appointments,
                c.conversion_pct, c.cost_to_date);
     } else {
-      pill('run', 'Active', 'Continual coverage \u00b7 the next campaign starts automatically');
+      // the changes workflow (Matt 11/11: "resume cant be automatic"):
+      // a client who STOPPED their campaign makes changes and starts
+      // the next one themselves; between natural completions the next
+      // campaign still starts automatically
+      if (d.stopped) {
+        pill('pausepill', 'Stopped',
+             'Make your changes in Settings, then start your next campaign');
+        $('reqBtn').classList.remove('hide');
+        $('reqBtn').disabled = false;
+      } else {
+        pill('run', 'Active', 'Continual coverage \u00b7 the next campaign starts automatically');
+      }
       setStats(0, 0, 0, 0, 0, 0);
     }
   }
