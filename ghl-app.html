@@ -1086,6 +1086,9 @@ body{padding:0}
       <div class="set-lab">Email for app notices<small>Campaign updates go here</small></div>
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
+    <div id="setRetHeader" style="display:none;border-top:1px solid var(--bd);margin:4px 0 -6px;padding-top:14px">
+      <div style="font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)">Retainer</div>
+    </div>
     <div class="set-row" id="setSurfaceRow">
       <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
@@ -1096,6 +1099,25 @@ body{padding:0}
     <div class="set-row" id="setCalendarRow">
       <div class="set-lab">Calendar<small id="setCalNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
+    </div>
+    <div class="set-row" id="setAudRow" style="display:none">
+      <div class="set-lab">Leads to include<small>Changes take effect on your next campaign</small></div>
+      <div class="set-ctl" style="text-align:right">
+        <span id="setTagAll" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
+      </div>
+    </div>
+    <div class="set-row" id="setAudTagsRow" style="display:none">
+      <div class="set-lab" style="flex:0 0 100%;max-width:none">
+        <div class="aud-tgs" style="margin:0">
+          <label class="aud-tg"><input type="checkbox" id="setAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
+          <label class="aud-tg"><input type="checkbox" id="setAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
+        </div>
+        <div id="setAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="set-row" id="setStopRow" style="display:none">
+      <div class="set-lab" style="color:#c62828">Stop campaign<small>Ends this campaign now. Make your changes, then start the next one from the main page.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setStopBtn">Stop campaign</button></div>
     </div>
     <div class="set-row">
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
@@ -1408,7 +1430,7 @@ function apply(s, until){
   $('pastSec').classList.toggle('hide', s === 'none');
   syncTabs();
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
-  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
+  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
   $('reqBtn').classList.toggle('hide', s === 'retainer'
     && !(PAGE.data && PAGE.data.stopped));
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
@@ -1828,6 +1850,7 @@ $('confirmResume').addEventListener('click', function(){
 $('cancelBtn').addEventListener('click', function(){ open_('confirmOverlay'); });
 $('confirmCancel').addEventListener('click', function(){
   close_('confirmOverlay');
+  close_('settingsOverlay');   // stopping from the section closes both
   if (PAGE.live) {
     api('/api/ghl/cancel-campaign', {}).then(function(j){
       if (j.ok) {
@@ -2329,6 +2352,117 @@ function _prepPoll(){
 $('retainerAdLink').addEventListener('click', function(){
   open_('retainerOverlay');
 });
+// RETAINER SECTION (Matt 11/11: "settings should have a section that
+// shows up for retainers only that exists to solve the active
+// retainer needing to make calendar, calendar app and or tag
+// changes"): the tag pool lives here; saves are silent (the row's
+// standing note carries the next-campaign timing)
+var RET_AUD = null;
+function _retSelTags(){
+  return [...document.querySelectorAll('#setAudTags .aud-chip.inc')]
+    .map(function(c){ return c.textContent; });
+}
+function _retSaveAud(tags, revert){
+  if (!PAGE.token) return;
+  var swO = $('setAudOpen'), swL = $('setAudLost');
+  api('/api/ghl/settings', {audience: {
+    skip_open_opp: swO ? swO.checked : true,
+    include_lost_opp: swL ? swL.checked : true,
+    include_tags: tags}}).then(function(j){
+      if (j && j.ok && !j.audience_ignored && PAGE.data) {
+        PAGE.data.audience = PAGE.data.audience || {};
+        PAGE.data.audience.include_tags = tags.slice();
+        if (swO) PAGE.data.audience.skip_open_opp = swO.checked;
+        if (swL) PAGE.data.audience.include_lost_opp = swL.checked;
+      } else {
+        if (revert) revert();
+        toast('The change did not save. Try again in a moment.');
+      }
+    }).catch(function(){
+      if (revert) revert();
+      toast('The change did not save. Try again in a moment.');
+    });
+}
+function _retPaintTags(){
+  var box = $('setAudTags'); if (!box) return;
+  var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
+  box.innerHTML = '';
+  var _ta = $('setTagAll');
+  if (_ta) _ta.style.display = 'none';
+  if (RET_AUD === null) {
+    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">' +
+      "Couldn't load tags right now. Close and reopen to retry.</span>";
+    return;
+  }
+  if (!RET_AUD.length) {
+    box.innerHTML = '<span style="font-size:13px;color:var(--mut)">No tags in this location yet</span>';
+    return;
+  }
+  RET_AUD.forEach(function(t){
+    var c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'aud-chip' + (cur.indexOf(t) >= 0 ? ' inc' : '');
+    c.textContent = t;
+    c.addEventListener('click', function(){
+      var ix = cur.indexOf(t);
+      var nowInc = ix < 0;
+      if (ix >= 0) cur.splice(ix, 1); else cur.push(t);
+      c.classList.toggle('inc', nowInc);
+      _retSaveAud(cur.slice(), function(){
+        var jx = cur.indexOf(t);
+        if (nowInc && jx >= 0) cur.splice(jx, 1);
+        if (!nowInc && jx < 0) cur.push(t);
+        c.classList.toggle('inc', !nowInc);
+      });
+    });
+    box.appendChild(c);
+  });
+  if (_ta) {
+    var _every = !!RET_AUD.length && cur.length >= RET_AUD.length;
+    _ta.style.display = '';
+    _ta.textContent = _every ? 'Clear all' : 'Select all';
+    _ta.onclick = function(){
+      var _before = (((PAGE.data || {}).audience || {})
+                     .include_tags || []).slice();
+      var _target = _every ? [] : RET_AUD.slice();
+      PAGE.data.audience = PAGE.data.audience || {};
+      PAGE.data.audience.include_tags = _target;
+      _retPaintTags();
+      _retSaveAud(_target.slice(), function(){
+        PAGE.data.audience.include_tags = _before;
+        _retPaintTags();
+      });
+    };
+  }
+}
+function _retLoadAud(){
+  if (!PAGE.token) return;
+  var a = ((PAGE.data || {}).audience) || {};
+  var swO = $('setAudOpen'), swL = $('setAudLost');
+  if (swO && swL) {
+    swO.checked = a.skip_open_opp !== false;
+    swL.checked = a.include_lost_opp !== false;
+    swO.onchange = function(){
+      _retSaveAud(_retSelTags(), function(){ swO.checked = !swO.checked; });
+    };
+    swL.onchange = function(){
+      _retSaveAud(_retSelTags(), function(){ swL.checked = !swL.checked; });
+    };
+  }
+  if (RET_AUD === null) {
+    RET_AUD = [];
+    api('/api/ghl/tags').then(function(j){
+      if (j && j.ok) { RET_AUD = (j.tags || []); }
+      else { RET_AUD = null; }
+      _retPaintTags();
+    }).catch(function(){ RET_AUD = null; _retPaintTags(); });
+  } else {
+    _retPaintTags();
+  }
+}
+$('setStopBtn').addEventListener('click', function(){
+  open_('confirmOverlay');
+});
 $('setCancelRet').addEventListener('click', function(){
   close_('settingsOverlay');   // never stacked underneath (Matt 11/11)
   open_('cancelRetOverlay');
@@ -2590,6 +2724,14 @@ $('settingsLink').addEventListener('click', function(){
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
   var _crS = $('setCancelRetRow');
   if (_crS) _crS.style.display = _isRetS ? '' : 'none';
+  // the retainer section (Matt 11/11): header + tag pool + stop row
+  ['setRetHeader', 'setAudRow', 'setAudTagsRow'].forEach(function(id){
+    var el = $(id); if (el) el.style.display = _isRetS ? '' : 'none';
+  });
+  var _stopR = $('setStopRow');
+  if (_stopR) _stopR.style.display =
+    (_isRetS && PAGE.data && PAGE.data.campaign) ? '' : 'none';
+  if (_isRetS) _retLoadAud();
   // the lock is campaign-client truth; a retainer queues for the
   // next campaign (Matt 11/11)
   var _lockTxt = _isRetS
