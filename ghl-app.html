@@ -1087,14 +1087,14 @@ body{padding:0}
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
     <div class="set-row" id="setSurfaceRow">
-      <div class="set-lab">Calendar app<small id="setSurfaceNote">Changes take effect on your next campaign</small></div>
+      <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
       </select></div>
     </div>
     <div class="set-row" id="setCalendarRow">
-      <div class="set-lab">Calendar<small id="setCalNote">Changes take effect on your next campaign</small></div>
+      <div class="set-lab">Calendar<small id="setCalNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
     </div>
     <div class="set-row">
@@ -1408,7 +1408,7 @@ function apply(s, until){
   $('pastSec').classList.toggle('hide', s === 'none');
   syncTabs();
   $('pauseBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
-  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed' || s === 'retainer');
+  $('cancelBtn').classList.toggle('hide', s === 'none' || s === 'cancelled' || s === 'completed');
   $('reqBtn').classList.toggle('hide', s === 'retainer');
   $('cooldown').classList.toggle('hide', s === 'none' || s === 'retainer');
   var _rl = $('retainerLine'); if (_rl) _rl.classList.toggle('hide', s === 'none' || s === 'retainer');
@@ -1830,7 +1830,11 @@ $('confirmCancel').addEventListener('click', function(){
   if (PAGE.live) {
     api('/api/ghl/cancel-campaign', {}).then(function(j){
       if (j.ok) {
-        apply('cancelled');
+        // a retainer stopping a campaign stays ON retainer - the next
+        // campaign starts automatically with their saved settings
+        var _wasRetC = (((PAGE.data || {}).client || {}).state
+                        === 'retainer') || S === 'retainer';
+        apply(_wasRetC ? 'retainer' : 'cancelled');
         toast('Campaign cancelled. Appointments already on your calendar are unaffected.');
       } else {
         toast(j.error || 'The cancel did not go through. Try again or write Matt@hayessystems.com.');
@@ -2371,13 +2375,19 @@ $('retainerStart').addEventListener('click', function(){
 
 // Settings overlay: notices email + agency details, persisted to the DB
 var _calOptions = [], _calCurrent = '';
+function _campLockedSt(){
+  // live-campaign lock for CAMPAIGN clients (Matt 11/11: the lock
+  // STAYS - a save that looks immediate but isn't lies to them;
+  // retainers are exempt: their saves queue for the next campaign).
+  // Accepts BOTH state vocabularies: page-data carries the server's
+  // 'campaign-running' while S holds the mapped 'running'.
+  var st = ((PAGE.data || {}).client || {}).state || S || '';
+  if (st === 'retainer') return false;
+  return st === 'campaign-running' || st === 'running' || st === 'paused';
+}
 function _loadCalPicker(){
   var sel = $('setCalendar');
-  // THE QUEUE (Matt 11/11 final): editable for EVERY client - saves
-  // ride the chapter binding and apply to the next campaign; the GHL
-  // pick only sleeps while Calendly is the active surface (dormant,
-  // not deleted)
-  var locked = false;
+  var locked = _campLockedSt();
   // W4-15: the GHL pick sits DORMANT while appointments land on
   // Calendly - kept, never deleted, just not the active surface
   sel.disabled = locked || _storedSurface() === 'calendly';
@@ -2444,7 +2454,7 @@ function _loadSurfaceRow(){
   // LOCK READS THE SERVER STATE (Matt 11/8: fields greyed with no
   // campaign - S initializes to the demo 'running' before the first
   // live payload lands and an early Settings open read that default)
-  sf.disabled = !PAGE.live;   // the queue: editable for everyone
+  sf.disabled = !PAGE.live || _campLockedSt();
   _surfStateLine();
 }
 function _saveSurface(v){
@@ -2562,10 +2572,14 @@ $('settingsLink').addEventListener('click', function(){
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
   var _crS = $('setCancelRetRow');
   if (_crS) _crS.style.display = _isRetS ? '' : 'none';
-  // the queue's one truth for everyone (Matt 11/11 final)
+  // the lock is campaign-client truth; a retainer queues for the
+  // next campaign (Matt 11/11)
+  var _lockTxt = _isRetS
+    ? 'Changes take effect on your next campaign'
+    : 'Locked while a campaign runs';
   var _sn = $('setSurfaceNote'), _cn = $('setCalNote');
-  if (_sn) _sn.textContent = 'Changes take effect on your next campaign';
-  if (_cn) _cn.textContent = 'Changes take effect on your next campaign';
+  if (_sn) _sn.textContent = _lockTxt;
+  if (_cn) _cn.textContent = _lockTxt;
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
   var dr = $('setDataRow');
@@ -4468,11 +4482,17 @@ applyOb(init);
       if (leads < 0) leads = 0;
       var cd = d.cooldown && d.cooldown.next_open ? d.cooldown.next_open : 'the cooldown ends';
       var lis = document.querySelectorAll('#cxList li');
+      var isRet = ((d.client || {}).state === 'retainer') || S === 'retainer';
       if (lis.length === 3) {
         lis[0].querySelector('span:last-child').innerHTML =
           '<b>' + leads + ' leads</b> still waiting for their first email will never be contacted';
-        lis[2].querySelector('span:last-child').innerHTML =
-          'A <b>3-month cooldown</b> starts - your next campaign can\'t open until ' + cd;
+        // Matt 11/11: a retainer's stop is NOT a cooldown - the
+        // scheduler relaunches the next campaign automatically with
+        // their saved settings (the severe-issue escape: change now,
+        // stop, next campaign starts fresh - no re-signup fee)
+        lis[2].querySelector('span:last-child').innerHTML = isRet
+          ? 'Your <b>next campaign starts automatically</b> with your saved settings - no waiting period, no new fees'
+          : 'A <b>3-month cooldown</b> starts - your next campaign can\'t open until ' + cd;
       }
     } catch (e) {}
   });
