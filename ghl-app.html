@@ -1282,6 +1282,10 @@ body{padding:0}
     <div class="field"><label>Who this campaign contacts</label>
       <div id="audReq"></div>
     </div>
+    <label class="ob-check" style="margin:4px 0 0"><input type="checkbox" id="reqAgree">
+      <span>I have read and agree to the <a href="https://www.hayessystems.com/terms.html#data-agreement" target="_blank">Data
+      Agreement</a> and the <a href="https://www.hayessystems.com/terms.html#campaign-terms" target="_blank">Campaign
+      Terms</a>.</span></label>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="reqOverlay">Not yet</button>
       <button class="btn btn-primary" id="confirmReq">Start new campaign</button>
@@ -1987,6 +1991,13 @@ function _openReqDialog(){
   // About-N count, and the sample-email link that used to ride in
   // Settings. Submitted WITH the request; frozen from launch.
   if (PAGE.token) { audFromData(); audRender(); }
+  // TERMS GATE (restored 11/11, Matt: "it should have the same terms
+  // agreement checkbox that the first campaign has") - the button
+  // unlocks on the checkbox and the box resets after each send
+  var _ra = $('reqAgree');
+  if (_ra) { _ra.checked = false; }
+  var _cr0 = $('confirmReq');
+  if (_cr0) _cr0.disabled = true;
   open_('reqOverlay');
 }
 function _renderCfgCheck(d){
@@ -2228,7 +2239,11 @@ $('audEveryoneYes').addEventListener('click', function(){
   var f = _audEveryoneOk; _audEveryoneOk = null;
   if (f) f();
 });
+$('reqAgree').addEventListener('change', function(){
+  $('confirmReq').disabled = !this.checked;
+});
 $('confirmReq').addEventListener('click', function(){
+  if (!$('reqAgree').checked) return;
   if (!audValid()) {
     toast('This selection reaches no contacts.');
     open_('reqOverlay');
@@ -2236,6 +2251,8 @@ $('confirmReq').addEventListener('click', function(){
   }
   _audEveryoneGate(function(){
   close_('reqOverlay');
+  $('reqAgree').checked = false;
+  $('confirmReq').disabled = true;
   var btn = $('reqBtn');
   function _resetReq(){ btn.disabled = false; btn.textContent = 'Start new campaign'; }
   if (PAGE.live) {
