@@ -1100,13 +1100,13 @@ body{padding:0}
       <div class="set-lab">Payment method<small id="setCardState">Payment method on file</small></div>
       <div class="set-ctl"><button class="btn btn-ghost" id="setCardUpdate">Update</button></div>
     </div>
-    <div class="set-row" id="setCancelRetRow" style="display:none">
-      <div class="set-lab" style="color:#c62828">Cancel retainer<small>Stops the monthly fee. Your current campaign runs to its finish.</small></div>
-      <div class="set-ctl"><button class="btn btn-danger" id="setCancelRet">Cancel retainer</button></div>
-    </div>
     <div class="set-row" id="setDataRow">
       <div class="set-lab" style="color:#c62828">Delete my data<small>Erases your data from our servers. This cancels any active campaigns and cannot be undone.</small></div>
       <div class="set-ctl"><button class="btn btn-danger" id="setDeleteData">Delete</button></div>
+    </div>
+    <div class="set-row" id="setCancelRetRow" style="display:none">
+      <div class="set-lab" style="color:#c62828">Cancel retainer<small>Stops the monthly fee. Your current campaign runs to its finish.</small></div>
+      <div class="set-ctl"><button class="btn btn-danger" id="setCancelRet">Cancel retainer</button></div>
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" data-close="settingsOverlay">Cancel</button>
@@ -2315,6 +2315,7 @@ $('keepRetBtn').addEventListener('click', function(){
 });
 $('confirmCancelRet').addEventListener('click', function(){
   close_('cancelRetOverlay');
+  close_('settingsOverlay');   // one flow: both close together (11/11)
   if (PAGE.live) {
     api('/api/ghl/cancel-retainer', {}).then(function(j){
       if (j.ok) {
