@@ -1092,13 +1092,10 @@ body{padding:0}
       <select id="chgCal" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
     </div>
     <div class="ob-field" style="margin:0 0 6px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <label style="margin:0">Leads to include</label>
-        <span id="retTagAll2" style="font-size:12.5px;color:var(--acc);cursor:pointer;font-weight:600">Select all</span>
-      </div>
+      <label style="margin:0">Leads to include</label>
       <div class="aud-tgs" style="margin-top:8px">
-        <label class="aud-tg"><input type="checkbox" id="retAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
-        <label class="aud-tg"><input type="checkbox" id="retAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
+        <label class="aud-tg"><input type="checkbox" id="setAudOpen"><span class="tt"><b>Skip open opportunities</b></span><span class="sw"></span></label>
+        <label class="aud-tg"><input type="checkbox" id="setAudLost"><span class="tt"><b>Include lost opportunities</b></span><span class="sw"></span></label>
       </div>
       <div id="setAudTags" class="aud-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
     </div>
@@ -2423,8 +2420,6 @@ function _retPaintTags(){
   var box = $('setAudTags'); if (!box) return;
   var cur = (((PAGE.data || {}).audience || {}).include_tags) || [];
   box.innerHTML = '';
-  var _ta = $('retTagAll2');
-  if (_ta) _ta.style.display = 'none';
   if (RET_AUD === null) {
     box.innerHTML = '<span style="font-size:13px;color:var(--mut)">' +
       "Couldn't load tags right now. Close and reopen to retry.</span>";
@@ -2453,31 +2448,16 @@ function _retPaintTags(){
     });
     box.appendChild(c);
   });
-  if (_ta) {
-    var _every = !!RET_AUD.length && cur.length >= RET_AUD.length;
-    _ta.style.display = '';
-    _ta.textContent = _every ? 'Clear all' : 'Select all';
-    _ta.onclick = function(){
-      var _before = (((PAGE.data || {}).audience || {})
-                     .include_tags || []).slice();
-      var _target = _every ? [] : RET_AUD.slice();
-      PAGE.data.audience = PAGE.data.audience || {};
-      PAGE.data.audience.include_tags = _target;
-      _retPaintTags();
-      _retSaveAud(_target.slice(), function(){
-        PAGE.data.audience.include_tags = _before;
-        _retPaintTags();
-      });
-    };
-  }
 }
 function _retLoadAud(){
   if (!PAGE.token) return;
   var a = ((PAGE.data || {}).audience) || {};
   var swO = $('setAudOpen'), swL = $('setAudLost');
   if (swO && swL) {
-    swO.checked = a.skip_open_opp !== false;
-    swL.checked = a.include_lost_opp !== false;
+    // default profile on every open (Matt 11/11): skip-open ON,
+    // include-lost ON - flips save from here
+    swO.checked = true;
+    swL.checked = true;
     swO.onchange = function(){
       _retSaveAud(_retSelTags(), function(){ swO.checked = !swO.checked; });
     };
