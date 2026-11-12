@@ -487,7 +487,7 @@ body{padding:0}
       <div class="hiw-sep"></div>
       <div class="hiw-item">
         <div class="hiw-q"><span class="hiw-n">3</span>Appointments</div>
-        <div class="hiw-a">Interested leads reply to our email and receive an immediate phone call from our conversational AI booking agent who assists them in picking an available time from your calendar. Appointments follow your GHL or Calendly calendar settings such as availability and appointment length.</div>
+        <div class="hiw-a">Interested leads reply to our email and receive an immediate phone call from our conversational AI booking agent who assists them in picking an available time from your calendar. Appointments follow your CRM or Calendly calendar settings such as availability and appointment length.</div>
       </div>
       <div class="hiw-sep"></div>
       <div class="hiw-item">
@@ -547,7 +547,7 @@ body{padding:0}
 <div class="ob-card hide" id="billingCloser">
     <h2 id="bcTitle">Payment confirmed</h2>
     <p id="bcBody" style="font-size:14px;color:#4b5563">Your payment method is saved.
-    Return to the Hayes Systems app in your GHL dashboard to finish
+    Return to the Hayes Systems app in your CRM dashboard to finish
     setting up.</p>
   </div>
 
@@ -577,7 +577,7 @@ body{padding:0}
 
     <div class="ob-step" id="obConnectStep" style="display:none">
       <h3>Connect your account</h3>
-      <p>One connection to your GoHighLevel account runs the whole service.</p>
+      <p>One connection to your account runs the whole service.</p>
       <div class="kick kb">Why we need it</div>
       <div class="cperm">
         <div class="cperm-row">
@@ -615,7 +615,7 @@ body{padding:0}
         <li>Every lead gets 6 emails over about a month and can reply at
         any time</li>
         <li>We never qualify leads; your own process is untouched</li>
-        <li>Works with GHL and Calendly calendars; a round-robin is
+        <li>Works with CRM and Calendly calendars; a round-robin is
         required and linked later</li>
       </ul>
     </div>
@@ -647,17 +647,17 @@ body{padding:0}
     <div class="ob-step" id="obCalStep">
       <h3>Appointments</h3>
       <p>Where should booked appointments land? Most teams using this app
-      pick their <b>whole team calendar</b> in GoHighLevel: a round-robin
+      pick their <b>whole team calendar</b> in your CRM: a round-robin
       with every agent who should take calls added to it.</p>
       <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obSurface">Appointments land on</label>
           <select id="obSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
-            <option value="ghl">Your GoHighLevel calendar</option>
+            <option value="ghl">Your CRM calendar</option>
             <option value="calendly">Calendly</option>
           </select></div>
         <div class="ob-field" id="obCalField"><label for="obCal">Calendar for appointments</label>
           <select id="obCal" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
-          <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Don't have one yet? Create it in GoHighLevel under Calendars (choose Round Robin, add your agents), then <span id="obCalRelink" style="color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px">refresh the list</span>.</p></div>
+          <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Don't have one yet? Create it in your CRM under Calendars (choose Round Robin, add your agents), then <span id="obCalRelink" style="color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px">refresh the list</span>.</p></div>
         <div class="ob-field hide" id="obClyField">
           <p style="margin:0;font-size:13px;color:#4b5563">We will connect
           your Calendly when your campaign is set up - nothing to do here
@@ -731,7 +731,7 @@ body{padding:0}
     <p style="margin:0 0 18px;font-size:14px;color:var(--mut)">Here are some quick tips. For more detailed information please see the 'How it works' tab.</p>
     <div class="qs-row"><div class="qs-ic"><svg viewBox="0 0 20 20" width="18" height="18"><rect x="2" y="4" width="16" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></div>
       <div><div class="qs-h">Report a no-show <span class="qs-w">Appointments</span></div>
-      <p>Past appointments carry a Report no-show button. Mark the appointment as a no-show in your GHL or Calendly calendar then mark it in the app to receive your refund.</p></div></div>
+      <p>Past appointments carry a Report no-show button. Mark the appointment as a no-show in your CRM or Calendly calendar then mark it in the app to receive your refund.</p></div></div>
     <div class="qs-row"><div class="qs-ic"><svg viewBox="0 0 20 20" width="18" height="18"><rect x="3" y="3" width="14" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6.5v7l6-3.5z" fill="currentColor"/></svg></div>
       <div><div class="qs-h">Pause or resume <span class="qs-w">Campaign header</span></div>
       <p>Setting out of office time or just need a break? Use the pause feature to stop outreach for the selected time period.</p></div></div>
@@ -756,16 +756,16 @@ body{padding:0}
       <h3>Where do appointments live at your business?</h3>
       <p id="schedBody"></p>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-primary" id="schedGhl">Our GoHighLevel calendars</button>
+        <button class="btn btn-primary" id="schedGhl">Our CRM calendars</button>
         <button class="btn btn-ghost" id="schedCal">Calendly</button>
       </div>
       <div id="schedCals" class="hide" style="margin-top:12px">
         <p style="margin:0 0 8px 0;font-size:13px;color:#4b5563"><b>Which calendar should appointments land on?</b><br>
         Appointments need a <b>whole team calendar</b>: a round-robin in
-        GoHighLevel with every agent who should take calls added to it.
-        If you don't have one yet, create it in GoHighLevel under
+        your CRM with every agent who should take calls added to it.
+        If you don't have one yet, create it in your CRM under
         Calendars (choose Round Robin, add your agents), then check again.
-        <span id="schedNoRR" class="hide" style="display:block;margin-top:8px;color:#b45309;font-weight:600;font-size:12.5px">None of your calendars are round-robin yet. Create one in GoHighLevel with your agents on it, then check again below.</span></p>
+        <span id="schedNoRR" class="hide" style="display:block;margin-top:8px;color:#b45309;font-weight:600;font-size:12.5px">None of your calendars are round-robin yet. Create one in your CRM with your agents on it, then check again below.</span></p>
         <div id="schedCalBtns" style="display:flex;gap:8px;flex-direction:column;align-items:flex-start"></div>
       </div>
     </div>
@@ -778,7 +778,7 @@ body{padding:0}
       <button class="btn btn-primary" id="failOver" style="padding:9px 18px">Start over</button>
     </div>
     <div id="failFix" class="hide" style="margin-top:14px">
-      <p style="margin:0 0 10px;font-size:13.5px;color:#4b5563"><b>Pick the calendar appointments should land on</b> (a round-robin in GoHighLevel with every agent who takes calls). Don't have one yet? Create it in GoHighLevel under Calendars, choose Round Robin, add your agents, then come back and refresh.</p>
+      <p style="margin:0 0 10px;font-size:13.5px;color:#4b5563"><b>Pick the calendar appointments should land on</b> (a round-robin in your CRM with every agent who takes calls). Don't have one yet? Create it in your CRM under Calendars, choose Round Robin, add your agents, then come back and refresh.</p>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <select id="failCal" style="flex:1;min-width:220px;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
         <button class="btn btn-primary" id="failRetry" style="padding:9px 18px">Save and start campaign</button>
@@ -1087,7 +1087,7 @@ body{padding:0}
     <div class="ob-field" style="margin:0 0 10px">
       <label for="chgSurface">Calendar app</label>
       <select id="chgSurface" style="width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
-        <option value="ghl">Your GoHighLevel calendar</option>
+        <option value="ghl">Your CRM calendar</option>
         <option value="calendly">Calendly</option>
       </select>
       <div id="chgSurfaceState" style="font-size:12px;color:var(--mut);margin-top:4px"></div>
@@ -1118,7 +1118,7 @@ body{padding:0}
 <div class="overlay" id="chgCalConfirm">
   <div class="dialog">
     <h3>Switch to Calendly?</h3>
-    <p style="font-size:13px;color:var(--mut);line-height:1.6;margin:2px 0 0">Switching changes where future campaigns book appointments. Your current campaign keeps booking on your GoHighLevel calendar until it ends - the switch applies starting with your next campaign. Appointments already booked stay where they are.</p>
+    <p style="font-size:13px;color:var(--mut);line-height:1.6;margin:2px 0 0">Switching changes where future campaigns book appointments. Your current campaign keeps booking on your CRM calendar until it ends - the switch applies starting with your next campaign. Appointments already booked stay where they are.</p>
     <p style="font-size:13px;color:var(--mut);line-height:1.6;margin:10px 0 0">To continue you'll connect your Calendly account. A Calendly authorization page opens in a new tab.</p>
     <div class="dialog-actions" style="margin-top:16px">
       <button class="btn btn-ghost" id="chgCalNo">Cancel</button>
@@ -1148,7 +1148,7 @@ body{padding:0}
     <div class="set-row" id="setSurfaceRow">
       <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
       <div class="set-ctl"><select id="setSurface">
-        <option value="ghl">Your GoHighLevel calendar</option>
+        <option value="ghl">Your CRM calendar</option>
         <option value="calendly">Calendly</option>
       </select></div>
     </div>
@@ -1182,7 +1182,7 @@ body{padding:0}
     <ul class="cx-list">
       <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Any running campaign <b>ends immediately</b>: leads who respond after cancellation do not receive any outreach from us. A final invoice covering any pending charges will be issued.</span></li>
       <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>Lead data for your campaigns is <b>deleted</b>: names, emails, phone numbers, message history, and your imported lead list are removed from our systems</span></li>
-      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>The connection to your GoHighLevel location is <b>revoked</b>. We can no longer see your contacts</span></li>
+      <li><span class='cx-x'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 2.5 L9.5 9.5 M9.5 2.5 L2.5 9.5" stroke="#c62828" stroke-width="2" stroke-linecap="round"/></svg></span><span>The connection to your account is <b>revoked</b>. We can no longer see your contacts</span></li>
       <li><span class='cx-ok'><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 6.2 L4.8 9 L10 3.2" stroke="#15803d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>What stays: opt-out and consent records, so contacts who asked to stop contact stay suppressed, and your invoices and payment records, which accounting requires. <a href="https://www.hayessystems.com/privacy.html" target="_blank" rel="noopener">Privacy policy</a></span></li>
     </ul>
     <div class="field"><label for="delConfirm">Type <b id="delName"></b> to confirm</label>
@@ -1235,12 +1235,12 @@ body{padding:0}
     <div class="ob-fields" style="grid-template-columns:1fr">
       <div class="ob-field"><label for="calOvSurface">Appointments land on</label>
         <select id="calOvSurface" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
-          <option value="ghl">Your GoHighLevel calendar</option>
+          <option value="ghl">Your CRM calendar</option>
           <option value="calendly">Calendly</option>
         </select></div>
       <div class="ob-field" id="calOvCalField"><label for="calOvCal">Calendar for appointments</label>
         <select id="calOvCal" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff"></select>
-        <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Create one in GoHighLevel under Calendars if none appear.</p></div>
+        <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Only round-robin calendars are valid. Create one in your CRM under Calendars if none appear.</p></div>
       <div class="ob-field hide" id="calOvClyField">
         <p style="margin:0 0 10px;font-size:13px;color:#4b5563">Appointments book onto your team's Calendly.</p>
         <button class="btn btn-primary" id="calOvConnect" style="padding:9px 18px">Connect Calendly</button>
@@ -1351,7 +1351,7 @@ body{padding:0}
   if (_bp === 'cancelled') {
     document.getElementById('bcTitle').textContent = 'Payment setup cancelled';
     document.getElementById('bcBody').textContent = 'No payment method was saved.'
-      + ' Return to the Hayes Systems app in your GHL dashboard to'
+      + ' Return to the Hayes Systems app in your CRM dashboard to'
       + ' try again.';
   }
   window.__BILLING_DONE = true;
@@ -1741,7 +1741,7 @@ function renderActionBar(st){
     // live-caught on the fresh walkthrough)
     if (h.connection_ok === false
         && st.client && st.client.state !== 'onboarding') {
-      items.push(['The connection to your GoHighLevel account needs attention.',
+      items.push(['The connection to your account needs attention.',
                   'Reconnect', 'openReconnect']);
     }
   }
@@ -1765,7 +1765,7 @@ function renderActionBar(st){
 }
 function openReconnect(){
   if (!PAGE.token) { toast('Reconnect is unavailable in preview mode.'); return; }
-  toast('Opening GoHighLevel to reconnect...');
+  toast('Opening your CRM to reconnect...');
   fetch(API + '/api/ghl/reconnect-url', {
     headers: {'X-Hayes-Token': PAGE.token}
   }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
@@ -2823,7 +2823,7 @@ function _saveSurface(v){
       _surfStateLine();
       _loadCalPicker();
       toast(v === 'calendly' ? 'Appointments land on Calendly.'
-                             : 'Appointments land on your GoHighLevel calendar.');
+                             : 'Appointments land on your CRM calendar.');
     } else {
       $('setSurface').value = _storedSurface();
       _surfStateLine();
@@ -3222,7 +3222,7 @@ function _renderPending(){
   var audParts = _audSummary().split(' \u00b7 ');
   var steps = [
     ['Location', null,
-     [(PAGE.data && PAGE.data.location_name) || 'GoHighLevel location'],
+     [(PAGE.data && PAGE.data.location_name) || 'Your account'],
      true],
     ['Business', 'editBusiness',
      [((PAGE.data.client || {}).name || '')]
