@@ -15,11 +15,11 @@ terminology, pricing disclosed, factual claims only).
 
 Turn the contacts already in your CRM into booked appointments.
 
-## Long description (CURRENT listing text, updated 11/12: campaign price stated, retainer tier added, "directly on GoHighLevel" -> "directly inside your CRM" (GHL whitelabel rule: no direct GHL reference in listing text), flat "pay per appointment and nothing else" scoped to campaigns because retainers bill monthly)
+## Long description (CURRENT, 11/12: real estate named first per Matt's ruling "our entire model is based around it"; campaign price stated; retainer tier added; whitelabel-neutral "inside your CRM")
 
-Run hands-free lead reactivation campaigns directly inside your CRM. Install the app and we run the whole campaign for you: personalized email outreach engages leads then books them straight to open slots on your calendar using a conversational agent powered by Retell AI. No new software to install or platform to manage.
+Every real estate team has a database full of past clients and old inquiries who went quiet. Hayes Systems turns them into appointments. Install the app, connect your account, and we get to work: your inactive contacts get a personalized email, and the moment someone replies, our AI booking assistant calls them back and books them straight into an open slot on your calendar, while the lead is still warm.
 
-Never pay for vague promises or bogus fees. Campaigns cost $60 per appointment that lands on your calendar and nothing else. No setup, per-minute or surcharge fees, ever. Retainer service keeps campaigns running back to back for $250 a month plus $40 per appointment. Enjoy weekly reports, no-spam lead burn protection, no-show refunds and more.
+You only pay when an appointment lands. Campaigns are $60 per booked appointment and nothing else. No setup fees, no per-minute charges, no surcharges. Retainer service keeps campaigns running back to back for $250 a month plus $40 per booked appointment. No-shows you report are refunded, weekly reports keep you posted, and lead burn protection means each contact hears from you at most once every 180 days.
 
 Stop paying for new leads. Start reviving the ones you have.
 
