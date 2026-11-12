@@ -1668,7 +1668,7 @@ function renderActionBar(st){
                   'Update card', 'openCardUpdate']);
     } else if (!b.card_on_file && st.client && st.client.state !== 'none'
                && st.client.state !== 'onboarding') {
-      items.push(['No working payment method on file. Add one so appointments can be invoiced.',
+      items.push(['No working payment method on file. Please add one to continue service.',
                   'Add card', 'openCardUpdate']);
     }
     var h = st.health || {};
