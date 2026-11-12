@@ -859,6 +859,8 @@ body{padding:0}
       </div>
       <div class="ordfacts">
         <div class="ordfact"><span class="k">Payment method</span><span class="v" id="ordPay"></span></div>
+        <div class="ordfact"><span class="k">Calendar</span><span class="v" id="ordCal"></span></div>
+        <div class="ordfact"><span class="k">Notices to</span><span class="v" id="ordEmail"></span></div>
         <div class="ordfact"><span class="k">Start date</span><span class="v" id="ordStart"></span></div>
       </div>
       <div class="ordtot"><span class="t">Due today</span><span class="z">$0.00</span></div>
@@ -2093,11 +2095,75 @@ function _pcStartDate(){
   } catch (e) {}
   return 'The next weekday';
 }
+var _ORD_GATE_OK = true;
+function _ordGate(ok){
+  _ORD_GATE_OK = ok;
+  var b = $('ordGo');
+  if (b) b.disabled = !ok;
+}
 function _openOrderReview(){
   var b = (PAGE.data && PAGE.data.billing) || {};
   $('ordPay').textContent = b.card_summary
     || (b.card_invalid ? 'Card needs attention' : 'Saved during setup');
   $('ordStart').textContent = _pcStartDate();
+  // SETTINGS REVIEW AT REQUEST TIME (Matt 11/11: "launching a campaign
+  // without showing them the settings 3 months later would be asking
+  // for stale info to be used"): the checkout sheet shows what will
+  // actually be used. A dead/missing calendar blocks Place order -
+  // stale info never launches silently.
+  var cal = (PAGE.data && PAGE.data.calendar) || {};
+  var ordCal = $('ordCal');
+  var _calOK = true;
+  if (cal.surface === 'calendly') {
+    ordCal.textContent = cal.connected ? 'Calendly (connected)'
+                                       : 'Calendly not connected';
+    _calOK = !!cal.connected;
+    ordCal.style.color = _calOK ? '' : '#b45309';
+    _ordGate(_calOK);
+  } else {
+    ordCal.textContent = cal.name || 'Checking...';
+    ordCal.style.color = '';
+    _calOK = !!cal.name;
+    if (!cal.name) {
+      ordCal.textContent = 'Not picked - update in Settings';
+      ordCal.style.color = '#b45309';
+      _ordGate(false);
+    } else {
+      // LIVE staleness check (the whole point, Matt 11/11): the stored
+      // pick must still exist in the location's live round-robin list -
+      // a calendar deleted 3 months ago must not look fine here
+      ordCal.textContent = cal.name + ' (checking...)';
+      api('/api/ghl/calendars').then(function(j){
+        if (!(j && j.ok)) {
+          ordCal.textContent = cal.name;
+          _ordGate(true);   // check unavailable: never block on our own
+          return;           // outage (the launch blockers still guard)
+        }
+        var rrs = (j.calendars || []).filter(function(c){ return c.rr; });
+        var still = rrs.some(function(c){
+          // the STORED next-campaign pick is what this campaign will
+          // use - it comes first; the live stamp is only a fallback
+          return c.id === (cal.id || (cal.live && cal.live.calendar)
+                           || j.current);
+        });
+        if (still) {
+          ordCal.textContent = cal.name;
+          _ordGate(true);
+        } else {
+          ordCal.textContent = cal.name
+            + ' (unavailable) - update in Settings';
+          ordCal.style.color = '#b45309';
+          _ordGate(false);
+        }
+      }).catch(function(){
+        ordCal.textContent = cal.name;
+        _ordGate(true);
+      });
+    }
+  }
+  var em = (PAGE.data && PAGE.data.client && PAGE.data.client.email) || '';
+  $('ordEmail').textContent = em || 'Missing - update in Settings';
+  $('ordEmail').style.color = em ? '' : '#b45309';
   // a retainer's campaign checkout reads TRUE (Matt 11/11): the
   // reduced appointment rate, nothing due at start (the subscription
   // already bills monthly)
