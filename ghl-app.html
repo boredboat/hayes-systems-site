@@ -1087,14 +1087,14 @@ body{padding:0}
       <div class="set-ctl"><input id="setEmail" class="set-in" placeholder="you@brokerage.com"></div>
     </div>
     <div class="set-row" id="setSurfaceRow">
-      <div class="set-lab">Calendar app<small id="setSurfaceNote">Locked while a campaign runs</small></div>
+      <div class="set-lab">Calendar app<small id="setSurfaceNote">Changes take effect on your next campaign</small></div>
       <div class="set-ctl"><select id="setSurface">
         <option value="ghl">Your GoHighLevel calendar</option>
         <option value="calendly">Calendly</option>
       </select></div>
     </div>
     <div class="set-row" id="setCalendarRow">
-      <div class="set-lab">Calendar<small id="setCalNote">Locked while a campaign runs</small></div>
+      <div class="set-lab">Calendar<small id="setCalNote">Changes take effect on your next campaign</small></div>
       <div class="set-ctl"><select id="setCalendar"></select></div>
     </div>
     <div class="set-row">
@@ -2371,18 +2371,13 @@ $('retainerStart').addEventListener('click', function(){
 
 // Settings overlay: notices email + agency details, persisted to the DB
 var _calOptions = [], _calCurrent = '';
-function _campLockedSt(){
-  // live-campaign check for the Settings pickers: accepts BOTH state
-  // vocabularies - page-data carries the server's 'campaign-running'
-  // while S holds the mapped 'running' (the old check compared only
-  // the mapped one, so a live campaign left the selects looking
-  // active while the server refused the save)
-  var st = ((PAGE.data || {}).client || {}).state || S || '';
-  return st === 'campaign-running' || st === 'running' || st === 'paused';
-}
 function _loadCalPicker(){
   var sel = $('setCalendar');
-  var locked = _campLockedSt();
+  // THE QUEUE (Matt 11/11 final): editable for EVERY client - saves
+  // ride the chapter binding and apply to the next campaign; the GHL
+  // pick only sleeps while Calendly is the active surface (dormant,
+  // not deleted)
+  var locked = false;
   // W4-15: the GHL pick sits DORMANT while appointments land on
   // Calendly - kept, never deleted, just not the active surface
   sel.disabled = locked || _storedSurface() === 'calendly';
@@ -2449,7 +2444,7 @@ function _loadSurfaceRow(){
   // LOCK READS THE SERVER STATE (Matt 11/8: fields greyed with no
   // campaign - S initializes to the demo 'running' before the first
   // live payload lands and an early Settings open read that default)
-  sf.disabled = !PAGE.live || _campLockedSt();
+  sf.disabled = !PAGE.live;   // the queue: editable for everyone
   _surfStateLine();
 }
 function _saveSurface(v){
@@ -2567,14 +2562,10 @@ $('settingsLink').addEventListener('click', function(){
   var _isRetS = (((PAGE.data || {}).client || {}).state || S) === 'retainer';
   var _crS = $('setCancelRetRow');
   if (_crS) _crS.style.display = _isRetS ? '' : 'none';
-  // the lock note is campaign-client truth; a retainer changes these
-  // any time and the change rides the next campaign (Matt 11/11)
-  var _lockTxt = _isRetS
-    ? 'Changes take effect on your next campaign'
-    : 'Locked while a campaign runs';
+  // the queue's one truth for everyone (Matt 11/11 final)
   var _sn = $('setSurfaceNote'), _cn = $('setCalNote');
-  if (_sn) _sn.textContent = _lockTxt;
-  if (_cn) _cn.textContent = _lockTxt;
+  if (_sn) _sn.textContent = 'Changes take effect on your next campaign';
+  if (_cn) _cn.textContent = 'Changes take effect on your next campaign';
   // Delete my data (W4-1, Matt 11/5): live accounts only - the demo
   // preview never offers a deletion
   var dr = $('setDataRow');
