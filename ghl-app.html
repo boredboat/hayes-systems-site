@@ -130,6 +130,13 @@ td .when{color:var(--mut);font-size:13px}
 .kebab:hover{background:var(--bg);color:var(--tx)}
 .rowmenu-panel{display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--bd);border-radius:8px;box-shadow:0 10px 30px rgba(17,24,39,.14);padding:5px;z-index:40;min-width:150px}
 .rowmenu.open .rowmenu-panel{display:block}
+/* 11/13 (Matt: kebab on a bottom row "does nothing"): .appt-scroll is an
+   overflow:auto box, and an absolutely-positioned panel opening DOWN from
+   the last row is clipped invisible. The JS flips .up on when the panel
+   would cross the scroll box's bottom edge; up beats down even when the
+   top clips a few px, because the reportable (past) row always sits at
+   or near the bottom of the list. */
+.rowmenu-panel.up{top:auto;bottom:calc(100% + 4px)}
 .rowmenu-panel button{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;color:var(--tx);padding:8px 10px;border-radius:6px}
 .rowmenu-panel button:hover{background:var(--bg)}
 .badge.marked-cal{background:#fef3c7;color:#b45309;border:1px solid #fde68a;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap;vertical-align:middle;line-height:15px;margin-left:6px}
@@ -1627,6 +1634,18 @@ function bindNoshow(){
       document.querySelectorAll('.rowmenu.open').forEach(function(o){
         if (o !== m) o.classList.remove('open'); });
       m.classList.toggle('open');
+      // flip the panel UP when opening down would clip past the scroll
+      // box's bottom edge (.appt-scroll is overflow:auto - a downward
+      // panel on the last row renders invisible; 11/13)
+      var p = m.querySelector('.rowmenu-panel');
+      if (p && m.classList.contains('open')) {
+        p.classList.remove('up');
+        var sc = m.closest('.appt-scroll');
+        if (sc) {
+          var pb = p.getBoundingClientRect(), sb = sc.getBoundingClientRect();
+          if (pb.bottom > sb.bottom - 2) p.classList.add('up');
+        }
+      }
     });
   });
   document.querySelectorAll('tr[data-ref] .rns').forEach(function(b){
