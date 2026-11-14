@@ -1555,6 +1555,19 @@ function api(path, body){
     .then(function(r){
       return r.json().then(function(j){ j._status = r.status; return j; })
         .catch(function(){ return {ok: false, _status: r.status, error: 'no response'}; });
+    })
+    .then(function(j){
+      // 11/13 (Matt: "customer initiated actions must refresh immediately"):
+      // every POST is a client-initiated mutation - pull fresh page-data
+      // the moment it resolves so the panel reflects the action in the same
+      // breath, never a 30s poll later. GETs never refresh (page-data itself
+      // arrives through here; no loop). Skipped pre-boot: the wizard's own
+      // handlers own that phase.
+      if (body && j && j.ok && window.PAGE && PAGE.bootOk
+          && typeof loadPageData === 'function') {
+        try { loadPageData(); } catch (e) {}
+      }
+      return j;
     });
 }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
