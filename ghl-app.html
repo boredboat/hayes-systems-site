@@ -1697,10 +1697,11 @@ function renderAppts(rows){
   var tb = $('apptBody'); if (!tb) return;
   var ct = $('apptCt'); if (ct) ct.textContent = fmtNum(rows.length);
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="5" class="empty">No appointments yet. Booked calls land here.</td></tr>';
+    var _e5 = '<tr><td colspan="5" class="empty">No appointments yet. Booked calls land here.</td></tr>';
+    if (tb._painted !== _e5) { tb._painted = _e5; tb.innerHTML = _e5; }
     return;
   }
-  tb.innerHTML = rows.map(function(a){
+  var _ap = rows.map(function(a){
     var badge = a.status === 'booked' ? '<span class="badge booked">Booked</span>'
       : a.status === 'reported' ? '<span class="badge reported">No-show reported</span>'
       : '<span class="badge held">Held</span>';
@@ -1716,15 +1717,19 @@ function renderAppts(rows){
       + esc(a.agent || '') + '</td><td>' + badge
       + '</td><td>' + btn + '</td></tr>';
   }).join('');
+  if (tb._painted === _ap) return;   // FLICKER GUARD: rows unchanged
+  tb._painted = _ap;
+  tb.innerHTML = _ap;
   bindNoshow();
 }
 function renderInvoices(rows){
   var tb = $('invBody'); if (!tb) return;
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="4" class="empty">Invoices appear here as appointments land.</td></tr>';
+    var _e4 = '<tr><td colspan="4" class="empty">Invoices appear here as appointments land.</td></tr>';
+    if (tb._painted !== _e4) { tb._painted = _e4; tb.innerHTML = _e4; }
     return;
   }
-  tb.innerHTML = rows.map(function(v){
+  var _iv = rows.map(function(v){
     // Matt 11/3: billing is weekly invoices, the retainer monthly fee,
     // and refunds - never a special close-out invoice. Fee and refund
     // rows carry no appointment count; refunds render as credits.
@@ -1735,6 +1740,9 @@ function renderInvoices(rows){
     return '<tr><td class="when">' + esc(v.date) + '</td><td>' + esc(v.kind)
       + '</td><td>' + n + '</td><td>' + amt + '</td></tr>';
   }).join('');
+  if (tb._painted === _iv) return;   // FLICKER GUARD: rows unchanged
+  tb._painted = _iv;
+  tb.innerHTML = _iv;
 }
 function renderPast(rows){
   var tb = $('pastBody'); if (!tb) return;
@@ -1791,7 +1799,14 @@ function renderActionBar(st){
                   'Reconnect', 'openReconnect']);
     }
   }
-  if (!items.length) { bar.classList.add('hide'); bar.innerHTML = ''; return; }
+  var _ab = JSON.stringify(items);
+  if (!items.length) {
+    bar.classList.add('hide');
+    if (bar._painted !== '') { bar._painted = ''; bar.innerHTML = ''; }
+    return;
+  }
+  if (bar._painted === _ab) return;   // FLICKER GUARD: nothing changed
+  bar._painted = _ab;
   bar.innerHTML = items.map(function(it, i){
     return '<span>' + esc(it[0]) + '</span>'
       + '<button class="btn btn-primary" data-ab="' + i + '">' + esc(it[1]) + '</button>';
@@ -3072,6 +3087,12 @@ function audFromData(){
 }
 function audChips(el){
   if (!el) return;
+  // FLICKER GUARD (Matt 11/16): chips only repaint when the tag list,
+  // a count, or the selection changed - the steady poll re-ran this
+  // every cycle and the rebuilt row read as constant flicker.
+  var _cs = JSON.stringify([AUD_TAGS || [], AUD_COUNTS, AUD.include_tags]);
+  if (el._painted === _cs && el.firstChild) return;
+  el._painted = _cs;
   el.innerHTML = '';
   if (!(AUD_TAGS || []).length) {
     el.innerHTML = '<span style="font-size:13px;color:var(--mut)">No tags in this location yet</span>';
@@ -3116,8 +3137,21 @@ function audCountNow(){
 }
 function audValid(){ return audCountNow() > 0; }
 function audRender(){
+  // FLICKER GUARD (Matt 11/16): a poll that changes nothing structural
+  // (toggle states, tag list) must not rebuild the section - the rebuild
+  // cycled the big count through its placeholder states on every
+  // refresh. Chips, the warning state and the count paint each carry
+  // their own change guard below.
+  var _rs = JSON.stringify([AUD.skip_open_opp, AUD.include_lost_opp, AUD_TAGS || []]);
   ['audWizard', 'audReq', 'audPc'].forEach(function(id){
     var box = $(id); if (!box) return;
+    if (box._painted === _rs && box.firstChild) {
+      audChips($(id + '_tags'));
+      var _w0 = $(id + '_warn');
+      if (_w0) _w0.classList.toggle('show', !audValid());
+      return;
+    }
+    box._painted = _rs;
     box.innerHTML =
       '<div class="aud-top">' +
       '<div class="aud-tgs">' +
@@ -3163,7 +3197,7 @@ function audPaint(n){
     var ne = $(id + '_n'), w = $(id + '_warn');
     if (!ne) return;
     if (!audValid()) {
-      ne.textContent = '0';
+      if (ne.textContent !== '0') ne.textContent = '0';
       if (w) {
         w.classList.add('show');
         var last = w.lastChild;   // the text node after the svg
@@ -3174,7 +3208,8 @@ function audPaint(n){
     } else {
       if (w) w.classList.remove('show');
       if (n !== undefined && n !== null) {
-        ne.textContent = fmtNum(n);
+        var _pt = fmtNum(n);
+        if (ne.textContent !== _pt) ne.textContent = _pt;
       } else if (ne.textContent === '\u2014') {
         ne.textContent = '...';
       }
@@ -3253,7 +3288,8 @@ function _renderPending(){
   card.classList.remove('hide');
   var b = PAGE.data.billing || {};
   var flow = $('pcFlow');
-  flow.innerHTML = '';
+  // FLICKER GUARD (Matt 11/16): steps carries every displayed value,
+  // so an unchanged signature means an unchanged card - no rebuild.
   // titles only (Matt 11/3: the second detail lines were pointless -
   // the audience count lives in the big number) and every step is
   // EDITABLE so mistakes get fixed before starting
@@ -3294,6 +3330,14 @@ function _renderPending(){
      !!b.card_on_file && !b.card_invalid]
   ];
   var _crit = false;   // critical gaps disable Start (Matt 11/7)
+  steps.forEach(function(s){   // derived every pass, rebuild or not
+    if (!((s.length > 3) ? !!s[3] : true)
+        && (s[0] === 'Calendar' || s[0] === 'Payment method')) _crit = true;
+  });
+  var _fs = JSON.stringify(steps);
+  if (!(flow._painted === _fs && flow.firstChild)) {
+  flow._painted = _fs;
+  flow.innerHTML = '';
   steps.forEach(function(s){
     var row = document.createElement('div');
     row.className = 'pc-rowc';
@@ -3354,15 +3398,17 @@ function _renderPending(){
     }
     flow.appendChild(row);
   });
+  }
   var nums = $('pcNums');
   var est = _pcEstimate();
-  nums.innerHTML =
+  var _nh =
     '<div class="pc-ov"><div class="pc-ov-grid">'
     + '<div class="pc-ov-cell"><div class="n grn">'
     + fmtNum(est.leads) + '</div><div class="l">Leads</div></div>'
     + '<div class="pc-ov-cell"><div class="n">~' + est.weeks + ' wks</div><div class="l">Est. length</div></div>'
     + '<div class="pc-ov-cell"><div class="n">$60</div><div class="l">Per appt</div></div>'
     + '</div><div class="pc-ov-foot">Estimates based on your list size and campaign pacing.</div></div>';
+  if (nums._painted !== _nh) { nums._painted = _nh; nums.innerHTML = _nh; }
   // (the 11/3 list-verdict gate and the small-list advisory are retired
   // - W4-12, Matt 11/6: counts and health states only, no pass/fail
   // framing of the client's list anywhere on the page)
@@ -3979,10 +4025,12 @@ function loadPageData(){
       });
     }).then(function(f){
       if (!f || !f.ok || !(f.activity || []).length) return;
-      $('feedBody').innerHTML = f.activity.map(function(e){
+      var _fd = f.activity.map(function(e){
         return '<div class="feedrow"><span>' + esc(e.text) + '</span>'
           + '<span class="fw">' + esc(fmtDay(e.when)) + '</span></div>';
       }).join('');
+      var _fb = $('feedBody');
+      if (_fb._painted !== _fd) { _fb._painted = _fd; _fb.innerHTML = _fd; }
       $('feedSec').classList.remove('hide');
       syncTabs();
     });
