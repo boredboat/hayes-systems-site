@@ -3658,14 +3658,33 @@ $('pcStart').addEventListener('click', _openOrderReview);
 // ONBOARDING CALENDAR STEP (Matt 11/3: the pick lost its home when the
 // GHL-or-Calendly card retired - now it is a wizard step, saved on
 // selection like the audience block)
-var _obCals = [], _obCalCur = '';
-function _loadObCals(){
+var _obCals = [], _obCalCur = '', _obCalSig = null;
+function _obCalSigOf(){
+  return _obCalCur + '|' + _obCals.map(function(c){
+    return c.id + ':' + c.name; }).join(',');
+}
+function _loadObCals(force){
   var sel = $('obCal'); if (!sel || !PAGE.token) return;
-  sel.innerHTML = '<option>Loading calendars...</option>';
+  // POLL-RENDER GUARD (11/16 ruling, applied here 11/19 after Matt's
+  // live catch: the select "constantly refreshing" mid-pick): never
+  // show Loading or tear down the list when options already exist -
+  // the poll called this every cycle and rebuilt the dropdown under
+  // the cursor. Rebuild only when the list or saved pick CHANGED
+  // (or the refresh link forces it).
+  if (!sel.options.length) sel.innerHTML = '<option>Loading calendars...</option>';
   api('/api/ghl/calendars').then(function(j){
-    if (!(j && j.ok)) { sel.innerHTML = '<option>Unavailable right now</option>'; return; }
+    if (!(j && j.ok)) {
+      // keep a usable stale list over a transient poll error; only a
+      // truly empty select gets the unavailable placeholder
+      if (!sel.options.length)
+        sel.innerHTML = '<option>Unavailable right now</option>';
+      return;
+    }
     _obCals = (j.calendars || []).filter(function(c){ return c.rr; });
     _obCalCur = j.current || '';
+    var _sig = _obCalSigOf();
+    if (!force && _sig === _obCalSig && sel.options.length) return;
+    _obCalSig = _sig;
     sel.innerHTML = '';
     if (!_obCals.length) { sel.innerHTML = '<option>No round-robin calendars yet</option>'; return; }
     // HONEST DISPLAY (Matt 11/8, live-caught: 'it shows the calendar I
@@ -3730,12 +3749,13 @@ function _loadObCals(){
     }
     api('/api/ghl/settings', {calendarId: c.id, calendarName: c.name})
       .then(function(j){
-        if (j && j.ok) { _obCalCur = c.id; toast('Calendar saved: ' + c.name); }
+        if (j && j.ok) { _obCalCur = c.id; _obCalSig = _obCalSigOf();
+                        toast('Calendar saved: ' + c.name); }
         else { toast('Could not save that calendar. Try again.'); sel.value = ''; }
       })
       .catch(function(){ toast('Could not save that calendar. Try again.'); sel.value = ''; });
   });
-  if (relink) relink.addEventListener('click', _loadObCals);
+  if (relink) relink.addEventListener('click', function(){ _loadObCals(true); });
 })();
 var MAIL_TPL = null;   // {subject, from_line, body} with {agency} intact
 var MAIL_AGENCY = null;   // explicit override (the Business editor
