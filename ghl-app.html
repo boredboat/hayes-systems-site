@@ -4850,7 +4850,6 @@ function applyOb(s){
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     $('obForm').classList.add('hide');
     $('obDone').classList.remove('hide');
-    toast('Setup complete.');
   }
   $('obSubmit').addEventListener('click', function(){
     _signed = true;
