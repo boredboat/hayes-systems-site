@@ -107,6 +107,8 @@ h1{font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--tx)}
 .tab.on{color:var(--acc);border-bottom-color:var(--acc)}
 .tab .ct{background:#f3f4f6;color:var(--mut);font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:7px}
 .pane{display:none;background:#fff;border:1px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;padding:4px 0 8px}
+.sd-side{transition:background .15s, box-shadow .15s}
+.sd-side.on{background:rgba(24,139,246,.05);box-shadow:inset 0 2px 0 #188bf6}
 .pane.on{display:block}
 table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px;table-layout:fixed}
 th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);padding:12px 22px 8px}
@@ -679,6 +681,28 @@ body{padding:0}
       <div class="ob-fields" style="grid-template-columns:1fr">
         <div class="ob-field"><label for="obBusiness">Business name</label>
           <input id="obBusiness" value="Summit Realty Group"></div>
+        <div class="ob-field"><label for="obSendDomain">Sending domain</label>
+          <select id="obSendDomain" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+            <option value="">Hayes Systems default</option>
+            <option value="__other">A different domain</option>
+          </select>
+          <input id="obSendDomainOther" class="hide" placeholder="yourteam.com" style="margin-top:8px;width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:#fff">
+          <p style="margin:8px 0 0;font-size:12.5px;color:var(--mut)">Campaign mail can come from your own domain once it is connected for email sending in your CRM. Leave the default if you're not sure.</p>
+          <div style="margin-top:12px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1fr 1fr">
+              <div class="sd-side" id="sdCardUs" style="padding:12px 14px;border-right:1px solid var(--bd)">
+                <div style="font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin-bottom:7px">Hayes Systems default</div>
+                <div style="font-size:13px;line-height:1.55;color:var(--mut)">Mail comes from our address, with your business name in every message.</div>
+                <div style="font-size:13px;line-height:1.55;color:var(--mut);margin-top:7px">Nothing to set up. Nothing extra to pay.</div>
+              </div>
+              <div class="sd-side" id="sdCardThem" style="padding:12px 14px">
+                <div style="font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin-bottom:7px">Your domain</div>
+                <div style="font-size:13px;line-height:1.55;color:var(--mut)">Mail comes from your business's own email domain, the one your leads already know.</div>
+                <div style="font-size:13px;line-height:1.55;color:var(--mut);margin-top:7px">Needs your domain connected for email sending in your CRM. $0.675 per 1,000 emails, billed to your GoHighLevel plan by GoHighLevel.</div>
+              </div>
+            </div>
+          </div>
+          </div>
         <div class="ob-field"><label for="obNotice">Service notice email</label>
           <input id="obNotice" placeholder="you@brokerage.com">
           <p style="margin:6px 0 0;font-size:12.5px;color:var(--mut)">Campaign updates and service notices go here.</p></div>
@@ -3757,6 +3781,63 @@ function _loadObCals(force){
   });
   if (relink) relink.addEventListener('click', function(){ _loadObCals(true); });
 })();
+// SENDING DOMAIN SELECTOR (Matt 11/20, CLIENT-DOMAIN-SENDING phase 1:
+// collect-only - records the preference; sends still ride the default
+// until the client-domain transport ships). Loaded via audInit (the
+// calendar pattern: the token does not exist at script-load time, so
+// the fetch waits for the first poll); PAGE._domSeed self-limits to
+// once (poll-render ruling: never rebuilt per poll); a failed read
+// leaves the default selected and never blocks onboarding.
+function _loadSendDomain(){
+  var sel = $('obSendDomain'), other = $('obSendDomainOther');
+  if (!sel || !PAGE.token || PAGE._domSeed) return;
+  PAGE._domSeed = true;
+  api('/api/ghl/domains').then(function(j){
+    if (!(j && j.ok)) return;
+    function _opt(v){
+      var o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.insertBefore(o, sel.options[sel.options.length - 1]);
+      return o;
+    }
+    var d = (j.domain || '').trim().toLowerCase();
+    if (d) _opt(d);
+    var s = (j.saved || '').trim().toLowerCase();
+    if (s) {
+      var has = Array.prototype.some.call(
+        sel.options, function(x){ return x.value === s; });
+      if (has) sel.value = s;
+      else { sel.value = '__other';
+             if (other) { other.classList.remove('hide'); other.value = s; } }
+    } else if (d) {
+      // DEFAULT = THE PULLED DOMAIN (Matt 11/20): when the API has the
+      // location's domain, it is the selected default; the Hayes
+      // Systems option is the fallback only when nothing was found.
+      sel.value = d;
+    }
+  }).catch(function(){});
+}
+(function(){
+  var sel = $('obSendDomain'), other = $('obSendDomainOther');
+  if (!sel) return;
+  function _sdHi(){
+    var us = $('sdCardUs'), them = $('sdCardThem');
+    if (!us || !them) return;
+    var ours = sel.value === '';
+    us.classList.toggle('on', ours);
+    them.classList.toggle('on', !ours);
+  }
+  sel.addEventListener('change', function(){
+    if (other) other.classList.toggle('hide', sel.value !== '__other');
+    _sdHi();
+  });
+  _sdHi();
+  _loadSendDomain();
+  var _sdPoll = setInterval(function(){
+    if (PAGE._domSeed) { _sdHi(); clearInterval(_sdPoll); }
+  }, 500);
+  setTimeout(function(){ clearInterval(_sdPoll); }, 30000);
+})();
 var MAIL_TPL = null;   // {subject, from_line, body} with {agency} intact
 var MAIL_AGENCY = null;   // explicit override (the Business editor
                          // previews the name being typed, pre-save)
@@ -3805,6 +3886,7 @@ function audInit(){
     _openMailPreview($('obBusiness') ? $('obBusiness').value.trim() : '');
   };
   _loadObCals();
+  _loadSendDomain();   // sending-domain selector (once, first poll)
   var _nb = $('obNotice');
   if (_nb && !_nb.value) {
     _nb.value = ((PAGE.data && PAGE.data.client) || {}).email || '';
@@ -4867,6 +4949,17 @@ function applyOb(s){
         if (_obEm && _obEm.indexOf('@') > 1) {
           api('/api/ghl/settings', {email: _obEm}).catch(function(){});
           if (PAGE.data && PAGE.data.client) PAGE.data.client.email = _obEm;
+        }
+        // sending-domain choice rides the same submit (collect-only)
+        var _obSd = '';
+        if ($('obSendDomain')) {
+          _obSd = $('obSendDomain').value === '__other'
+            ? ($('obSendDomainOther') ? $('obSendDomainOther').value.trim() : '')
+            : $('obSendDomain').value;
+        }
+        if (_obSd) {
+          api('/api/ghl/settings', {sending_domain: _obSd.toLowerCase()})
+            .catch(function(){});
         }
       }
       fetch(API + '/api/ghl/stripe-setup', {
