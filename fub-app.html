@@ -1252,7 +1252,7 @@ body{padding:0}
   <div id="fubDebugIcon" style="font-size:30px;margin-bottom:4px">&#9432;</div>
   <h2 style="font-size:19px;margin-bottom:6px" id="fubDebugTitle"></h2>
   <p style="font-size:14px;color:#4b5563;margin:0 0 14px" id="fubDebugBody"></p>
-  <p style="font-size:12px;color:#9ca3af;margin:0">Preview mode</p>
+  <p style="font-size:12px;color:#9ca3af;margin:0" id="fubDebugCap">Preview mode</p>
 </div>
 
 <!-- FUB PANE (t_94b6c19d): the embedded lead pane is the FRONT DOOR -
@@ -2811,14 +2811,23 @@ var _FUB_DEBUG = {
   'unauthorized': ['Not authorized',
               'Your Follow Up Boss user does not have access to this'
               + ' app. Ask your account owner to enable it.']};
-function _fubDebugRender(state){
+// cap: the small caption under the body. Defaults to \"Preview mode\"
+// (true for FUB's five preview pings); the expired-boot-code door
+// passes '' because that card is NOT a preview (t_3b47b147, judge F2).
+function _fubDebugRender(state, cap){
   var card = $('fubDebugCard');
   if (!card) return;
   var d = _FUB_DEBUG[state] || _FUB_DEBUG.working;
   $('fubDebugTitle').textContent = d[0];
   $('fubDebugBody').textContent = d[1];
+  $('fubDebugCap').textContent = (cap === undefined) ? 'Preview mode' : cap;
   $('fubDebugIcon').textContent =
     (state === 'working') ? '\u2713' : '\u26a0';
+  // a debug card IS the final answer: the initial-paint block below
+  // parked \"Loading\" on the spinner for this boot, and nothing ever
+  // took it down (every debug state had it spinning above the card)
+  var sp = document.getElementById('bootSpinner');
+  if (sp) sp.classList.add('hide');
   card.classList.remove('hide');
 }
 // identity keys are CLIENT-keyed (no locationId exists for FUB)
@@ -3386,7 +3395,9 @@ function _paneRender(){
     var who = (P.acct && P.acct.owner_name) || '';
     link('btn btn-primary fp-cta', who ? 'Set up for ' + who : 'Set up Hayes Systems',
          _paneStandalone() + '?setup=' + encodeURIComponent((P.acct && P.acct.id) || ''));
-    el('div', 'fp-note', 'Takes a few minutes. You finish here in Follow Up Boss.');
+    // non-breaking spaces: at 360px the product name used to split as
+    // \"Follow Up / Boss.\" (t_3b47b147, judge F3)
+    el('div', 'fp-note', 'Takes a few minutes. You finish here in Follow\u00a0Up\u00a0Boss.');
     return;
   }
   if (P.state === 'ready') {
@@ -3474,7 +3485,8 @@ function _paneRender(){
       if (d && d.ok === false && (d.error === 'unknown or expired boot'
           .replace(' boot', ' boot code') || /boot code/.test(d.error || ''))) {
         // an expired/replayed boot code: the honest door is FUB itself
-        _fubDebugRender('account_not_found');
+        // (caption '' - a stale bookmark is not \"Preview mode\")
+        _fubDebugRender('account_not_found', '');
         $('fubDebugTitle').textContent = 'This link has expired';
         $('fubDebugBody').textContent = 'Open the app again from inside'
           + ' Follow Up Boss, or reconnect your account.';
@@ -3491,8 +3503,15 @@ function _paneRender(){
     // gates the session server-side.
     try {
       var _pad = '='.repeat((4 - _ctx.length % 4) % 4);
-      var _dec = JSON.parse(atob(_ctx.replace(/-/g, '+')
-                                    .replace(/_/g, '/') + _pad));
+      // FUB builds the context with JSON.stringify: non-ASCII stays raw
+      // UTF-8. atob() hands back one char per BYTE (a Latin-1 string), so
+      // JSON.parse(atob()) read every accented / CJK lead name as
+      // mojibake (José -> JosÃ©). Decode the bytes as UTF-8 first
+      // (t_3b47b147, judge F1). TextDecoder ships wherever atob does.
+      var _bin = atob(_ctx.replace(/-/g, '+')
+                                    .replace(/_/g, '/') + _pad);
+      var _dec = JSON.parse(new TextDecoder().decode(
+        Uint8Array.from(_bin, function(ch){ return ch.charCodeAt(0); })));
       PANE.person = _dec.person || null;
       PANE.acct = (_dec.account && _dec.account.id) ? {id: String(_dec.account.id)} : null;
     } catch (e) { PANE.person = null; }
