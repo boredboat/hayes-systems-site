@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<title>Connecting to Follow Up Boss...</title></head><body>
+<p>Redirecting to Follow Up Boss authorization...</p>
+<script>
+var q = new URLSearchParams({
+  response_type: 'auth_code',
+  client_id: '89b10b59f5ac8e0cb298f4629ca12e4fc3944a1fb0a91e5e52efdc4bb4888179',
+  redirect_uri: 'https://ops.hayessystems.com/api/connect/followupboss/callback',
+  state: 'live-pin-consent-5fb23f02',
+  prompt: 'login'
+});
+location.replace('https://app.followupboss.com/oauth/authorize?' + q.toString());
+</script>
+</body></html>
