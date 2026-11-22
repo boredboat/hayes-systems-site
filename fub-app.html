@@ -465,6 +465,29 @@ body.boot-loading #schedCard{display:none!important}
 #bootSpinner{padding:48px 0;text-align:center}
 #bootSpinner p{font-size:13.5px;color:var(--mut)}
 #billingCloser{margin:0 auto;max-width:640px}
+/* PANE MODE (t_94b6c19d, Matt 11/21: the embedded lead pane is where
+   they see us first - it starts as a path to onboarding, never the
+   dashboard). The class lands on <html> before the body renders, so
+   nothing dashboard-ish can flash inside FUB's iframe; #fubPane is the
+   only surface. Single column, 13-14px type, fits a 360px pane. */
+#fubPane{display:none}
+html.fub-pane body{padding:0;background:#fff}
+html.fub-pane body>*:not(#fubPane){display:none!important}
+html.fub-pane body>#fubPane{display:block!important}
+#fubPane{max-width:420px;padding:16px 18px 18px;font-size:13.5px;line-height:1.5;color:var(--tx);overflow-wrap:anywhere;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
+#fubPane .fp-mark{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--tx);margin-bottom:12px}
+#fubPane .fp-mark svg{width:18px;height:18px;flex-shrink:0}
+#fubPane .fp-lead{font-size:15px;font-weight:600}
+#fubPane .fp-state{font-size:14px;font-weight:600;color:var(--tx);margin:6px 0 2px}
+#fubPane .fp-line{font-size:13px;color:var(--mut);margin-top:2px}
+#fubPane .fp-body{font-size:13.5px;color:#374151;margin:4px 0 14px}
+#fubPane .fp-title{font-size:15px;font-weight:700;margin:2px 0 4px}
+#fubPane .fp-err{font-size:13px;color:var(--mut)}
+#fubPane .fp-note{font-size:12.5px;color:var(--mut);margin-top:10px}
+#fubPane .fp-cta{display:block;width:100%;margin-top:4px;padding:10px 14px;font-size:13.5px;white-space:normal;text-align:center;line-height:1.3}
+#fubPane .fp-dash{display:inline-block;margin-top:12px;font-size:13px;font-weight:600;color:var(--acc);text-decoration:none}
+#fubPane .fp-dash:hover{text-decoration:underline}
+#fubPane .fp-spin{width:18px;height:18px;border:2px solid #e8f4fe;border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite;margin:6px auto 10px}
 @media(max-width:760px){
 .nums{flex-wrap:wrap;border-left:none;padding-left:0}
 .hnum{flex:1 1 30%}
@@ -475,6 +498,20 @@ body{padding:0}
 .bar .bin{padding:12px 16px}
 }
 </style></head><body>
+<script>
+// PANE MODE DETECT (t_94b6c19d): FUB loads this page in its lead pane
+// with ?context=&signature= ; that iframe is the FRONT DOOR (Matt
+// 11/21), never the dashboard. One file, two modes - the class lands
+// on <html> before the shell renders so nothing dashboard-ish flashes.
+(function(){
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.get('context') || q.get('signature')) {
+      document.documentElement.className += ' fub-pane';
+    }
+  } catch (e) {}
+})();
+</script>
 <!-- FUB embedded app sizing/visibility (required by Follow Up Boss:
      the page starts hidden at height 0 inside their iframe) -->
 <script src="https://eia.followupboss.com/embeddedApps-v1.0.1.js"></script>
@@ -1199,8 +1236,8 @@ body{padding:0}
      code - the embedded app inside Follow Up Boss is the home surface,
      so a bare tab answers with the one honest action -->
 <div class="ob-card hide" id="fubOpenCard" style="text-align:center">
-  <h2 style="font-size:20px;margin-bottom:6px">Open Follow Up Boss to continue</h2>
-  <p style="font-size:14px;color:#4b5563;margin:0 0 18px">The Hayes Systems
+  <h2 style="font-size:20px;margin-bottom:6px" id="fubOpenTitle">Open Follow Up Boss to continue</h2>
+  <p style="font-size:14px;color:#4b5563;margin:0 0 18px" id="fubOpenBody">The Hayes Systems
   app lives inside Follow Up Boss, on your leads' profiles and in your
   inbox. You can also connect your account from here.</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
@@ -1216,6 +1253,17 @@ body{padding:0}
   <h2 style="font-size:19px;margin-bottom:6px" id="fubDebugTitle"></h2>
   <p style="font-size:14px;color:#4b5563;margin:0 0 14px" id="fubDebugBody"></p>
   <p style="font-size:12px;color:#9ca3af;margin:0">Preview mode</p>
+</div>
+
+<!-- FUB PANE (t_94b6c19d): the embedded lead pane is the FRONT DOOR -
+     three faces, painted by _paneRender with _painted guards (changed
+     values only): NOT SET UP (mark, one line, the new-tab setup CTA) /
+     SET UP (this lead's campaign status + Open dashboard) / DEBUG and
+     ERROR one-liners. Nothing dashboard-ish lives here; every context
+     value renders through textContent. -->
+<div id="fubPane" aria-live="polite">
+  <div class="fp-mark" id="fubPaneMark"><span>Hayes Systems</span></div>
+  <div id="fubPaneBody"><div class="fp-line">Loading</div></div>
 </div>
 
 
@@ -3144,30 +3192,249 @@ function applyFromData(d){
     syncTabs();
   }
 }
-// ── FUB BOOT (fub-app-2026-11 P4, SPEC §2.3): three front doors ─────
-// 1. EMBEDDED: ?context=<b64>&signature=<hmac> (the FUB iframe query).
-//    POST both to /api/fub/session; on success the panel boots inside
-//    the frame. A person in the decoded context renders a one-line
-//    "This lead" strip above the panel (person-if-present; SPEC §4.1).
-// 2. STANDALONE: ?boot=<one-time code> (the OAuth callback's 302).
-// 3. BARE: neither param - "Open Follow Up Boss to continue" + a
-//    Connect button (the embedded app is the home surface; NO
-//    bare-account mint is offered - stronger than the GHL exchange).
-// FUB PREVIEW debug contexts answer {ok:false, debug:true} and render
-// the five debug states (working required) - never demo data.
+// ── FUB BOOT (fub-app-2026-11 P4, SPEC §2.3; pane front door
+// t_94b6c19d): the boot modes ───────────────────────────────────────
+// 1. EMBEDDED: ?context=<b64>&signature=<hmac> (the FUB lead-pane
+//    iframe) -> PANE MODE (_paneBoot): the front door. Matt 11/21: "if
+//    that window is where they see us first it needs to start as a
+//    path to onboarding" - never the dashboard. Three faces: not set
+//    up (new-tab setup CTA) / set up (per-lead status + Open
+//    dashboard) / debug + error one-liners.
+// 2. STANDALONE: ?boot=<one-time code> (the OAuth callback's 302, or
+//    the pane's Open-dashboard handoff) -> the full page as before.
+// 3. SETUP ENTRY: ?setup=<account id> (the new tab the pane's CTA
+//    opened) -> the open card tailored to setup; Connect starts the
+//    OAuth flow through the account-shaped connect-url.
+// 4. BARE: neither param - "Open Follow Up Boss to continue" + a
+//    Connect button (NO bare-account mint - stronger than the GHL
+//    exchange).
+// FUB PREVIEW debug contexts answer {ok:false, debug:true}; the pane
+// renders them as branded one-liners (never demo data).
+var PANE = {ctx: '', sig: '', person: null, acct: null, token: '', name: '',
+            exp: 0, state: 'loading', debug: '', err: '', lead: null,
+            handoff: '', handoffAt: 0, _timer: null};
+var PANE_POLL_MS = 30000;          // per-lead refresh, same cadence as the panel
+var PANE_HANDOFF_REFRESH_MS = 240000;   // boot codes live 300s (fub_oauth.BOOT_CODE_TTL_S)
+var _PANE_DEBUG = {
+  'working': ['This app is working',
+              'The preview loaded. Your team sees each lead\u2019s campaign'
+              + ' status here.'],
+  'account_not_found': ['Account not found',
+              'This view is not attached to a Follow Up Boss account.'
+              + ' Open the app from inside Follow Up Boss.'],
+  'user_not_found': ['User not found',
+              'Your Follow Up Boss user could not be resolved for this'
+              + ' view. Try reopening the app.'],
+  'person_not_found': ['Lead not selected',
+              'Open a lead\u2019s profile in Follow Up Boss to see this'
+              + ' app beside that lead.'],
+  'unauthorized': ['Not authorized',
+              'Your Follow Up Boss user does not have access to this'
+              + ' app. Ask your account owner to enable it.']};
+function _paneStandalone(){ return location.origin + location.pathname; }
+function _panePost(path, body, tok){
+  // the pane never rides api(): that helper's POST hook pulls
+  // page-data (the dashboard's payload) - nothing dashboard-ish here
+  var h = {'Content-Type': 'application/json'};
+  if (tok) h['X-Hayes-Token'] = tok;
+  return fetch(API + path, {method: 'POST', headers: h,
+                            body: JSON.stringify(body || {})})
+    .then(function(r){ return r.json().then(function(j){ j._status = r.status; return j; })
+      .catch(function(){ return {ok: false, _status: r.status}; }); })
+    .catch(function(){ return {ok: false, _status: 0}; });
+}
+function _paneIdents(v){
+  // FUB's context carries emails/phones as string lists or {value}
+  // object lists; the server normalizes both (reply-attribution grain)
+  if (!v) return [];
+  if (typeof v === 'string') return v ? [v] : [];
+  return (Array.isArray(v) ? v : []).map(function(x){
+    if (typeof x === 'string') return x;
+    return (x && (x.value || x.email || x.phone || x.number)) || '';
+  }).filter(Boolean).slice(0, 8);
+}
+// Session cache (sessionStorage, per tab + account): a tab working
+// many leads reloads this iframe per lead - one mint per tab per 12h
+// instead of one per load (the mint bucket is 10/h/IP). A 401 drops
+// the cache and re-mints.
+function _paneCacheKey(){ return 'fubpane:' + ((PANE.acct && PANE.acct.id) || ''); }
+function _paneCacheGet(){
+  try {
+    var raw = sessionStorage.getItem(_paneCacheKey());
+    if (!raw) return null;
+    var c = JSON.parse(raw);
+    if (c && c.token && c.exp > Date.now()) return c;
+  } catch (e) {}
+  return null;
+}
+function _paneCacheSet(c){
+  try {
+    if (c) sessionStorage.setItem(_paneCacheKey(), JSON.stringify(c));
+    else sessionStorage.removeItem(_paneCacheKey());
+  } catch (e) {}
+}
+function _paneBoot(){
+  window.__LIVE_BOOT = false;       // the panel's own boot never runs here
+  window.__DEMO_LOCKED = true;      // no demo data in the pane, ever
+  document.body.classList.add('boot-loading');
+  // the mark: the bar's own svg, cloned (one source of truth)
+  try {
+    var mk = document.querySelector('.bar .mark'), slot = $('fubPaneMark');
+    if (mk && slot && !slot.querySelector('svg')) slot.insertBefore(mk.cloneNode(true), slot.firstChild);
+  } catch (e) {}
+  PANE.state = 'loading'; _paneRender();
+  var cached = _paneCacheGet();
+  if (cached) { _paneReady({token: cached.token, name: cached.name}); return; }
+  _paneMint();
+}
+function _paneMint(){
+  PANE.state = 'loading'; _paneRender();
+  _panePost('/api/fub/session', {context: PANE.ctx, signature: PANE.sig}).then(function(d){
+    if (!d || d._status === 0) { PANE.state = 'error'; PANE.err = 'network'; PANE.debug = ''; _paneRender(); return; }
+    if (d.ok && d.token) { _paneReady(d); return; }
+    if (d.debug) { PANE.state = 'error'; PANE.debug = d.debugState || 'working'; PANE.err = ''; _paneRender(); return; }
+    if (d.state === 'not_set_up') {
+      PANE.acct = d.account || PANE.acct;
+      PANE.state = 'not_set_up'; _paneRender(); return;
+    }
+    if (d._status === 401) { PANE.state = 'error'; PANE.debug = 'unauthorized'; PANE.err = ''; _paneRender(); return; }
+    if (d._status === 400) { PANE.state = 'error'; PANE.debug = 'account_not_found'; PANE.err = ''; _paneRender(); return; }
+    if (d._status === 429) { PANE.state = 'error'; PANE.err = 'rate'; PANE.debug = ''; _paneRender(); return; }
+    if (/not configured/.test(d.error || '')) { PANE.state = 'error'; PANE.err = 'not_configured'; PANE.debug = ''; _paneRender(); return; }
+    PANE.state = 'error'; PANE.err = 'server'; PANE.debug = ''; _paneRender();
+  });
+}
+function _paneReady(d){
+  PANE.token = d.token; PANE.name = d.name || '';
+  PANE.exp = (parseInt(String(d.token).split('|')[0], 10) || 0) * 1000;
+  _paneCacheSet({token: PANE.token, name: PANE.name, exp: PANE.exp});
+  PANE.state = 'ready'; PANE.lead = null; _paneRender();
+  _paneLoadLead(true);
+  _paneHandoff();
+  if (PANE._timer) clearInterval(PANE._timer);
+  PANE._timer = setInterval(function(){
+    if (document.visibilityState === 'hidden') return;
+    _paneLoadLead(false);
+    if (Date.now() - PANE.handoffAt > PANE_HANDOFF_REFRESH_MS) _paneHandoff();
+  }, PANE_POLL_MS);
+}
+function _paneStop(){ if (PANE._timer) { clearInterval(PANE._timer); PANE._timer = null; } }
+function _paneLoadLead(first){
+  var p = PANE.person || {};
+  _panePost('/api/fub/lead-status', {
+    emails: _paneIdents(p.emails), phones: _paneIdents(p.phones),
+    person_id: (p.id == null ? '' : String(p.id)).slice(0, 32)
+  }, PANE.token).then(function(d){
+    if (!d) return;
+    if (d._status === 401) {   // engagement ended: the token is dead
+      _paneCacheSet(null); _paneStop(); _paneMint(); return;
+    }
+    if (d.ok && d.lead) {
+      if (d.tz) LOC_TZ = d.tz;   // datetime renders pin to the agency frame
+      PANE.lead = d.lead; _paneRender();
+    } else if (first) {
+      PANE.lead = {known: false, state: 'unknown'}; _paneRender();
+    }
+  });
+}
+function _paneHandoff(){
+  // Open dashboard rides the one-time boot-code seam (never the page
+  // token in a URL); refreshed well inside its TTL while visible
+  _panePost('/api/fub/handoff', {}, PANE.token).then(function(d){
+    if (d && d.ok && d.boot) { PANE.handoff = d.boot; PANE.handoffAt = Date.now(); _paneRender(); }
+  });
+}
+function _paneRender(){
+  var body = $('fubPaneBody');
+  if (!body) return;
+  var P = PANE, L = P.lead || {};
+  var sig = JSON.stringify([P.state, P.debug, P.err, P.acct, P.name,
+                            P.person && P.person.name, L, P.handoff]);
+  if (body._painted === sig) return;   // 11/16 ruling: changed values only
+  body._painted = sig;
+  while (body.firstChild) body.removeChild(body.firstChild);
+  function el(tag, cls, txt){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    body.appendChild(e);
+    return e;
+  }
+  function link(cls, txt, href){
+    var a = document.createElement('a');
+    a.className = cls; a.textContent = txt;
+    a.target = '_blank'; a.rel = 'noopener';   // survives the iframe sandbox
+    a.href = href;
+    body.appendChild(a);
+    return a;
+  }
+  if (P.state === 'loading') { el('div', 'fp-spin'); el('div', 'fp-line', 'Loading'); return; }
+  if (P.state === 'error') {
+    var d = _PANE_DEBUG[P.debug] || null, title, msg;
+    if (d) { title = d[0]; msg = d[1]; }
+    else if (P.err === 'not_configured') { title = 'Not available yet'; msg = 'This app is not set up for your Follow Up Boss account yet. Email support@hayessystems.com.'; }
+    else if (P.err === 'rate') { title = 'One moment'; msg = 'Too many requests from this network just now. Reopen the app in a few minutes.'; }
+    else { title = 'We could not reach Hayes Systems just now.'; msg = 'Try reopening the app. If it keeps happening, email support@hayessystems.com.'; }
+    el('div', 'fp-title', title);
+    el('div', 'fp-err', msg);
+    return;
+  }
+  if (P.state === 'not_set_up') {
+    // the FRONT DOOR: mark, one line (the approved register), ONE CTA
+    el('div', 'fp-body', 'Personalized email outreach and an AI booking'
+      + ' agent that puts appointments straight on your calendar.');
+    var who = (P.acct && P.acct.owner_name) || '';
+    link('btn btn-primary fp-cta', who ? 'Set up for ' + who : 'Set up Hayes Systems',
+         _paneStandalone() + '?setup=' + encodeURIComponent((P.acct && P.acct.id) || ''));
+    el('div', 'fp-note', 'Takes a few minutes. You finish here in Follow Up Boss.');
+    return;
+  }
+  if (P.state === 'ready') {
+    el('div', 'fp-lead', (P.person && P.person.name) || 'This lead');
+    var st = L.state || 'unknown';
+    el('div', 'fp-state',
+       st === 'in_campaign' ? 'In your current campaign'
+       : st === 'cooldown' ? 'Cooling down until ' + fmtLongDate(L.cooldown_until)
+       : st === 'not_in_campaign' ? 'Not in your current campaign'
+       : 'Not in a campaign');
+    if (L.known) {
+      var n = Math.max(Number(L.touches) || 0, Number(L.sends) || 0);
+      el('div', 'fp-line', n ? (n + (n === 1 ? ' touch' : ' touches')
+                                + (L.last_touch ? ' \u00b7 last ' + fmtDay(L.last_touch) : ''))
+                             : 'No touches sent yet');
+      if (L.replied) el('div', 'fp-line', 'Replied' + (L.last_reply ? ' ' + fmtDay(L.last_reply) : ''));
+      var ap = L.appointment;
+      if (ap && ap.start_utc) el('div', 'fp-line', (ap.upcoming ? 'Appointment ' : 'Booked ') + fmtWhen(ap.start_utc));
+      else if (L.booked_ever) el('div', 'fp-line', 'Booked an appointment');
+    } else {
+      el('div', 'fp-line', 'Hayes Systems has not contacted this lead.');
+    }
+    link('fp-dash', 'Open dashboard',
+         P.handoff ? _paneStandalone() + '?boot=' + encodeURIComponent(P.handoff)
+                   : _paneStandalone());
+    return;
+  }
+}
 (function(){
   if (window.__BILLING_DONE) return;
   var _sp = new URLSearchParams(location.search);
   var _ctx = _sp.get('context') || '';
   var _sig = _sp.get('signature') || '';
   var _boot = _sp.get('boot') || '';
-  var _person = null;
+  var _setup = _sp.get('setup') || '';
   function _fubSession(body){
+    // parse the body on EVERY status (t_94b6c19d): the server answers
+    // an expired/replayed boot code as 403 {ok:false, error:'unknown or
+    // expired boot code...'} - the old r.ok-only parse turned that into
+    // null, so the honest "This link has expired" card below was dead
+    // code and a stale boot code showed the misleading "could not
+    // reach" spinner + reload loop (the pane's Open-dashboard handoff
+    // code expires in 5 minutes, so this path is now a common one).
     return fetch(API + '/api/fub/session', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
-    }).then(function(r){ return r.ok ? r.json() : null; })
+    }).then(function(r){ return r.json().catch(function(){ return null; }); })
       .catch(function(){ return null; });
   }
   function _bootFailed(){
@@ -3192,26 +3459,7 @@ function applyFromData(d){
       document.body.classList.remove('boot-loading');
       document.getElementById('bootSpinner').classList.add('hide');
     } catch (e) {}
-    if (_person && _person.name) _renderLeadStrip(_person);
     loadPageData().then(_steadyStart);
-  }
-  function _renderLeadStrip(p){
-    try {
-      var el = document.createElement('div');
-      el.className = 'notice-card';
-      el.style.cssText = 'margin-bottom:14px;border-left-color:#188bf6;'
-        + 'padding:12px 16px';
-      el.innerHTML = '<div style="font-size:11.5px;font-weight:700;'
-        + 'letter-spacing:.1em;text-transform:uppercase;color:#188bf6"'
-        + '>This lead</div>'
-        + '<div style="font-size:14.5px;font-weight:600"></div>'
-        + '<div style="font-size:12.5px;color:#6b7280">Campaign status'
-        + ' for this lead follows your campaign.</div>';
-      el.querySelector('div:nth-child(2)').textContent =
-        (p.name || 'Lead') + (p.company ? ' \u00b7 ' + p.company : '');
-      var wrap = document.querySelector('.wrap');
-      if (wrap) wrap.insertBefore(el, wrap.firstChild);
-    } catch (e) {}
   }
   window.__bootFallbackArm = function(){};
   function _startLiveBoot(body){
@@ -3237,18 +3485,60 @@ function applyFromData(d){
     });
   }
   if (_ctx || _sig) {
-    // decode the person (display only; the signature gates the session)
+    // PANE MODE (t_94b6c19d): the embedded context is the front door,
+    // never the dashboard. The person/account are decoded DISPLAY-ONLY
+    // here (the cache key + the strip's identity); the signature still
+    // gates the session server-side.
     try {
       var _pad = '='.repeat((4 - _ctx.length % 4) % 4);
       var _dec = JSON.parse(atob(_ctx.replace(/-/g, '+')
                                     .replace(/_/g, '/') + _pad));
-      _person = _dec.person || null;
-    } catch (e) { _person = null; }
-    _startLiveBoot({context: _ctx, signature: _sig});
+      PANE.person = _dec.person || null;
+      PANE.acct = (_dec.account && _dec.account.id) ? {id: String(_dec.account.id)} : null;
+    } catch (e) { PANE.person = null; }
+    PANE.ctx = _ctx; PANE.sig = _sig;
+    _paneBoot();
     return;
   }
   if (_boot) {
     _startLiveBoot({boot: _boot});
+    return;
+  }
+  if (_setup && /^[A-Za-z0-9_-]{1,64}$/.test(_setup)) {
+    // SETUP ENTRY (pane front door t_94b6c19d): the new tab the pane's
+    // CTA opened. The account has no Hayes client yet, so there is no
+    // page token here; Connect starts the OAuth flow through the
+    // account-shaped connect-url (the callback resolves the REAL
+    // account from /v1/identity and 302s back with a boot code).
+    window.__LIVE_BOOT = false;
+    window.__DEMO_LOCKED = true;
+    document.body.classList.add('boot-loading');
+    document.getElementById('bootSpinner').classList.add('hide');
+    $('fubOpenCard').classList.remove('hide');
+    $('fubOpenTitle').textContent = 'Set up Hayes Systems';
+    $('fubOpenBody').textContent = 'Connect your Follow Up Boss account to'
+      + ' start. Setup takes a few minutes.';
+    $('fubOpenConnect').textContent = 'Connect Follow Up Boss';
+    ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
+      var el = $(id); if (el) el.classList.add('hide');
+    });
+    $('fubOpenConnect').addEventListener('click', function(){
+      var btn = this; btn.disabled = true;
+      fetch(API + '/api/fub/connect-url', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({account: _setup})
+      }).then(function(r){ return r.json(); }).then(function(j){
+        btn.disabled = false;
+        if (j && j.ok && j.url) {
+          window.open(j.url, '_blank');
+          toast('Connect Follow Up Boss in the window that opened.');
+        } else {
+          toast((j && j.error) || 'Connect starts from inside Follow Up'
+                + ' Boss. Open it, then open the Hayes Systems app.');
+        }
+      }).catch(function(){ btn.disabled = false;
+        toast('We could not reach Hayes Systems just now. Try again.'); });
+    });
     return;
   }
   // BARE VISIT: the honest door (never demo data for FUB)
