@@ -1573,7 +1573,7 @@ function toast(msg){
 // below branches on PAGE.live.
 var API = 'https://ops.hayessystems.com';
 function auth(){ return {'Content-Type': 'application/json', 'X-Hayes-Token': PAGE.token}; }
-function api(path, body){
+function api(path, body, quiet){
   return fetch(API + path, {method: body ? 'POST' : 'GET', headers: auth(),
                             body: body ? JSON.stringify(body) : undefined})
     .then(function(r){
@@ -1587,7 +1587,14 @@ function api(path, body){
       // breath, never a 30s poll later. GETs never refresh (page-data itself
       // arrives through here; no loop). Skipped pre-boot: the wizard's own
       // handlers own that phase.
-      if (body && j && j.ok && window.PAGE && PAGE.bootOk
+      // QUIET READS (R3a first-browser-run catch, 11/21): the
+      // refresh hook below is for CUSTOMER-initiated mutations.
+      // audience-preview is a read the render chain itself fires
+      // (loadPageData -> audInit -> audRender -> audPreview), so
+      // letting it re-trigger loadPageData here made a
+      // self-sustaining refresh cycle on every open panel
+      // (83bd418..11/21). It passes quiet=1.
+      if (body && !quiet && j && j.ok && window.PAGE && PAGE.bootOk
           && typeof loadPageData === 'function') {
         try { loadPageData(); } catch (e) {}
       }
@@ -3253,7 +3260,7 @@ function audPreview(){
   clearTimeout(AUD_PREV_T);
   AUD_PREV_T = setTimeout(function(){
     if (!PAGE.token) return;
-    api('/api/ghl/audience-preview', {include_tags: AUD.include_tags}).then(function(j){
+    api('/api/ghl/audience-preview', {include_tags: AUD.include_tags}, 1).then(function(j){
       if (!j || !j.ok) return;
       // MERGE, never replace: this interaction call carries counts only
       // for the selected tags; replacing would wipe the boot fill's
@@ -3932,7 +3939,8 @@ function audFill(fresh, done){
   if (!PAGE.token || !(AUD_TAGS || []).length) { if (done) done(); return; }
   AUD_FILL_AT = Date.now();
   api('/api/ghl/audience-preview',
-      {include_tags: [], count_tags: AUD_TAGS.slice(0, 60), fresh: !!fresh})
+      {include_tags: [], count_tags: AUD_TAGS.slice(0, 60),
+       fresh: !!fresh}, 1)
     .then(function(p){
       if (p && p.ok && p.tag_counts) {
         // a fill replaces wholesale; the interaction preview merges
