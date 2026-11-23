@@ -1232,18 +1232,51 @@ body{padding:0}
 
 <div id="toast"></div>
 
-<!-- BARE VISIT (SPEC §2.3): neither the embedded context nor a boot
-     code - the embedded app inside Follow Up Boss is the home surface,
-     so a bare tab answers with the one honest action -->
-<div class="ob-card hide" id="fubOpenCard" style="text-align:center">
-  <h2 style="font-size:20px;margin-bottom:6px" id="fubOpenTitle">Open Follow Up Boss to continue</h2>
-  <p style="font-size:14px;color:#4b5563;margin:0 0 18px" id="fubOpenBody">The Hayes Systems
-  app lives inside Follow Up Boss, on your leads' profiles and in your
-  inbox. You can also connect your account from here.</p>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    <a class="btn btn-primary" id="fubOpenLink" href="https://app.followupboss.com/" target="_blank" rel="noopener" style="text-decoration:none">Open Follow Up Boss</a>
-    <button class="btn btn-ghost" id="fubOpenConnect">Connect account</button>
+<!-- KEY CONNECT DIALOG (fub standalone 11/23): the in-app twin of the
+     front door's key row - the wizard's Connect step and the Reconnect
+     banner both open it. Identity comes from Follow Up Boss's own
+     /v1/identity; the page session binds the key to THIS client -->
+<div class="overlay" id="keyOverlay">
+  <div class="dialog">
+    <h3 id="keyDlgTitle">Connect Follow Up Boss</h3>
+    <p id="keyDlgBody">Paste your Follow Up Boss API key so we can read your leads and count your workable list.</p>
+    <div class="field" style="margin-bottom:10px"><label for="keyDlgInput">Follow Up Boss API key</label>
+      <input id="keyDlgInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--tx);background:#fff">
+    </div>
+    <p style="font-size:12.5px;color:var(--mut);margin:0 0 18px">In Follow Up Boss, open <b>Admin</b>, then <b>API</b>, then <b>Generate a&nbsp;new&nbsp;key</b>.</p>
+    <p id="keyDlgErr" class="hide" style="font-size:13px;color:#b91c1c;margin:0 0 14px"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" data-close="keyOverlay">Cancel</button>
+      <button class="btn btn-primary" id="keyDlgBtn">Connect</button>
+    </div>
   </div>
+</div>
+
+<!-- BARE VISIT / STANDALONE FRONT DOOR (fub standalone, Matt 11/23: the
+     FUB integrations listing points here; the embedded app is parked).
+     Neither an embedded context nor a boot code: the two token-less
+     doors are the emailed sign-in link (/api/fub/signin) for returning
+     clients and the API-key connect (/api/fub/connect-key) for new ones
+     - never demo data for FUB -->
+<div class="ob-card hide" id="fubOpenCard" style="max-width:500px">
+  <h2 style="font-size:21px;margin-bottom:6px" id="fubOpenTitle">Sign in to Hayes Systems</h2>
+  <p style="font-size:14px;color:#4b5563;margin:0 0 18px" id="fubOpenBody">Enter the email on your Hayes Systems account. We'll send you a link that signs you in.</p>
+  <div id="fubSigninWrap">
+    <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+      <div class="ob-field" style="flex:1 1 240px;margin:0"><input id="fubSigninEmail" type="email" autocomplete="email" placeholder="you@yourcompany.com" aria-label="Email on your Hayes Systems account"></div>
+      <button class="btn btn-primary" id="fubSigninBtn" style="white-space:nowrap">Send sign-in link</button>
+    </div>
+    <p id="fubSigninErr" class="hide" style="font-size:13px;color:#b91c1c;margin:8px 0 0"></p>
+    <p id="fubSigninOk" class="hide" style="font-size:14px;color:#15803d;margin:10px 0 0">Check your inbox. The link signs you in and is good for 30 minutes.</p>
+  </div>
+  <div id="fubKeyDiv" style="border-top:1px solid #e5e7eb;margin:18px 0 14px"></div>
+  <p id="fubKeyHead" style="font-size:14px;font-weight:600;margin:0 0 4px">New to Hayes Systems?</p>
+  <p id="fubKeyHelp" style="font-size:13px;color:#4b5563;margin:0 0 12px">Connect your Follow Up Boss account with its API key. In Follow Up Boss, open <b>Admin</b>, then <b>API</b>, then <b>Generate a new key</b>.</p>
+  <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+    <div class="ob-field" style="flex:1 1 240px;margin:0"><input id="fubKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key" aria-label="Follow Up Boss API key"></div>
+    <button class="btn btn-ghost" id="fubOpenConnect" style="white-space:nowrap">Connect</button>
+  </div>
+  <p id="fubKeyErr" class="hide" style="font-size:13px;color:#b91c1c;margin:8px 0 0"></p>
 </div>
 
 <!-- FUB PREVIEW DEBUG STATES (SPEC §4.1): working is the healthy
@@ -1764,14 +1797,71 @@ function renderActionBar(st){
 }
 function openReconnect(){
   if (!PAGE.token) { toast('Reconnect is unavailable in preview mode.'); return; }
-  toast('Opening Follow Up Boss to reconnect...');
-  fetch(API + '/api/fub/reconnect-url', {
-    headers: {'X-Hayes-Token': PAGE.token}
-  }).then(function(r){return r.ok ? r.json() : null;}).then(function(d){
-    if (d && d.ok && d.url) window.open(d.url, '_blank');
-    else toast('Reconnect is unavailable right now. Contact us and we will restore it.');
-  }).catch(function(){ toast('Reconnect is unavailable right now.'); });
+  openKeyDialog('reconnect');
 }
+// KEY CONNECT DIALOG (fub standalone 11/23): the in-app twin of the
+// front door's key row. The wizard's Connect step and the Reconnect
+// banner both open it; identity comes from Follow Up Boss's own
+// /v1/identity and the page session token (when there is one) binds
+// the key to THIS client. Success reloads on the one-time boot code,
+// which exchanges for a fresh page token at /api/fub/session.
+function openKeyDialog(mode){
+  var ov = $('keyOverlay'); if (!ov) return;
+  var isRe = (mode === 'reconnect');
+  $('keyDlgTitle').textContent = isRe ? 'Reconnect Follow Up Boss'
+                                       : 'Connect Follow Up Boss';
+  $('keyDlgBody').textContent = isRe
+    ? 'Paste a Follow Up Boss API key to restore the connection.'
+    : 'Paste your Follow Up Boss API key so we can read your leads and count your workable list.';
+  var err = $('keyDlgErr');
+  err.textContent = ''; err.classList.add('hide');
+  var inp = $('keyDlgInput');
+  inp.value = '';
+  ov.classList.add('show');
+  setTimeout(function(){ try { inp.focus(); } catch (e) {} }, 30);
+}
+function _keyDialogSubmit(){
+  var inp = $('keyDlgInput'), btn = $('keyDlgBtn'), err = $('keyDlgErr');
+  var v = (inp.value || '').trim();
+  if (v.length < 16) {
+    err.textContent = 'Paste the key first. In Follow Up Boss: Admin, then API.';
+    err.classList.remove('hide');
+    return;
+  }
+  err.classList.add('hide');
+  // busy state keeps the button's box intact: the label stays, only
+  // the small spinner runs (the ghl-app Refresh tags lesson 11/23)
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin-sm"></span>Connecting';
+  var hdr = {'Content-Type': 'application/json'};
+  if (PAGE.token) hdr['X-Hayes-Token'] = PAGE.token;
+  fetch(API + '/api/fub/connect-key', {
+    method: 'POST', headers: hdr, body: JSON.stringify({key: v})
+  }).then(function(r){
+    return r.json().catch(function(){ return null; })
+      .then(function(j){ return {status: r.status, j: j}; });
+  }).catch(function(){ return {status: 0, j: null}; }).then(function(r){
+    if (r.status === 200 && r.j && r.j.ok && r.j.boot) {
+      inp.value = '';
+      location.replace(location.pathname + '?boot='
+                       + encodeURIComponent(r.j.boot));
+      return;
+    }
+    btn.disabled = false;
+    btn.textContent = 'Connect';
+    inp.select();
+    err.textContent = (r.j && r.j.message)
+      || 'We could not connect just now. Try again in a moment.';
+    err.classList.remove('hide');
+  });
+}
+(function(){
+  var ov = document.getElementById('keyOverlay'); if (!ov) return;
+  document.getElementById('keyDlgBtn').addEventListener('click', _keyDialogSubmit);
+  document.getElementById('keyDlgInput').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); _keyDialogSubmit(); }
+  });
+})();
 function openCardUpdate(){
   if (!PAGE.token) { toast('Payment setup is unavailable in preview mode.'); return; }
   toast('Opening secure payment update...');
@@ -1955,21 +2045,12 @@ $('confirmNoshow').addEventListener('click', function(){
 });
 
 // Request campaign (enabled with no live campaign: none or completed)
-// FUB CONNECT (fub-app-2026-11 P4): the OAuth consent opens in a POPUP
-// (allow-popups makes popouts first-class inside the FUB iframe). The
-// still-open page polls; the credential row landing flips the banner.
+// FUB CONNECT (fub standalone 11/23): the wizard's Connect step opens
+// the key dialog (the OAuth popup this used to open dies on FUB's
+// sign-in for Google users); a successful connect reloads the page on
+// the one-time boot code, so no credential poll is needed.
 $('connectLocBtn').addEventListener('click', function(){
-  this.disabled = true;
-  var btn = this;
-  api('/api/fub/connect-url', {}).then(function(j){
-    btn.disabled = false;
-    if (j && j.ok && j.url) {
-      window.open(j.url, '_blank');
-      toast('Connect Follow Up Boss in the window that opened.');
-      _startConnectPoll();
-    }
-    else { toast((j && j.error) || 'Could not start the connection. Try again.'); }
-  }).catch(function(){ btn.disabled = false; toast('The connection could not start. Try again.'); });
+  openKeyDialog('connect');
 });
 // REQUEST (Matt 10/30): a what-happens dialog first - the request is
 // the page's one commit action and it used to fire with no info at all.
@@ -3433,6 +3514,9 @@ function _paneRender(){
   var _sig = _sp.get('signature') || '';
   var _boot = _sp.get('boot') || '';
   var _setup = _sp.get('setup') || '';
+  // ?new=1: the landing page's "Connect Follow Up Boss" button. Same
+  // key-only door as the setup entry, without a FUB account id
+  var _newDoor = _sp.get('new') === '1';
   function _fubSession(body){
     // parse the body on EVERY status (t_94b6c19d): the server answers
     // an expired/replayed boot code as 403 {ok:false, error:'unknown or
@@ -3523,50 +3607,139 @@ function _paneRender(){
     _startLiveBoot({boot: _boot});
     return;
   }
-  if (_setup && /^[A-Za-z0-9_-]{1,64}$/.test(_setup)) {
+  // ── the standalone front door (fub standalone, Matt 11/23) ──────
+  // Two token-less doors, both public routes with their own per-IP
+  // buckets: the emailed sign-in link for returning clients, the
+  // API-key connect for new ones (identity comes from Follow Up Boss's
+  // own /v1/identity; the page boots on the one-time code it hands
+  // back). The key is posted and forgotten - never stored here.
+  function _fdMsg(id, msg){
+    var el = $(id);
+    if (!el) return;
+    if (msg) { el.textContent = msg; el.classList.remove('hide'); }
+    else { el.textContent = ''; el.classList.add('hide'); }
+  }
+  function _fdPost(path, body){
+    return fetch(API + path, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    }).then(function(r){
+      return r.json().catch(function(){ return null; })
+        .then(function(j){ return {status: r.status, j: j}; });
+    }).catch(function(){ return {status: 0, j: null}; });
+  }
+  function _fdBusy(btn, on, label){
+    // busy state keeps the button's box intact (the ghl-app Refresh
+    // tags lesson 11/23): the label stays, only the small spinner runs
+    btn.disabled = on;
+    btn.innerHTML = on ? '<span class="spin-sm"></span>' + label : label;
+  }
+  function _wireSignin(){
+    var em = $('fubSigninEmail'), btn = $('fubSigninBtn');
+    if (!em || !btn) return;
+    function go(){
+      var v = (em.value || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)) {
+        _fdMsg('fubSigninErr',
+               'Enter the email address on your Hayes Systems account.');
+        return;
+      }
+      _fdMsg('fubSigninErr', '');
+      _fdBusy(btn, true, 'Sending');
+      _fdPost('/api/fub/signin', {email: v}).then(function(r){
+        _fdBusy(btn, false, 'Send sign-in link');
+        // the server answers ok for every well-formed address (no
+        // account oracle); only transport and shape failures differ
+        if (r.status === 429) {
+          _fdMsg('fubSigninErr', (r.j && r.j.message)
+                 || 'Too many requests. Wait a moment and try again.');
+          return;
+        }
+        if (r.status === 400) {
+          _fdMsg('fubSigninErr', (r.j && r.j.message)
+                 || 'Check the address and try again.');
+          return;
+        }
+        if (r.status !== 200) {
+          _fdMsg('fubSigninErr',
+                 'We could not send the link just now. Try again in a moment.');
+          return;
+        }
+        em.value = '';
+        $('fubSigninOk').classList.remove('hide');
+      });
+    }
+    btn.addEventListener('click', go);
+    em.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { e.preventDefault(); go(); }
+    });
+    em.addEventListener('input', function(){ _fdMsg('fubSigninErr', ''); });
+  }
+  function _wireKeyConnect(){
+    var inp = $('fubKeyInput'), btn = $('fubOpenConnect');
+    if (!inp || !btn) return;
+    function go(){
+      var v = (inp.value || '').trim();
+      if (v.length < 16) {
+        _fdMsg('fubKeyErr',
+               'Paste the key first. In Follow Up Boss: Admin, then API.');
+        return;
+      }
+      _fdMsg('fubKeyErr', '');
+      _fdBusy(btn, true, 'Connecting');
+      _fdPost('/api/fub/connect-key', {key: v}).then(function(r){
+        if (r.status === 200 && r.j && r.j.ok && r.j.boot) {
+          // a fresh load through the proven ?boot= path: the one-time
+          // code exchanges for the page token at /api/fub/session
+          inp.value = '';
+          location.replace(location.pathname + '?boot='
+                           + encodeURIComponent(r.j.boot));
+          return;
+        }
+        _fdBusy(btn, false, 'Connect');
+        inp.select();
+        _fdMsg('fubKeyErr', (r.j && r.j.message)
+               || 'We could not connect just now. Try again in a moment.');
+      });
+    }
+    btn.addEventListener('click', go);
+    inp.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { e.preventDefault(); go(); }
+    });
+    inp.addEventListener('input', function(){ _fdMsg('fubKeyErr', ''); });
+  }
+  if ((_setup && /^[A-Za-z0-9_-]{1,64}$/.test(_setup)) || _newDoor) {
     // SETUP ENTRY (pane front door t_94b6c19d): the new tab the pane's
-    // CTA opened. The account has no Hayes client yet, so there is no
-    // page token here; Connect starts the OAuth flow through the
-    // account-shaped connect-url (the callback resolves the REAL
-    // account from /v1/identity and 302s back with a boot code).
+    // CTA opened, or the landing page's Connect button (?new=1). No Hayes
+    // client yet, no page token: the key connect IS the front door
+    // (fub standalone 11/23 - the OAuth popup this used to open dies on
+    // FUB's sign-in for Google users; the key path is the same door the
+    // listing sends people to).
     window.__LIVE_BOOT = false;
     window.__DEMO_LOCKED = true;
     document.body.classList.add('boot-loading');
     document.getElementById('bootSpinner').classList.add('hide');
-    $('fubOpenCard').classList.remove('hide');
-    $('fubOpenTitle').textContent = 'Set up Hayes Systems';
-    $('fubOpenBody').textContent = 'Connect your Follow Up Boss account to'
-      + ' start. Setup takes a few minutes.';
-    $('fubOpenConnect').textContent = 'Connect Follow Up Boss';
-    // Matt 11/22: in the setup flow the visitor JUST came from FUB -
-    // "Open Follow Up Boss" is redundant and circular, so it goes.
-    // BARE visits (typed URL, no params) keep it: that is their way in.
-    $('fubOpenLink').classList.add('hide');
-    $('fubOpenConnect').classList.remove('btn-ghost');
-    $('fubOpenConnect').classList.add('btn-primary');
     ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
-    $('fubOpenConnect').addEventListener('click', function(){
-      var btn = this; btn.disabled = true;
-      fetch(API + '/api/fub/connect-url', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({account: _setup})
-      }).then(function(r){ return r.json(); }).then(function(j){
-        btn.disabled = false;
-        if (j && j.ok && j.url) {
-          window.open(j.url, '_blank');
-          toast('Connect Follow Up Boss in the window that opened.');
-        } else {
-          toast((j && j.error) || 'Connect starts from inside Follow Up'
-                + ' Boss. Open it, then open the Hayes Systems app.');
-        }
-      }).catch(function(){ btn.disabled = false;
-        toast('We could not reach Hayes Systems just now. Try again.'); });
-    });
+    $('fubOpenCard').classList.remove('hide');
+    $('fubOpenTitle').textContent = 'Connect Follow Up Boss';
+    $('fubOpenBody').textContent = 'Paste your Follow Up Boss API key to'
+      + ' connect. Nothing is installed in your account.';
+    // the visitor JUST came from FUB: no sign-in row here - the key
+    // row is the one action
+    $('fubSigninWrap').classList.add('hide');
+    $('fubKeyDiv').classList.add('hide');
+    $('fubKeyHead').textContent = 'Your API key';
+    $('fubKeyHelp').innerHTML = 'In Follow Up Boss, open <b>Admin</b>,'
+      + ' then <b>API</b>, then <b>Generate a new key</b>. Paste it here.';
+    $('fubOpenConnect').classList.remove('btn-ghost');
+    $('fubOpenConnect').classList.add('btn-primary');
+    _wireKeyConnect();
     return;
   }
-  // BARE VISIT: the honest door (never demo data for FUB)
+  // BARE VISIT: the standalone front door - sign-in link for returning
+  // clients, API-key connect for new ones (never demo data for FUB)
   window.__LIVE_BOOT = false;
   window.__DEMO_LOCKED = true;
   document.body.classList.add('boot-loading');
@@ -3575,21 +3748,8 @@ function _paneRender(){
   ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
     var el = $(id); if (el) el.classList.add('hide');
   });
-  $('fubOpenConnect').addEventListener('click', function(){
-    var btn = this; btn.disabled = true;
-    api('/api/fub/connect-url', {}).then(function(j){
-      btn.disabled = false;
-      if (j && j.ok && j.url) {
-        window.open(j.url, '_blank');
-        toast('Connect Follow Up Boss in the window that opened.');
-      } else {
-        toast((j && j.error) || 'Connect starts from inside Follow Up'
-              + ' Boss. Open it, then open the Hayes Systems app.');
-      }
-    }).catch(function(){ btn.disabled = false;
-      toast('Connect starts from inside Follow Up Boss.'); });
-    return;
-  });
+  _wireSignin();
+  _wireKeyConnect();
 })();
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
@@ -3809,22 +3969,12 @@ function applyOb(s){
         if (_obCur === 0) { setTimeout(function(){ _obGo(1); }, 600); } }, 1200);
       return;
     }
-    // FUB OAuth (SPEC §2.1): the authorize URL opens in a POPUP; FUB
-    // consents, our callback 302s the popup to fub-app.html?boot= (it
-    // lands connected), and THIS still-open page advances on the poll
-    api('/api/fub/connect-url', {}).then(function(j){
-      btn.disabled = false;
-      if (j && j.ok && j.url) {
-        try {
-          localStorage.setItem(_obKey() + ':pendingConn', '1');
-        } catch(e) {}
-        window.open(j.url, '_blank');
-        toast('Connect Follow Up Boss in the window that opened.');
-        _startConnectPoll();
-      }
-      else { toast((j && j.error) || 'Could not start the connection.'); }
-    }).catch(function(){ btn.disabled = false;
-      toast('The connection could not start.'); });
+    // fub standalone 11/23: the key dialog replaces the OAuth popup
+    // (dead on FUB's sign-in for Google users); a successful connect
+    // reloads the page on the one-time boot code and the walk resumes
+    // on its saved step with the credential present
+    btn.disabled = false;
+    openKeyDialog('connect');
   });
   function _startConnectPoll() {
     if (_connectPoll) return;
