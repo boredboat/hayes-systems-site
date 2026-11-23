@@ -3208,10 +3208,28 @@ function audRender(){
     o.addEventListener('change', function(){ AUD.skip_open_opp = o.checked; audChanged(); });
     l.addEventListener('change', function(){ AUD.include_lost_opp = l.checked; audChanged(); });
     var rf = $(id + '_rf');
+    // BUSY STATE (11/23, Matt: "a spinning bar instead of the correct
+    // graphics"): this used to toggle the boot loader's `.spin` class on
+    // the BUTTON itself. That rule forces 22x22 + margin + a 1s rotation,
+    // so the whole button collapsed into a spinning chip with its label
+    // spilling out (live-reproduced 11/23: 109x32 -> ~30x22 while busy).
+    // The button now keeps its size: disabled + faded by .rfbtn:disabled,
+    // with the app's standard small spinner (.spin-sm, same as the
+    // request button's working state) in front of the same label.
+    // Resolved by id at apply time: a tag-list re-read repaints the panel
+    // (audRender), which replaces the button mid-wait. Both innerHTML
+    // writes below are fixed string literals, never user or CRM data.
+    var rfBusy = function(on){
+      var b = $(id + '_rf') || rf;
+      b.disabled = on;
+      b.innerHTML = on ? '<span class="spin-sm"></span>Refresh tags'
+                       : 'Refresh tags';
+    };
     if (rf) rf.addEventListener('click', function(){
-      rf.disabled = true; rf.classList.add('spin');
+      rfBusy(true);
       audRefetchTags(function(){
-        audFill(true, function(){ rf.disabled = false; rf.classList.remove('spin'); });
+        rfBusy(true);
+        audFill(true, function(){ rfBusy(false); });
       });
     });
     audChips($(id + '_tags'));
