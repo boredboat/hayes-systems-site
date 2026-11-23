@@ -1241,7 +1241,7 @@ body{padding:0}
   app lives inside Follow Up Boss, on your leads' profiles and in your
   inbox. You can also connect your account from here.</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    <a class="btn btn-primary" href="https://app.followupboss.com/" target="_blank" rel="noopener" style="text-decoration:none">Open Follow Up Boss</a>
+    <a class="btn btn-primary" id="fubOpenLink" href="https://app.followupboss.com/" target="_blank" rel="noopener" style="text-decoration:none">Open Follow Up Boss</a>
     <button class="btn btn-ghost" id="fubOpenConnect">Connect account</button>
   </div>
 </div>
@@ -3538,6 +3538,12 @@ function _paneRender(){
     $('fubOpenBody').textContent = 'Connect your Follow Up Boss account to'
       + ' start. Setup takes a few minutes.';
     $('fubOpenConnect').textContent = 'Connect Follow Up Boss';
+    // Matt 11/22: in the setup flow the visitor JUST came from FUB -
+    // "Open Follow Up Boss" is redundant and circular, so it goes.
+    // BARE visits (typed URL, no params) keep it: that is their way in.
+    $('fubOpenLink').classList.add('hide');
+    $('fubOpenConnect').classList.remove('btn-ghost');
+    $('fubOpenConnect').classList.add('btn-primary');
     ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
       var el = $(id); if (el) el.classList.add('hide');
     });
