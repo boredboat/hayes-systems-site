@@ -9,6 +9,7 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon-512.png" type="image/png" sizes="512x512">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0A1122">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -20,161 +21,377 @@
 }
 </script>
 <style>
+/* Palette: navy hero, azure primary, ice call to action, a navy-to-powder
+   gradient spine. Poppins (self-hosted, latin subset) for display and
+   buttons; the system UI font for body copy. */
+@font-face{font-family:'Poppins';font-weight:600;font-display:swap;src:url('fonts/Poppins-600.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-weight:700;font-display:swap;src:url('fonts/Poppins-700.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-weight:800;font-display:swap;src:url('fonts/Poppins-800.woff2') format('woff2')}
 :root{
-  --navy:#02101F; --navy-lift:#071526; --navy-card:#0B1C30;
-  --ivory:#EDE8DD; --soft:#F4F1EA;
-  --gold:#D9A441; --gold-soft:rgba(217,164,65,.14);
-  --ink-on-light:#0A1B2E; --gold-ink:#7D5C15;
-  --serif:'Cormorant Garamond',Georgia,serif;
-  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --navy:#0A1122; --navy-2:#0B1E45; --azure:#0487FF; --azure-deep:#1668DE;
+  --powder:#B9D9F6; --ice:#BEEFFA; --cyan:#1FB9E6; --cyan-lt:#8DE1FF;
+  --violet:#8B7BFF; --gold:#D9A441; --ink:#0A1122; --ink-2:#334155; --mut:#64748B;
+  --line:#E2E8F0; --soft:#F3F7FC; --ok:#16A34A;
+  --disp:'Poppins',-apple-system,'Segoe UI',sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
 }
-@font-face{font-family:'Cormorant Garamond';font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600.woff2') format('woff2')}
-@font-face{font-family:'Montserrat';font-weight:400;font-display:swap;src:url('fonts/Montserrat-400.woff2') format('woff2')}
-@font-face{font-family:'Montserrat';font-weight:600;font-display:swap;src:url('fonts/Montserrat-600.woff2') format('woff2')}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--ivory);color:var(--ink-on-light);line-height:1.65}
-.wrap{max-width:820px;margin:0 auto;padding:64px 24px 80px}
-.eyebrow{font-size:13px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;color:var(--gold-ink)}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(36px,5vw,52px);line-height:1.1;margin:12px 0 14px}
-.lede{font-size:17px;color:rgba(10,27,46,.84);max-width:640px}
-.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:28px 0 8px}
-.btn{display:inline-block;padding:14px 24px;border-radius:2px;background:var(--gold);color:var(--navy);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--sans);text-decoration:none;line-height:1.2}
-.btn:hover{filter:brightness(1.05)}
-.btn.ghost{background:transparent;border:1px solid rgba(10,27,46,.35);color:var(--ink-on-light)}
-.btn.ghost:hover{border-color:var(--ink-on-light);filter:none}
-.btn:disabled{opacity:.55;cursor:default}
-.setup-line{font-size:13.5px;color:rgba(10,27,46,.62);margin-bottom:40px}
-h2{font-family:var(--serif);font-weight:600;font-size:25px;margin:0 0 10px;color:var(--ink-on-light)}
-p{font-size:15px;color:rgba(10,27,46,.82);margin-bottom:12px}
-p:last-child{margin-bottom:0}
-a{color:var(--gold-ink);font-weight:600}
-strong{color:var(--ink-on-light)}
-.card{background:#FCFAF4;border:1px solid rgba(10,27,46,.09);box-shadow:0 10px 30px rgba(10,27,46,.06);border-radius:16px;padding:26px 28px;margin:22px 0}
-.card ol,.card ul{padding-left:22px}
-.card li{font-size:15px;color:rgba(10,27,46,.82);margin-bottom:10px}
-.card li:last-child{margin-bottom:0}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.two .card{margin:0}
-@media (max-width:720px){.two{grid-template-columns:1fr}}
-#signin{scroll-margin-top:24px}
-label{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--gold-ink);margin:14px 0 6px}
-input[type=email]{width:100%;padding:13px 14px;font-family:var(--sans);font-size:14.5px;color:var(--ink-on-light);background:#fff;border:1px solid rgba(10,27,46,.25);border-radius:8px}
-input:focus{outline:none;border-color:var(--gold)}
-.signin-row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-top:14px}
-.signin-row .fld{flex:1 1 240px}
-.signin-row label{margin-top:0}
-.signin-row .btn{white-space:nowrap;height:52px;display:inline-flex;align-items:center}
-.signin-row input{height:52px}
-.msg{display:none;font-size:13.5px;border-radius:8px;padding:11px 14px;margin-top:14px;line-height:1.5}
-.msg.ok{background:rgba(46,125,50,.10);border:1px solid rgba(46,125,50,.45);color:#256029}
-.msg.bad{background:rgba(158,59,59,.08);border:1px solid rgba(158,59,59,.3);color:#9E3B3D}
-.qa{margin-top:16px}
-.qa h3{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink-on-light);margin:0 0 4px}
-.qa p{margin-bottom:0}
-.qa + .qa{margin-top:18px;padding-top:18px;border-top:1px solid rgba(10,27,46,.09)}
-.back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--gold-ink);font-weight:600}
-.fine{font-size:12px;color:rgba(10,27,46,.55);margin-top:18px;line-height:1.6}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--ink);background:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2,h3,.disp{font-family:var(--disp)}
+h1{font-weight:800;font-size:clamp(34px,4.6vw,62px);line-height:1.08;letter-spacing:-.015em}
+h2{font-weight:700;font-size:clamp(24px,2.6vw,34px);line-height:1.15;letter-spacing:-.01em}
+.sub{font-size:18px;color:rgba(255,255,255,.84);max-width:540px}
+.eyebrow{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--azure)}
+p{font-size:16px;color:var(--ink-2)}
+a.tx{color:var(--azure-deep);font-weight:600}
+a.tx:hover{text-decoration:underline}
+section[id],.after[id]{scroll-margin-top:84px}
+:focus-visible{outline:2px solid var(--azure-deep);outline-offset:2px}
+.nav :focus-visible,.hero :focus-visible,footer :focus-visible{outline-color:#fff}
+input:focus-visible{outline:none}
+
+/* nav */
+.nav{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(255,255,255,.06);overflow:hidden}
+.nav .wrap{display:flex;align-items:center;gap:26px;height:68px}
+.lockup{display:flex;align-items:center;gap:12px;flex:none}
+.lockup .mark-art{width:36px;height:39px}
+.lockup .divider{width:1px;height:34px;background:var(--gold);opacity:.6}
+.lockup .words{display:flex;flex-direction:column}
+.lockup .hayes-art{width:110px;height:23.7px;color:#fff}
+.lockup .systems{font-family:var(--body);font-size:8.5px;font-weight:500;letter-spacing:.36em;margin-right:-.36em;color:var(--gold);display:flex;align-items:center;gap:7px;margin-top:3px}
+.lockup .systems::before,.lockup .systems::after{content:'';height:1px;background:var(--gold);opacity:.6;flex:1}
+.nav a.link{font-size:14px;color:rgba(255,255,255,.78);font-weight:500;padding:6px 2px;white-space:nowrap}
+.nav a.link:hover{color:#fff}
+.nav .sp{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--disp);font-weight:600;font-size:14px;padding:11px 18px;border-radius:9px;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.btn-azure{background:var(--azure);color:#fff;box-shadow:0 8px 22px rgba(4,135,255,.35);white-space:nowrap}
+.btn-ghost-d{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28);white-space:nowrap}
+.btn-ghost-d:hover{background:rgba(255,255,255,.06)}
+.btn-ice{background:var(--ice);color:var(--navy);padding:14px 14px 14px 22px;font-size:15px;white-space:nowrap}
+.btn-ice .chip{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:15px}
+.btn-ice:hover{box-shadow:0 14px 30px rgba(190,239,250,.25)}
+
+/* hero + gradient spine */
+.hero{background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 34%,var(--azure-deep) 66%,#5E9FE3 84%,var(--powder) 100%);color:#fff;padding:72px 0 190px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;width:1600px;height:1200px;right:-520px;top:-380px;background:radial-gradient(closest-side,rgba(141,225,255,.17),rgba(141,225,255,.055) 55%,rgba(141,225,255,0) 78%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center;position:relative;z-index:1}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--disp);font-weight:600;font-size:12.5px;letter-spacing:.06em;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.06)}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--cyan-lt);box-shadow:0 0 10px var(--cyan-lt)}
+.hero h1{margin:18px 0 16px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:30px}
+.cta-row .btn{height:54px}
+.note{font-size:14px;color:rgba(255,255,255,.86);margin-top:16px}
+
+/* product shot (sample data) */
+.shot{position:relative}
+.win{background:#fff;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:148px minmax(0,1fr);box-shadow:0 40px 90px rgba(2,16,50,.5),0 0 0 1px rgba(255,255,255,.14);color:var(--ink)}
+.side{background:var(--navy);color:rgba(255,255,255,.72);padding:14px 10px;font-size:12px}
+.side .b{font-family:var(--disp);font-weight:700;color:#fff;font-size:11px;padding:4px 8px 12px}
+.side div.i{padding:7px 8px;border-radius:7px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.side div.i.on{background:rgba(4,135,255,.28);color:#fff}
+.side div.i span{width:12px;height:12px;border-radius:3px;background:currentColor;opacity:.55}
+.main{padding:16px 20px 16px 18px;min-width:0}
+.mtop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.mtop .t{font-family:var(--disp);font-weight:700;font-size:14px}
+.mtop .t small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:var(--mut)}
+.mtop .go{background:var(--azure);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-width:0}
+.tile small{display:block;font-size:10px;color:var(--mut);white-space:nowrap}
+.tile b{font-family:var(--disp);font-weight:700;font-size:17px}
+.tile.up b{color:var(--ok)}
+.ai{display:flex;gap:10px;align-items:flex-start;background:#F3F1FF;border:1px solid #E1DBFF;border-radius:10px;padding:9px 11px;font-size:11.5px;color:#3B3178;margin-bottom:12px}
+.ai i{width:18px;height:18px;border-radius:50%;background:var(--violet);flex:none}
+.rows{font-size:11.5px}
+.rows .r{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;padding:7px 4px;border-top:1px solid var(--line)}
+.rows .r span{white-space:nowrap}
+.rows .r span:first-child{overflow:hidden;text-overflow:ellipsis}
+.rows .r.h{font-weight:600;color:var(--mut);border-top:none;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.rows .st{justify-self:start;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600;background:#E6F4EA;color:#1B7A3D;white-space:nowrap}
+.rows .st.w{background:#FFF4D6;color:#8A5A00}
+.tag{position:absolute;top:-13px;right:18px;background:var(--ice);color:var(--navy);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;box-shadow:0 6px 16px rgba(2,16,50,.25)}
+
+/* cards straddling the gradient */
+.after{margin-top:-150px;position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px;box-shadow:0 20px 50px rgba(10,17,34,.12)}
+.card h3{font-weight:700;font-size:18px;margin-bottom:6px}
+.card p{font-size:14.5px}
+.card .ic{width:40px;height:40px;border-radius:10px;background:var(--ice);display:grid;place-items:center;margin-bottom:14px}
+.card .ic svg{width:20px;height:20px;stroke:var(--azure-deep);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.frow{display:flex;gap:10px;margin-top:4px}
+input[type=email]{flex:1;min-width:0;height:48px;border:1px solid #CBD5E1;border-radius:9px;padding:0 14px;font-size:15px;font-family:var(--body);color:var(--ink);background:#fff}
+input[type=email]:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 3px rgba(4,135,255,.18)}
+.frow .btn{height:48px}
+.msg{display:none;margin-top:12px;font-size:14px;padding:11px 14px;border-radius:9px}
+.msg.ok{background:#E6F4EA;color:#1B7A3D}
+.msg.bad{background:#FDECEC;color:#A61E1E}
+
+/* sections */
+section{padding:76px 0}
+section.soft{background:var(--soft)}
+.sec-h{max-width:640px;margin-bottom:36px}
+.sec-h .eyebrow{display:block;margin-bottom:10px}
+.sec-h p{margin-top:10px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px}
+.step .n{width:38px;height:38px;border-radius:10px;background:var(--azure);color:#fff;font-family:var(--disp);font-weight:700;display:grid;place-items:center;margin-bottom:16px;box-shadow:0 8px 20px rgba(4,135,255,.3)}
+.step h3{font-weight:700;font-size:18px;margin-bottom:6px}
+.step p{font-size:15px}
+.feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.feats .card{box-shadow:none}
+.pay{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.pay h2{max-width:560px}
+.pay p{max-width:560px;margin-top:10px}
+.faq{max-width:820px}
+.q{border:1px solid var(--line);border-radius:14px;background:#fff;margin-bottom:12px;overflow:hidden}
+.q button{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:18px 22px;font-family:var(--disp);font-weight:600;font-size:16px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:16px}
+.q button svg{width:18px;height:18px;stroke:var(--azure);fill:none;stroke-width:2.4;stroke-linecap:round;transition:transform .2s;flex:none}
+.q.open button svg{transform:rotate(45deg)}
+.q .a{max-height:0;overflow:hidden;visibility:hidden;transition:max-height .25s ease,visibility .25s}
+.q .a p{padding:0 22px 18px;font-size:15px}
+.q.open .a{max-height:420px;visibility:visible}
+footer{background:var(--navy);color:rgba(255,255,255,.72);padding:44px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+footer p{color:rgba(255,255,255,.62);font-size:13px;max-width:620px;margin-top:14px}
+footer nav{display:flex;gap:22px;font-size:14px;font-weight:500;flex-wrap:wrap}
+footer nav a{color:#fff}
+footer nav a:hover{text-decoration:underline}
+
+@media (max-width:1100px){
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:40px}
+  .shot{max-width:640px}
+  .hero{padding-bottom:200px}
+}
+@media (max-width:980px){
+  .after{grid-template-columns:minmax(0,1fr)}
+  .steps,.feats{grid-template-columns:minmax(0,1fr)}
+  .nav a.link{display:none}
+}
+@media (max-width:720px){
+  .nav .wrap{gap:12px;height:62px}
+  .nav .btn-azure{display:none}
+  .lockup{gap:9px}
+  .lockup .mark-art{width:30px;height:33px}
+  .lockup .divider{display:none}
+  .lockup .hayes-art{width:92px;height:19.8px}
+  .lockup .systems{font-size:8px;letter-spacing:.3em;margin-right:-.3em}
+  .hero{padding:52px 0 190px}
+}
+@media (max-width:480px){
+  .frow{flex-wrap:wrap}
+  .frow input,.frow .btn{flex:1 1 100%}
+}
+@media (max-width:640px){
+  .win{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  section{padding:60px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn,.q button svg,.q .a{transition:none}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <span class="eyebrow">For teams on Follow Up Boss</span>
-  <h1>Your dormant Follow Up Boss leads, back on your calendar.</h1>
-  <p class="lede">Hayes Systems runs the reactivation for you. We email every workable lead in your Follow Up Boss, call the ones who ask, and book them onto your Follow Up Boss calendar. You pay per appointment.</p>
-  <div class="cta-row">
-    <a class="btn" href="/fub-app.html?new=1">Connect Follow Up Boss</a>
-    <a class="btn ghost" href="#signin">Already a client? Sign in</a>
-  </div>
-  <p class="setup-line">Setup is an API key from Follow Up Boss and a card on file. Nothing to install.</p>
 
-  <div class="card" id="signin">
-    <h2>Sign in</h2>
-    <p>Enter the email on your Hayes Systems account and we'll send a link that signs you in.</p>
-    <form id="signinForm" novalidate>
-      <div class="signin-row">
-        <div class="fld">
-          <label for="signinEmail">Email</label>
-          <input type="email" id="signinEmail" autocomplete="email" placeholder="you@yourcompany.com">
-        </div>
-        <button type="submit" class="btn" id="signinBtn">Send sign-in link</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="mark" viewBox="86 216 226 247">
+    <path fill="#EDE8DD" fill-rule="evenodd" d="M 91.178 226.685 C 91.381 227.739, 93.189 228.800, 96.007 229.519 C 102.422 231.155, 104.735 232.613, 106.740 236.280 C 108.387 239.294, 108.500 245.994, 108.500 341.044 C 108.500 437.233, 108.405 442.733, 106.696 445.342 C 104.359 448.908, 99.854 451.608, 94.926 452.396 C 92.398 452.800, 91 453.554, 91 454.512 C 91 455.801, 95.679 456, 126 456 C 155.476 456, 161 455.777, 161 454.588 C 161 453.714, 159.437 452.912, 156.898 452.483 C 150.864 451.463, 147.202 447.644, 145.995 441.114 C 145.448 438.151, 145 421.435, 145 403.966 L 145 372.205 171.186 352.436 C 185.588 341.563, 197.850 332.685, 198.436 332.707 C 199.021 332.729, 210.750 341.184, 224.500 351.495 C 238.250 361.806, 250.063 370.461, 250.750 370.728 C 252.673 371.475, 252.539 440.775, 250.606 445.401 C 248.894 449.498, 245.686 451.858, 240.750 452.652 C 238.532 453.009, 237 453.816, 237 454.628 C 237 455.764, 242.852 456, 271 456 C 300.361 456, 305 455.798, 305 454.519 C 305 453.705, 303.762 452.764, 302.250 452.429 C 293.343 450.457, 291.118 448.963, 288.949 443.498 C 288.055 441.245, 287.786 415.728, 287.867 340.748 C 287.958 255.964, 288.192 240.475, 289.427 237.520 C 291.098 233.520, 295.839 230.248, 301.250 229.360 C 304.029 228.904, 305 228.260, 305 226.872 C 305 225.078, 303.526 225, 269.500 225 C 234.667 225, 234 225.038, 234 227 C 234 228.510, 234.674 229.005, 236.750 229.022 C 238.262 229.034, 241.432 229.921, 243.793 230.992 C 247.142 232.512, 248.518 233.918, 250.052 237.384 C 251.940 241.652, 252.007 244.026, 251.758 298.024 L 251.500 354.222 234 340.956 C 224.375 333.660, 212.612 324.610, 207.861 320.845 C 203.110 317.080, 198.933 314, 198.580 314 C 198.226 314, 186.364 322.994, 172.219 333.987 C 158.073 344.981, 146.146 353.981, 145.713 353.987 C 145.280 353.994, 145.056 328.688, 145.215 297.750 C 145.471 247.812, 145.690 241.088, 147.168 237.828 C 149.141 233.477, 152.499 231.071, 158.849 229.461 C 161.717 228.734, 163.624 227.652, 163.823 226.641 C 164.118 225.144, 160.937 225, 127.500 225 C 93.676 225, 90.878 225.130, 91.178 226.685 "/>
+    <path fill="#D9A441" fill-rule="evenodd" d="M 179 380 L 195 380 L 195 396 L 179 396 Z M 202 380 L 218 380 L 218 396 L 202 396 Z M 179 403 L 195 403 L 195 419 L 179 419 Z M 202 403 L 218 403 L 218 419 L 202 419 Z"/>
+  </symbol>
+<symbol id="word-hayes" viewBox="403 253 542 117">
+    <path fill="currentColor" fill-rule="evenodd" d="M 903.081 257.535 C 896.115 259.477, 891.993 262.065, 887.205 267.504 C 882.631 272.701, 881 277.536, 881 285.899 C 881 298.025, 887.429 305.700, 907.782 317.871 C 927.152 329.454, 932.034 334.939, 932.238 345.345 C 932.559 361.697, 914.983 370.796, 898.348 362.890 C 892.585 360.151, 885.445 352.174, 881.818 344.424 C 880.139 340.837, 878.651 338.036, 878.512 338.201 C 878.372 338.365, 878.537 343.895, 878.879 350.489 C 879.447 361.449, 879.672 362.507, 881.500 362.814 C 882.600 362.999, 887.100 364.549, 891.500 366.259 C 898.576 369.008, 900.713 369.374, 910 369.425 C 922.225 369.491, 926.925 367.875, 934.312 361.066 C 940.603 355.268, 943.394 348.458, 943.356 339 C 943.298 324.418, 936.269 316.238, 912.500 303.093 C 897.459 294.775, 892.068 288.450, 892.022 279.066 C 891.968 268.224, 899.980 260.610, 911.408 260.643 C 921.973 260.673, 930.285 266.634, 935.896 278.205 L 938.949 284.500 938.967 279.500 C 939.001 270.410, 937.766 260.911, 936.602 261.310 C 935.996 261.518, 932.464 260.661, 928.754 259.405 C 919.646 256.322, 909.963 255.617, 903.081 257.535  M 593.444 260.750 C 592.574 262.813, 587.215 275.750, 581.537 289.500 C 562.629 335.282, 552.978 357.341, 550.342 360.796 C 548.907 362.678, 545.880 365.059, 543.616 366.087 L 539.500 367.956 554.500 367.888 C 565.050 367.840, 568.586 367.554, 566.419 366.925 C 561.927 365.621, 559.516 362.497, 559.659 358.166 C 559.726 356.150, 562.140 348.762, 565.025 341.750 L 570.270 329 592.385 329.028 L 614.500 329.056 619.263 341.278 C 626.305 359.350, 626.423 359.777, 625.124 362.627 C 624.505 363.985, 622.536 365.733, 620.749 366.509 C 617.793 367.795, 619.121 367.923, 635.500 367.939 L 653.500 367.956 649.346 366.070 C 646.506 364.780, 644.390 362.810, 642.657 359.842 C 640.013 355.315, 611.903 290.023, 600.427 261.754 C 598.027 255.843, 595.659 255.503, 593.444 260.750  M 408.718 260.326 C 415.887 262.942, 415.469 259.891, 415.778 311.896 C 415.957 342.016, 415.692 359.679, 415.036 361.406 C 414.387 363.113, 412.464 364.795, 409.757 366.024 L 405.500 367.956 423 367.956 L 440.500 367.956 436.480 366.130 C 430.321 363.332, 430 361.863, 430 336.453 L 430 314 462.051 314 L 494.103 314 493.801 337.474 C 493.507 360.366, 493.444 361.005, 491.224 363.224 C 489.973 364.476, 487.498 366.028, 485.724 366.674 C 483.048 367.648, 485.558 367.848, 500.500 367.848 C 516.037 367.848, 518.029 367.678, 515.055 366.603 C 513.161 365.919, 510.686 364.120, 509.555 362.606 C 507.551 359.921, 507.500 358.709, 507.500 313.500 C 507.500 268.291, 507.551 267.079, 509.555 264.394 C 510.686 262.880, 513.161 261.081, 515.055 260.397 C 518.041 259.318, 516.166 259.147, 501 259.115 C 485.653 259.083, 483.869 259.241, 486.500 260.403 C 493.317 263.411, 493.466 263.968, 493.821 287.603 L 494.142 309 462.071 309 L 430 309 430 288.547 C 430 265.309, 430.392 263.636, 436.480 260.870 L 440.500 259.044 423 259.098 C 408.401 259.143, 406.033 259.347, 408.718 260.326  M 656.541 260.880 C 662.577 263.621, 664.964 266.835, 687.422 302.445 L 698.109 319.389 697.804 340.169 C 697.510 360.254, 697.424 361.025, 695.224 363.224 C 693.973 364.476, 691.498 366.028, 689.724 366.674 C 687.048 367.648, 689.558 367.848, 704.500 367.848 C 719.442 367.848, 721.952 367.648, 719.276 366.674 C 717.502 366.028, 715.027 364.476, 713.776 363.224 C 711.572 361.019, 711.489 360.264, 711.162 339.343 L 710.825 317.739 724.662 294.722 C 739.208 270.528, 745.782 262.251, 752 260.302 C 754.896 259.394, 752.910 259.193, 740.500 259.141 C 726.915 259.084, 725.799 259.208, 728.671 260.458 C 732.915 262.304, 734.335 265.125, 733.161 269.378 C 732.653 271.220, 727.834 280.326, 722.454 289.614 C 717.073 298.901, 711.957 307.735, 711.085 309.244 C 710.213 310.753, 709.275 311.985, 709 311.983 C 708.031 311.975, 682.022 269.245, 681.854 267.385 C 681.475 263.200, 682.145 261.841, 685.250 260.491 C 688.208 259.205, 686.881 259.077, 670.500 259.061 L 652.500 259.044 656.541 260.880  M 774.581 260.075 C 776.276 260.567, 778.526 261.923, 779.581 263.089 C 781.406 265.105, 781.514 267.485, 781.779 311.827 C 781.986 346.301, 781.747 359.198, 780.861 361.335 C 780.094 363.188, 778.201 364.876, 775.582 366.042 C 771.545 367.839, 771.916 367.859, 809.530 367.929 L 847.560 368 849.301 357.750 C 850.259 352.113, 851.316 346.375, 851.651 345 C 852.012 343.518, 850.623 344.990, 848.238 348.617 C 844.160 354.818, 840.334 358.299, 834 361.572 C 831.186 363.026, 827.378 363.466, 814.577 363.814 C 800.057 364.210, 798.537 364.088, 797.327 362.433 C 796.314 361.047, 796 355.084, 796 337.213 L 796 313.808 809.797 314.154 C 825.650 314.552, 827.929 315.428, 831.062 322.328 L 832.956 326.500 832.956 312 L 832.956 297.500 831.115 301.500 C 828.107 308.033, 825.332 309, 809.596 309 L 796 309 796 286 L 796 263 811.322 263 C 822.657 263, 827.849 263.411, 831.276 264.579 C 836.575 266.384, 842.120 271.924, 844.095 277.385 C 844.814 279.373, 845.671 281, 845.999 281 C 846.616 281, 845.405 265.246, 844.482 261.250 L 843.962 259 807.731 259.090 C 784.641 259.148, 772.618 259.505, 774.581 260.075  M 591.341 277.607 C 590.952 278.648, 586.666 289.127, 581.817 300.893 C 576.968 312.660, 573 322.672, 573 323.143 C 573 323.615, 581.823 324, 592.607 324 C 607.894 324, 612.103 323.725, 611.712 322.750 C 606.567 309.953, 592.684 276.398, 592.413 276.107 C 592.212 275.891, 591.729 276.566, 591.341 277.607 "/>
+  </symbol>
+</svg>
+
+<nav class="nav" aria-label="Page">
+  <div class="wrap">
+    <a class="lockup" href="/" aria-label="Hayes Systems home">
+      <svg class="mark-art" aria-hidden="true"><use href="#mark"/></svg>
+      <span class="divider"></span>
+      <span class="words">
+        <svg class="hayes-art" aria-hidden="true"><use href="#word-hayes"/></svg>
+        <span class="systems">SYSTEMS</span>
+      </span>
+    </a>
+    <a class="link" href="#how">How it works</a>
+    <a class="link" href="#what">What we do</a>
+    <a class="link" href="#faq">Questions</a>
+    <span class="sp"></span>
+    <a class="btn btn-ghost-d" href="#signin">Sign in</a>
+    <a class="btn btn-azure" href="/fub-app.html?new=1">Connect Follow Up Boss</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="badge"><i aria-hidden="true"></i>For teams on Follow Up Boss</span>
+      <h1>Your dormant Follow Up Boss leads, back on your calendar.</h1>
+      <p class="sub">Hayes Systems runs the reactivation for you. We email every workable lead in your Follow Up Boss, call the ones who ask, and book them onto your Follow Up Boss calendar. You pay per appointment.</p>
+      <div class="cta-row">
+        <a class="btn btn-ice" href="/fub-app.html?new=1">Connect Follow Up Boss <span class="chip" aria-hidden="true">&rarr;</span></a>
+        <a class="btn btn-ghost-d" href="#how">See how it works</a>
       </div>
-      <div class="msg ok" id="signinOk">Check your inbox. The link signs you in and is good for 30 minutes.</div>
-      <div class="msg bad" id="signinErr"></div>
+      <p class="note">Setup is an API key from Follow Up Boss and a card on file. Nothing to install.</p>
+    </div>
+
+    <div class="shot" role="img" aria-label="Sample view of the Hayes Systems app: a campaign summary with emailed, replied and booked counts, an assistant recap, and upcoming appointments.">
+      <span class="tag" aria-hidden="true">Sample data</span>
+      <div class="win" aria-hidden="true">
+        <div class="side">
+          <div class="b">HAYES SYSTEMS</div>
+          <div class="i on"><span></span>Campaign</div>
+          <div class="i"><span></span>Leads</div>
+          <div class="i"><span></span>Appointments</div>
+          <div class="i"><span></span>Reports</div>
+          <div class="i"><span></span>Settings</div>
+        </div>
+        <div class="main">
+          <div class="mtop">
+            <div class="t">Summit Realty<small>Reactivation &middot; week 3 of 6</small></div>
+            <div class="go">Pause</div>
+          </div>
+          <div class="tiles">
+            <div class="tile"><small>Workable</small><b>1,284</b></div>
+            <div class="tile"><small>Emailed</small><b>1,190</b></div>
+            <div class="tile"><small>Replies</small><b>61</b></div>
+            <div class="tile up"><small>Booked</small><b>14</b></div>
+          </div>
+          <div class="ai"><i></i><div><b>Assistant recap</b> &middot; 9 leads asked to be called back this week. 6 are booked; 3 asked for early next week and sit in the callback queue.</div></div>
+          <div class="rows">
+            <div class="r h"><span>Upcoming</span><span>When</span><span>Status</span></div>
+            <div class="r"><span>Daniel R.</span><span>Tue 10:30 AM</span><span class="st">Confirmed</span></div>
+            <div class="r"><span>Priya S.</span><span>Tue 2:00 PM</span><span class="st">Confirmed</span></div>
+            <div class="r"><span>Marcus L.</span><span>Wed 11:15 AM</span><span class="st w">Reschedule</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap after" id="signin">
+  <div class="card">
+    <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+    <h3>Sign in</h3>
+    <p>Enter the email on your Hayes Systems account and we'll send a link that signs you in.</p>
+    <form id="signinForm" novalidate style="margin-top:14px">
+      <label for="signinEmail">Email</label>
+      <div class="frow">
+        <input type="email" id="signinEmail" autocomplete="email" placeholder="you@yourcompany.com">
+        <button class="btn btn-azure" type="submit" id="signinBtn">Send link</button>
+      </div>
+      <div class="msg ok" id="signinOk" role="status">Check your inbox. The link signs you in and is good for 30 minutes.</div>
+      <div class="msg bad" id="signinErr" role="alert"></div>
     </form>
   </div>
-
   <div class="card">
-    <h2>How it works</h2>
-    <ol>
-      <li><strong>Create an API key.</strong> In Follow Up Boss, open Admin, then API, then Generate a new key.</li>
-      <li><strong>Paste it into Hayes Systems.</strong> Add a card through Stripe's secure page and request your campaign.</li>
-      <li><strong>We run it start to finish.</strong> Follow the whole campaign in the Hayes Systems app, and a closeout report arrives by email when it wraps.</li>
-    </ol>
+    <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+    <h3>Email first. Calls only on reply.</h3>
+    <p>Every lead gets a personalized email. Calls go only to leads who reply and ask for one. No one is ever called cold.</p>
   </div>
-
   <div class="card">
-    <h2>What we do</h2>
-    <ul>
-      <li><strong>Clean and import your list.</strong> Duplicates, dead numbers, and junk entries are removed before anything is contacted.</li>
-      <li><strong>Run the outreach sequence.</strong> A personalized email first, and calls only to leads who reply and ask for one. No one is ever called cold, and every call opens by saying it's an AI assistant.</li>
-      <li><strong>Book the appointment.</strong> Leads who want to talk get booked onto your Follow Up Boss calendar, with your own reminders.</li>
-      <li><strong>Report everything.</strong> Follow the whole campaign in the app, and a full closeout report arrives by email when it wraps.</li>
-    </ul>
+    <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4M8 15l3 3 5-6"/></svg></div>
+    <h3>Appointments land in Follow Up Boss.</h3>
+    <p>Leads who want to talk get booked onto your Follow Up Boss calendar, with your own reminders.</p>
   </div>
-
-  <div class="two">
-    <div class="card">
-      <h2>What the connection can do</h2>
-      <p>The key acts with the permissions of the Follow Up Boss user who created it. We use it to read your leads for the campaign and to read and book your calendar. Nothing else in your account changes, and your team keeps working the way they already do. Revoke the key any time under Admin, then API.</p>
-    </div>
-    <div class="card">
-      <h2>What you pay</h2>
-      <p>You pay per appointment that lands on your calendar. No subscription, no setup fee. The full cost picture is on the <a href="/how-it-works.html">how it works</a> page.</p>
-    </div>
-  </div>
-  <div class="two" style="margin-top:22px">
-    <div class="card">
-      <h2>Stopping</h2>
-      <p>Any time, by email to <a href="mailto:Matt@hayessystems.com">Matt@hayessystems.com</a> or from inside the app. Outreach and booking stop the same day, and appointments already on your calendar stay booked. At closeout we delete our copy of your key and your lead data. Opt-outs stay honored permanently. The full policy is on the <a href="/cancellation.html">cancellation page</a>.</p>
-    </div>
-    <div class="card">
-      <h2>Your lead data</h2>
-      <p>Lead information is used solely to run your campaign: hygiene, outreach, consented calls, appointment booking, and reporting. When your engagement ends, lead data is removed with opt-out suppression retained, so a lead who asked to stop is never contacted again. More in the <a href="/privacy.html">privacy policy</a> and the <a href="/terms.html">data agreement</a>.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Questions</h2>
-    <div class="qa">
-      <h3>Do I need to install anything in Follow Up Boss?</h3>
-      <p>No. You create an API key under Admin, then API, and paste it into Hayes Systems. Nothing is installed in your account and nothing changes for your team. You can revoke the key yourself at any time, which cuts our access off immediately.</p>
-    </div>
-    <div class="qa">
-      <h3>What can you see and change?</h3>
-      <p>We read your leads to build the campaign list, and we read and book your calendar so appointments land in Follow Up Boss with your own reminders. We do not edit leads, change pipelines, or send anything from your Follow Up Boss account.</p>
-    </div>
-    <div class="qa">
-      <h3>Who gets contacted?</h3>
-      <p>Leads who inquired and went quiet. Every one gets a personalized email first. Calls go only to leads who reply and ask for one, and anyone who opts out is never contacted again.</p>
-    </div>
-    <div class="qa">
-      <h3>What happens to my data afterward?</h3>
-      <p>At closeout we delete our copy of your key and your lead data, keeping only opt-out suppression so a lead who asked to stop stays stopped. You revoke the key under Admin, then API. Details are in our <a href="/terms.html">data agreement</a>.</p>
-    </div>
-    <div class="qa">
-      <h3>What does it cost?</h3>
-      <p>You pay per appointment that lands on your calendar. Nothing upfront, nothing monthly, nothing per message, and a no-show is refunded on your report. The full picture is on the <a href="/how-it-works.html">how it works</a> page.</p>
-    </div>
-  </div>
-
-  <a class="back" href="/">← Back to hayessystems.com</a>
-  <p class="fine">Follow Up Boss is a trademark of Follow Up Boss, Inc. Hayes Systems is an independent service and is not affiliated with or endorsed by Follow Up Boss.</p>
 </div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow">How it works</span><h2>Three steps. Then we run it.</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n" aria-hidden="true">1</div><h3>Create an API key.</h3><p>In Follow Up Boss, open Admin, then API, then Generate a new key.</p></div>
+      <div class="step"><div class="n" aria-hidden="true">2</div><h3>Paste it into Hayes Systems.</h3><p>Add a card through Stripe's secure page and request your campaign.</p></div>
+      <div class="step"><div class="n" aria-hidden="true">3</div><h3>We run it start to finish.</h3><p>Follow the whole campaign in the Hayes Systems app, and a closeout report arrives by email when it wraps.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="what" class="soft">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow">What we do</span><h2>One campaign, handled for you.</h2></div>
+    <div class="feats">
+      <div class="card"><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h12M4 18h8M18 16l2 2 3-4"/></svg></div><h3>Clean and import your list.</h3><p>Duplicates, dead numbers, and junk entries are removed before anything is contacted.</p></div>
+      <div class="card"><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></div><h3>Run the outreach sequence.</h3><p>A personalized email first, and calls only to leads who reply and ask for one. Every call opens by saying it's an AI assistant.</p></div>
+      <div class="card"><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4M8 15l3 3 5-6"/></svg></div><h3>Book the appointment.</h3><p>Leads who want to talk get booked onto your Follow Up Boss calendar, with your own reminders.</p></div>
+      <div class="card"><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></div><h3>Report everything.</h3><p>Follow the whole campaign in the app, and a full closeout report arrives by email when it wraps.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pay" class="soft">
+  <div class="wrap pay">
+    <div><span class="eyebrow">What you pay</span><h2 style="margin-top:10px">Per appointment. Nothing else.</h2><p>No subscription, no setup fee, nothing per message. The full cost picture is on the <a class="tx" href="/how-it-works.html">how it works page</a>.</p></div>
+    <a class="btn btn-azure" href="/fub-app.html?new=1">Connect Follow Up Boss <span class="chip" style="background:#fff;color:var(--azure);width:26px;height:26px;font-size:13px" aria-hidden="true">&rarr;</span></a>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow">Questions</span><h2>What teams ask before they connect.</h2></div>
+    <div class="faq">
+      <div class="q open"><button type="button" aria-expanded="true" aria-controls="faq-a1">Do I need to install anything in Follow Up Boss?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><div class="a" id="faq-a1" role="region"><p>No. You create an API key under Admin, then API, and paste it into Hayes Systems. Nothing is installed in your account and nothing changes for your team. You can revoke the key yourself at any time, which cuts our access off immediately.</p></div></div>
+      <div class="q"><button type="button" aria-expanded="false" aria-controls="faq-a2">What can you see and change?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><div class="a" id="faq-a2" role="region"><p>We read your leads to build the campaign list, and we read and book your calendar so appointments land in Follow Up Boss with your own reminders. We do not edit leads, change pipelines, or send anything from your Follow Up Boss account.</p></div></div>
+      <div class="q"><button type="button" aria-expanded="false" aria-controls="faq-a3">Who gets contacted?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><div class="a" id="faq-a3" role="region"><p>Leads who inquired and went quiet. Every one gets a personalized email first. Calls go only to leads who reply and ask for one, and anyone who opts out is never contacted again.</p></div></div>
+      <div class="q"><button type="button" aria-expanded="false" aria-controls="faq-a4">What happens to my data afterward?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><div class="a" id="faq-a4" role="region"><p>At closeout we delete our copy of your key and your lead data, keeping only opt-out suppression so a lead who asked to stop stays stopped. You revoke the key under Admin, then API. Details are in our <a class="tx" href="/terms.html">data agreement</a>.</p></div></div>
+      <div class="q"><button type="button" aria-expanded="false" aria-controls="faq-a5">What does it cost?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><div class="a" id="faq-a5" role="region"><p>You pay per appointment that lands on your calendar. Nothing upfront, nothing monthly, nothing per message, and a no-show is refunded on your report. The full picture is on the <a class="tx" href="/how-it-works.html">how it works</a> page.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="lockup" href="/" aria-label="Hayes Systems home">
+        <svg class="mark-art" aria-hidden="true"><use href="#mark"/></svg>
+        <span class="divider"></span>
+        <span class="words">
+          <svg class="hayes-art" aria-hidden="true"><use href="#word-hayes"/></svg>
+          <span class="systems">SYSTEMS</span>
+        </span>
+      </a>
+      <p>Follow Up Boss is a trademark of Follow Up Boss, Inc. Hayes Systems is an independent service and is not affiliated with or endorsed by Follow Up Boss.</p>
+    </div>
+    <nav aria-label="Site">
+      <a href="/how-it-works.html">The process</a>
+      <a href="/privacy.html">Privacy policy</a>
+      <a href="/cancellation.html">Cancellation</a>
+      <a href="mailto:Matt@hayessystems.com">Contact</a>
+    </nav>
+  </div>
+</footer>
+
 <script>
 (function(){
-  var API = 'https://ops.hayessystems.com';
+  // Questions: one answer open at a time
+  var qs = document.querySelectorAll('.q');
+  Array.prototype.forEach.call(qs, function(q){
+    var b = q.querySelector('button');
+    if (!b) return;
+    b.addEventListener('click', function(){
+      var was = q.classList.contains('open');
+      Array.prototype.forEach.call(qs, function(o){
+        o.classList.remove('open');
+        o.querySelector('button').setAttribute('aria-expanded', 'false');
+      });
+      if (!was) { q.classList.add('open'); b.setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  // Sign in: POSTs the address; the server answers ok for every well-formed
+  // address, so nothing on this page reveals whether an address has an account
   var form = document.getElementById('signinForm');
   if (!form) return;
+  var API = 'https://ops.hayessystems.com';
   var em = document.getElementById('signinEmail');
   var btn = document.getElementById('signinBtn');
   var ok = document.getElementById('signinOk');
@@ -187,6 +404,8 @@ input:focus{outline:none;border-color:var(--gold)}
       fail('Enter the email address on your Hayes Systems account.'); return;
     }
     err.style.display = 'none';
+    // hold the button's box while the label changes ( Sending is shorter )
+    btn.style.minWidth = btn.offsetWidth + 'px';
     btn.disabled = true;
     var label = btn.textContent;
     btn.textContent = 'Sending';
@@ -199,8 +418,7 @@ input:focus{outline:none;border-color:var(--gold)}
     }).catch(function(){ return {status: 0, j: null}; }).then(function(r){
       btn.disabled = false;
       btn.textContent = label;
-      // the server answers ok for every well-formed address: no one can
-      // learn from this page whether an address has an account
+      btn.style.minWidth = '';
       if (r.status === 429) { fail((r.j && r.j.message) || 'Too many requests. Wait a moment and try again.'); return; }
       if (r.status === 400) { fail((r.j && r.j.message) || 'Check the address and try again.'); return; }
       if (r.status !== 200) { fail('We could not send the link just now. Try again in a moment.'); return; }
@@ -212,5 +430,6 @@ input:focus{outline:none;border-color:var(--gold)}
   em.addEventListener('input', function(){ err.style.display = 'none'; });
 })();
 </script>
+<noscript><style>.q .a{max-height:none !important;visibility:visible !important}</style></noscript>
 </body>
 </html>
