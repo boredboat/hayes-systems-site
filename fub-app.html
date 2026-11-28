@@ -607,6 +607,10 @@ body{padding:0}
   <span class="barlink" id="settingsLink">Settings</span>
   <span class="barlink" id="retainerAdLink">Retainer service</span>
   <span class="barlink" id="contactLink">Contact us</span>
+  <!-- client accounts (client-accounts-2026-11 Card B, BRIEF 5.7): the
+       standalone header's Sign out control. Hidden by default; the boot
+       shows it only for a 4-part (account session) page token. -->
+  <span class="barlink hide" id="signOutLink">Sign out</span>
 </div></div>
 
 <div class="wrap">
@@ -1290,6 +1294,10 @@ body{padding:0}
 <div class="ob-card hide" id="fubOpenCard" style="max-width:500px">
   <h2 style="font-size:21px;margin-bottom:6px" id="fubOpenTitle">Sign in to Hayes Systems</h2>
   <p style="font-size:14px;color:#4b5563;margin:0 0 18px" id="fubOpenBody">Enter the email on your Hayes Systems account. We'll send you a link that signs you in.</p>
+  <!-- client accounts (Card B, BRIEF 5.7 step 2): the fub-session 404/409
+       message, or "Your session ended. Sign in again." after a dead
+       account session. Quiet, never blocking the two doors below. -->
+  <div class="notice-card hide" id="fubOpenNote" style="border-left-color:#188bf6;margin:0 0 18px"></div>
   <div id="fubSigninWrap">
     <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
       <div class="ob-field" style="flex:1 1 240px;margin:0"><input id="fubSigninEmail" type="email" autocomplete="email" placeholder="you@yourcompany.com" aria-label="Email on your Hayes Systems account"></div>
@@ -1871,6 +1879,12 @@ function _keyDialogSubmit(){
       .then(function(j){ return {status: r.status, j: j}; });
   }).catch(function(){ return {status: 0, j: null}; }).then(function(r){
     if (r.status === 200 && r.j && r.j.ok && r.j.boot) {
+      // client accounts (Card B): same first-visit invite flag as the
+      // front door's key row (see _wireKeyConnect)
+      if (r.j.invite) {
+        try { sessionStorage.setItem('fubob:invite_note', '1'); }
+        catch (e) {}
+      }
       inp.value = '';
       location.replace(location.pathname + '?boot='
                        + encodeURIComponent(r.j.boot));
@@ -3000,6 +3014,15 @@ $('contactLink').addEventListener('click', function(){ window.open('mailto:suppo
 var _rebootN = 0, _rebootAt = 0;
 function _sessionReboot(){
   if (!PAGE.live) return;
+  // client accounts (Card B, BRIEF 5.7 step 3): a 4-part page token is
+  // bound to an account session, so the legacy replay below has no
+  // identity to re-exchange and would only loop. Clear the token, run
+  // the account session boot once more, and when the account is signed
+  // out land on the front door with the ended-session note.
+  if (PAGE.token && String(PAGE.token).split('|').length === 4) {
+    _accountSessionEnded();
+    return;
+  }
   var nowMs = Date.now();
   if (_rebootN >= 3 || (nowMs - _rebootAt) < 10000) return;
   _rebootAt = nowMs; _rebootN++;
@@ -3017,6 +3040,25 @@ function _sessionReboot(){
         loadPageData();
       }
     }).catch(function(){});
+}
+
+// client accounts (Card B): the account session behind a 4-part page
+// token just 401'd. Stop the data flow, run the session boot once more
+// (it re-mints a fresh token when the session is still live, and shows
+// the front door with the ended-session note when it is not). One shot
+// per page load; the boot owns everything after this.
+function _accountSessionEnded(){
+  if (window.__ACCOUNT_ENDED) return;
+  window.__ACCOUNT_ENDED = true;
+  try { PAGE.token = ''; PAGE.live = false; } catch (e) {}
+  try {
+    if (_steadyT) { clearTimeout(_steadyT); _steadyT = null; }
+  } catch (e) {}
+  try {
+    var _soE = $('signOutLink');
+    if (_soE) _soE.classList.add('hide');
+  } catch (e) {}
+  if (window.__accountSessionBoot) window.__accountSessionBoot(true);
 }
 
 function loadPageData(){
@@ -3583,6 +3625,31 @@ function _paneRender(){
       document.body.classList.remove('boot-loading');
       document.getElementById('bootSpinner').classList.add('hide');
     } catch (e) {}
+    // client accounts (Card B): the Sign out control rides the standalone
+    // header for 4-part (account session) page tokens only. Legacy
+    // 3-part boots (boot code, key connect, pane) keep today's header.
+    try {
+      var _so = $('signOutLink');
+      if (_so) {
+        if (String(d.token || '').split('|').length === 4) {
+          _so.classList.remove('hide');
+        } else {
+          _so.classList.add('hide');
+        }
+      }
+    } catch (e) {}
+    // The first-visit invite notice (Card B): the connect-key response
+    // carried "invite", the flag survived the reload, and the boot has
+    // landed. One quiet toast, never blocking anything.
+    try {
+      if (sessionStorage.getItem('fubob:invite_note') === '1') {
+        sessionStorage.removeItem('fubob:invite_note');
+        setTimeout(function(){
+          toast('We emailed you a link to create a sign-in, so you'
+                 + ' can come back without a new link.');
+        }, 600);
+      }
+    } catch (e) {}
     loadPageData().then(_steadyStart);
   }
   window.__bootFallbackArm = function(){};
@@ -3649,8 +3716,12 @@ function _paneRender(){
     else { el.textContent = ''; el.classList.add('hide'); }
   }
   function _fdPost(path, body){
+    // credentials ride along: the /api/auth/fub-session exchange is
+    // cookie-only (client accounts, Card B); the public doors ignore
+    // whatever cookie happens to travel
     return fetch(API + path, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', credentials: 'include',
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
     }).then(function(r){
       return r.json().catch(function(){ return null; })
@@ -3720,6 +3791,13 @@ function _paneRender(){
         if (r.status === 200 && r.j && r.j.ok && r.j.boot) {
           // a fresh load through the proven ?boot= path: the one-time
           // code exchanges for the page token at /api/fub/session
+          // client accounts (Card B): a first-time connect carries an
+          // emailed sign-in invite; remember it across the reload so
+          // the landing boot can say so, once, quietly
+          if (r.j.invite) {
+            try { sessionStorage.setItem('fubob:invite_note', '1'); }
+            catch (e) {}
+          }
           inp.value = '';
           location.replace(location.pathname + '?boot='
                            + encodeURIComponent(r.j.boot));
@@ -3767,18 +3845,74 @@ function _paneRender(){
     _wireKeyConnect();
     return;
   }
-  // BARE VISIT: the standalone front door - sign-in link for returning
-  // clients, API-key connect for new ones (never demo data for FUB)
-  window.__LIVE_BOOT = false;
-  window.__DEMO_LOCKED = true;
-  document.body.classList.add('boot-loading');
-  document.getElementById('bootSpinner').classList.add('hide');
-  $('fubOpenCard').classList.remove('hide');
-  ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
-    var el = $(id); if (el) el.classList.add('hide');
+  // BARE VISIT (client accounts, Card B, BRIEF 5.7): the account session
+  // is asked first. Signed out: the front door exactly as today. Signed
+  // in: POST /api/auth/fub-session exchanges the session for the 4-part
+  // page token and the panel boots on it. A 404/409 answer is the front
+  // door plus the server's own message; anything else falls to the
+  // front door too. The boot parks on the loading spinner (the
+  // paint-park at the bottom of this script) until the answer lands.
+  function _frontDoor(msg){
+    window.__LIVE_BOOT = false;
+    window.__DEMO_LOCKED = true;
+    document.body.classList.add('boot-loading');
+    document.getElementById('bootSpinner').classList.add('hide');
+    $('fubOpenCard').classList.remove('hide');
+    ['heroBand','spine','tabsCard','actRow'].forEach(function(id){
+      var el = $(id); if (el) el.classList.add('hide');
+    });
+    _fdMsg('fubOpenNote', msg || '');
+    _wireSignin();
+    _wireKeyConnect();
+  }
+  function _accountSessionBoot(again){
+    window.__LIVE_BOOT = true;
+    window.__accountSessionBoot = _accountSessionBoot;
+    fetch(API + '/api/auth/me', {credentials: 'include'})
+      .then(function(r){
+        return r.json().catch(function(){ return null; })
+          .then(function(j){ return {status: r.status, j: j}; });
+      })
+      .catch(function(){ return {status: 0, j: null}; })
+      .then(function(r){
+        if (!r.j || !r.j.ok) {
+          _frontDoor(again ? 'Your session ended. Sign in again.' : '');
+          return;
+        }
+        _fdPost('/api/auth/fub-session', {}).then(function(fr){
+          if (fr.status === 200 && fr.j && fr.j.ok && fr.j.token) {
+            _bootOk(fr.j);
+            return;
+          }
+          if (fr.status === 404 || fr.status === 409) {
+            _frontDoor((fr.j && fr.j.message) || '');
+            return;
+          }
+          _frontDoor('');
+        });
+      });
+  }
+  _accountSessionBoot(false);
+})();
+
+// client accounts (Card B, BRIEF 5.7 step 5): the header's Sign out
+// control. POST /api/auth/logout, then the sign-in page. The control is
+// only ever shown for a 4-part (account session) page token; pane mode
+// and legacy boots never see the bar link at all.
+(function(){
+  var so = $('signOutLink');
+  if (!so) return;
+  so.addEventListener('click', function(){
+    so.style.pointerEvents = 'none';
+    fetch(API + '/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {'Content-Type': 'application/json'},
+      body: '{}'
+    }).catch(function(){}).then(function(){
+      location.assign('/login.html');
+    });
   });
-  _wireSignin();
-  _wireKeyConnect();
 })();
 
 // ONBOARDING GATE (Matt 10/25: nobody gets buttons or charges before they
